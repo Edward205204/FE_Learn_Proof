@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "noUnusedLocals": true, // cảnh báo nếu khai báo biến mà không dùng lint lỗi
+    "noUnusedParameters": true, // cảnh báo nếu tham số không đc sử dụng -> lint lỗi
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,16 +21,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts", "**/*.mts"],
   "exclude": ["node_modules"]
 }
