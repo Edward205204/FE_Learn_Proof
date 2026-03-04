@@ -3,13 +3,13 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { LoginInput, LoginSchema } from "./_utils/zod";
-import GoogleIcon from "@/components/common/google-icon";
+import { LoginSchema, LoginInput } from "@/lib/validations/auth";
 
 export default function LoginPage() {
   // 1. Khởi tạo Form
@@ -79,7 +79,7 @@ export default function LoginPage() {
                 <FormItem>
                   <div className="flex items-center justify-between">
                     <FormLabel className="text-foreground font-medium">Mật khẩu</FormLabel>
-                    <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                    <Link href="/forgot-password" size="sm" className="text-xs text-muted-foreground hover:text-primary transition-colors">
                       Quên mật khẩu?
                     </Link>
                   </div>
@@ -122,7 +122,7 @@ export default function LoginPage() {
           type="button"
           className="w-full border-border rounded-md py-6 flex gap-3 items-center hover:bg-accent hover:text-accent-foreground transition-all"
         >
-          <GoogleIcon size={22} />
+          <FcGoogle size={22} />
           <span className="font-medium">Google</span>
         </Button>
 

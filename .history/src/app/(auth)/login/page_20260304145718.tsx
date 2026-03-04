@@ -79,7 +79,7 @@ export default function LoginPage() {
                 <FormItem>
                   <div className="flex items-center justify-between">
                     <FormLabel className="text-foreground font-medium">Mật khẩu</FormLabel>
-                    <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                    <Link href="/forgot-password" size="sm" className="text-xs text-muted-foreground hover:text-primary transition-colors">
                       Quên mật khẩu?
                     </Link>
                   </div>
