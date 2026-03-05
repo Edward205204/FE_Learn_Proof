@@ -5,7 +5,8 @@ const authApi = {
   login: (body: { email: string; password: string }) => http.post<AuthResponse>('/auth/login', body),
   register: (body: { email: string; fullName: string; password: string; confirmPassword: string; code: string }) =>
     http.post<AuthResponse>('/auth/register', body),
-  sendOtpRegister: (body: { email: string }) => http.post<{ message: string }>('/auth/otp/register', body)
+  sendOtpRegister: (body: { email: string }) => http.post<{ message: string }>('/auth/otp/register', body),
+  forgotPassword: (body: { email: string }) => http.post<{ message: string }>('/auth/forgot-password', body)
 }
 
 export default authApi

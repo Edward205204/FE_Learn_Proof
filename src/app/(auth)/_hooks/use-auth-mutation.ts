@@ -33,3 +33,12 @@ export function useSendOtpMutation() {
     }
   })
 }
+
+export function useForgotPasswordMutation() {
+  return useMutation({
+    mutationFn: authApi.forgotPassword,
+    onSuccess: (response) => {
+      toast.success(response.data.message || 'Yêu cầu đặt lại mật khẩu đã được gửi!')
+    }
+  })
+}
