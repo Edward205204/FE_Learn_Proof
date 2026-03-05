@@ -36,6 +36,32 @@ export const RegisterSchema = z
     }
   })
 
+export const ForgotPasswordSchema = z
+  .object({
+    email: z.string().trim().min(1, 'Email là bắt buộc').max(255, 'Email quá dài').email('Email không đúng định dạng')
+  })
+  .strict()
+
+export const ResetPasswordSchema = z
+  .object({
+    password: PasswordSchema,
+    confirmPassword: PasswordSchema
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Mật khẩu và xác nhận mật khẩu không khớp',
+        path: ['confirmPassword']
+      })
+    }
+  })
+
+export type ResetPasswordInput = z.infer<typeof ResetPasswordSchema>
+
+export type ForgotPasswordInput = z.infer<typeof ForgotPasswordSchema>
+
 export type RegisterInput = z.infer<typeof RegisterSchema>
 
 export type LoginInput = z.infer<typeof LoginSchema>
