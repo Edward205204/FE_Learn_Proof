@@ -13,6 +13,7 @@ import GoogleIcon from '@/components/common/google-icon'
 import { useLoginMutation } from '../_hooks/use-auth-mutation'
 import { HttpStatusCode } from '@/constants/http-status'
 import { ApiErrorResponse, ApiFieldError } from '../_types/auth'
+import { useGoogleLogin } from '../_hooks/use-google-login'
 
 export default function LoginPage() {
   const loginMutation = useLoginMutation()
@@ -124,9 +125,10 @@ export default function LoginPage() {
           variant='outline'
           type='button'
           className='w-full border-border rounded-md py-6 flex gap-3 items-center hover:bg-accent hover:text-accent-foreground transition-all'
+          onClick={useGoogleLogin}
         >
           <GoogleIcon size={22} />
-          <span className='font-medium'>Google</span>
+          <span className='font-medium'>Đăng nhập với Google</span>
         </Button>
 
         <p className='text-center text-sm text-muted-foreground mt-8'>

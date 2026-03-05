@@ -1,5 +1,12 @@
 import * as z from 'zod'
 
+const EmailSchema = z
+  .string()
+  .trim()
+  .min(1, 'Email là bắt buộc')
+  .max(255, 'Email quá dài')
+  .email('Email không đúng định dạng')
+
 const PasswordSchema = z
   .string()
   .min(1, 'Mật khẩu là bắt buộc')
@@ -11,15 +18,14 @@ const PasswordSchema = z
 
 export const LoginSchema = z
   .object({
-    email: z.string().trim().min(1, 'Email là bắt buộc').max(255, 'Email quá dài').email('Email không đúng định dạng'),
-
+    email: EmailSchema,
     password: PasswordSchema
   })
   .strict()
 
 export const RegisterSchema = z
   .object({
-    email: z.string().trim().min(1, 'Email là bắt buộc').max(255, 'Email quá dài').email('Email không đúng định dạng'),
+    email: EmailSchema,
     fullName: z.string().trim().min(1, 'Tên là bắt buộc').max(255, 'Tên quá dài'),
     password: PasswordSchema,
     confirmPassword: PasswordSchema,
@@ -38,12 +44,43 @@ export const RegisterSchema = z
 
 export const ForgotPasswordSchema = z
   .object({
-    email: z.string().trim().min(1, 'Email là bắt buộc').max(255, 'Email quá dài').email('Email không đúng định dạng')
+    email: EmailSchema
   })
   .strict()
 
+export const SendOtpBodySchema = z
+  .object({
+    email: EmailSchema
+  })
+  .strict()
+
+export const ForgotPasswordVerifyBodySchema = z
+  .object({
+    email: EmailSchema,
+    code: z.string().trim().length(6, 'Mã otp không đúng định dạng')
+  })
+  .strict()
+
+export const ResetPasswordBodySchema = z
+  .object({
+    email: EmailSchema,
+    password: PasswordSchema,
+    confirmPassword: PasswordSchema
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Mật khẩu và xác nhận mật khẩu không khớp',
+        path: ['confirmPassword']
+      })
+    }
+  })
+
+export type ForgotPasswordVerifyInput = z.infer<typeof ForgotPasswordVerifyBodySchema>
+export type SendOtpInput = z.infer<typeof SendOtpBodySchema>
 export type ForgotPasswordInput = z.infer<typeof ForgotPasswordSchema>
-
 export type RegisterInput = z.infer<typeof RegisterSchema>
-
 export type LoginInput = z.infer<typeof LoginSchema>
+export type ResetPasswordInput = z.infer<typeof ResetPasswordBodySchema>

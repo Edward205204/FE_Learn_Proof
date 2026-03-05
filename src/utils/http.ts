@@ -9,7 +9,7 @@ class Http {
 
   constructor() {
     this.instance = axios.create({
-      baseURL: config.baseURL,
+      baseURL: config.BE_URL,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json'

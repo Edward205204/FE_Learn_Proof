@@ -42,3 +42,20 @@ export function useForgotPasswordMutation() {
     }
   })
 }
+
+export function useForgotPasswordVerifyMutation() {
+  return useMutation({
+    mutationFn: authApi.forgotPasswordVerify
+  })
+}
+
+export function useResetPasswordMutation() {
+  const router = useRouter()
+  return useMutation({
+    mutationFn: authApi.resetPassword,
+    onSuccess: (response) => {
+      toast.success(response.data.message || 'Mật khẩu đã được đặt lại thành công!')
+      router.push('/login')
+    }
+  })
+}
