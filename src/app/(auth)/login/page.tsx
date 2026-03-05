@@ -14,6 +14,7 @@ import { useLoginMutation } from '../_hooks/use-auth-mutation'
 import { HttpStatusCode } from '@/constants/http-status'
 import { ApiErrorResponse, ApiFieldError } from '../_types/auth'
 import { useGoogleLogin } from '../_hooks/use-google-login'
+import { PATH } from '@/constants/path'
 
 export default function LoginPage() {
   const loginMutation = useLoginMutation()
@@ -82,7 +83,7 @@ export default function LoginPage() {
                   <div className='flex items-center justify-between'>
                     <FormLabel className='text-foreground font-medium'>Mật khẩu</FormLabel>
                     <Link
-                      href='/forgot-password'
+                      href={PATH.FORGOT_PASSWORD}
                       className='text-xs text-muted-foreground hover:text-primary transition-colors'
                     >
                       Quên mật khẩu?
@@ -133,7 +134,7 @@ export default function LoginPage() {
 
         <p className='text-center text-sm text-muted-foreground mt-8'>
           Chưa có tài khoản?{' '}
-          <Link href='/register' className='text-primary font-semibold hover:underline'>
+          <Link href={PATH.REGISTER} className='text-primary font-semibold hover:underline'>
             Đăng ký ngay
           </Link>
         </p>

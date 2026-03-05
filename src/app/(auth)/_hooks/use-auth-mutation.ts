@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import authApi from '@/app/(auth)/_api/auth.api'
+import { PATH } from '@/constants/path'
 
 export function useLoginMutation() {
   const router = useRouter()
@@ -55,7 +56,7 @@ export function useResetPasswordMutation() {
     mutationFn: authApi.resetPassword,
     onSuccess: (response) => {
       toast.success(response.data.message || 'Mật khẩu đã được đặt lại thành công!')
-      router.push('/login')
+      router.push(PATH.LOGIN)
     }
   })
 }

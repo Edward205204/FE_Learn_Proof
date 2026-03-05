@@ -6,6 +6,7 @@ import { CheckCircle2, XCircle } from 'lucide-react'
 import { useAuthStore } from '@/store/auth.store'
 import authApi from '@/app/(auth)/_api/auth.api'
 import GoogleIcon from '@/components/common/google-icon'
+import { PATH } from '@/constants/path'
 
 type CallbackStatus = 'loading' | 'success' | 'error'
 
@@ -22,14 +23,14 @@ export default function GoogleCallbackPage() {
     if (errorMessage) {
       startTransition(() => setStatus('error'))
       toast.error(errorMessage)
-      setTimeout(() => router.replace('/login'), 2000)
+      setTimeout(() => router.replace(PATH.LOGIN), 2000)
       return
     }
 
     if (!accessToken || !refreshToken) {
       startTransition(() => setStatus('error'))
       toast.error('Đăng nhập thất bại. Vui lòng thử lại.')
-      setTimeout(() => router.replace('/login'), 2000)
+      setTimeout(() => router.replace(PATH.LOGIN), 2000)
       return
     }
 
@@ -39,11 +40,11 @@ export default function GoogleCallbackPage() {
         useAuthStore.getState().setAuth({ accessToken, refreshToken, user: response.data })
         setStatus('success')
         toast.success('Đăng nhập với Google thành công!')
-        setTimeout(() => router.replace('/'), 1000)
+        setTimeout(() => router.replace(PATH.HOME), 1000)
       })
       .catch(() => {
         setStatus('error')
-        setTimeout(() => router.replace('/login'), 2000)
+        setTimeout(() => router.replace(PATH.LOGIN), 2000)
       })
   }, [searchParams, router])
 

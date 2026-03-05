@@ -14,6 +14,7 @@ import { ForgotPasswordInput, ForgotPasswordSchema } from '../_utils/zod'
 import { useForgotPasswordMutation } from '../_hooks/use-auth-mutation'
 import { HttpStatusCode } from '@/constants/http-status'
 import { ApiErrorResponse, ApiFieldError } from '../_types/auth'
+import { PATH } from '@/constants/path'
 
 export default function ForgotPasswordPage() {
   const { countdown, start: startCountdown } = useCountdown(60)
@@ -51,7 +52,7 @@ export default function ForgotPasswordPage() {
       <div className='w-full max-w-md bg-card p-8 rounded-lg border border-border shadow-sm'>
         <div className='mb-8'>
           <Link
-            href='/login'
+            href={PATH.LOGIN}
             className='inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors mb-6'
           >
             <ChevronLeft size={16} className='mr-1' />

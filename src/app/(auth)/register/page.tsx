@@ -14,6 +14,7 @@ import { RegisterInput, RegisterSchema } from '../_utils/zod'
 import { useRegisterMutation, useSendOtpMutation } from '../_hooks/use-auth-mutation'
 import { ApiErrorResponse, ApiFieldError } from '../_types/auth'
 import { HttpStatusCode } from '@/constants/http-status'
+import { PATH } from '@/constants/path'
 
 export default function RegisterPage() {
   const { countdown, start: startCountdown } = useCountdown(60)
@@ -236,7 +237,7 @@ export default function RegisterPage() {
 
         <p className='text-center text-sm text-muted-foreground mt-6'>
           Đã có tài khoản?{' '}
-          <Link href='/login' className='text-primary font-semibold hover:underline'>
+          <Link href={PATH.LOGIN} className='text-primary font-semibold hover:underline'>
             Đăng nhập
           </Link>
         </p>

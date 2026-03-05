@@ -15,6 +15,7 @@ import { ResetPasswordBodySchema, ResetPasswordInput } from '../_utils/zod'
 import { useForgotPasswordVerifyMutation, useResetPasswordMutation } from '../_hooks/use-auth-mutation'
 import { HttpStatusCode } from '@/constants/http-status'
 import { ApiErrorResponse, ApiFieldError } from '../_types/auth'
+import { PATH } from '@/constants/path'
 
 type VerifyStatus = 'verifying' | 'valid' | 'invalid'
 
@@ -100,7 +101,7 @@ function ResetPasswordContent() {
             Liên kết đặt lại mật khẩu đã hết hạn hoặc không đúng. Vui lòng thử lại.
           </p>
           <Link
-            href='/forgot-password'
+            href={PATH.FORGOT_PASSWORD}
             className='inline-flex items-center gap-1.5 mt-6 text-sm font-semibold text-primary hover:underline'
           >
             <ChevronLeft size={15} />
@@ -177,7 +178,7 @@ function ResetPasswordContent() {
         </Form>
 
         <p className='text-center text-sm text-muted-foreground mt-6'>
-          <Link href='/login' className='inline-flex items-center gap-1 hover:text-primary transition-colors'>
+          <Link href={PATH.LOGIN} className='inline-flex items-center gap-1 hover:text-primary transition-colors'>
             <ChevronLeft size={14} />
             Quay lại đăng nhập
           </Link>
