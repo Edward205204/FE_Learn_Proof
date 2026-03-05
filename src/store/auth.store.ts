@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { User } from '@/@types/user'
+import { clearRoleCookie, setRoleCookie } from '@/utils/cookie'
 
 interface AuthState {
   user: User | null
@@ -16,8 +17,14 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       accessToken: '',
       refreshToken: '',
-      setAuth: ({ user, accessToken, refreshToken }) => set({ user, accessToken, refreshToken }),
-      clearAuth: () => set({ user: null, accessToken: '', refreshToken: '' })
+      setAuth: ({ user, accessToken, refreshToken }) => {
+        set({ user, accessToken, refreshToken })
+        setRoleCookie(user.role)
+      },
+      clearAuth: () => {
+        set({ user: null, accessToken: '', refreshToken: '' })
+        clearRoleCookie()
+      }
     }),
     {
       name: 'auth-storage',

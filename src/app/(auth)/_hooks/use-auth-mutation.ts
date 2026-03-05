@@ -10,7 +10,8 @@ export function useLoginMutation() {
     mutationFn: authApi.login,
     onSuccess: () => {
       toast.success('Đăng nhập thành công!')
-      router.push('/')
+      router.refresh()
+      router.replace(PATH.HOME)
     }
   })
 }
@@ -21,7 +22,8 @@ export function useRegisterMutation() {
     mutationFn: authApi.register,
     onSuccess: () => {
       toast.success('Đăng ký thành công!')
-      router.push('/')
+      router.refresh()
+      router.replace(PATH.HOME)
     }
   })
 }

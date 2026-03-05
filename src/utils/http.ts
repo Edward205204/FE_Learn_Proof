@@ -3,6 +3,7 @@ import { HttpStatusCode } from '@/constants/http-status'
 import { toast } from 'sonner'
 import { config } from '@/constants/config'
 import { useAuthStore } from '@/store/auth.store'
+import { PATH } from '@/constants/path'
 
 class Http {
   instance: AxiosInstance
@@ -49,7 +50,8 @@ class Http {
           toast.error(message)
 
           if (error.response?.status === HttpStatusCode.Unauthorized) {
-            useAuthStore.getState().clearAuth()
+            useAuthStore.getState().clearAuth() // clearAuth đã tự xóa cookie role
+            window.location.href = PATH.LOGIN
           }
         }
         return Promise.reject(error)
