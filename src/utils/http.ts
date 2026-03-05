@@ -27,7 +27,7 @@ class Http {
     this.instance.interceptors.response.use(
       (response) => {
         const { url } = response.config
-        if (url?.includes('/login') || url?.includes('/register')) {
+        if (url?.endsWith('/auth/login') || url?.endsWith('/auth/register')) {
           const { tokens, user } = response.data
           useAuthStore.getState().setAuth({
             accessToken: tokens.accessToken,

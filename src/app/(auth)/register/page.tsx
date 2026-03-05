@@ -4,8 +4,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,7 +16,6 @@ import { ApiErrorResponse, ApiFieldError } from '../_types/auth'
 import { HttpStatusCode } from '@/constants/http-status'
 
 export default function RegisterPage() {
-  const router = useRouter()
   const { countdown, start: startCountdown } = useCountdown(60)
   const registerMutation = useRegisterMutation()
   const sendOtpMutation = useSendOtpMutation()
@@ -30,25 +27,30 @@ export default function RegisterPage() {
       email: '',
       password: '',
       confirmPassword: '',
-      otpCode: ''
+      code: ''
     }
   })
 
-  function handleSendOtp() {
-    const email = form.getValues('email')
-    if (!email || form.getFieldState('email').invalid) {
-      form.setError('email', { message: 'Vui lòng nhập email hợp lệ trước khi gửi OTP' })
-      return
-    }
+  async function handleSendOtp() {
+    const isEmailValid = await form.trigger('email')
+    if (!isEmailValid || sendOtpMutation.isPending) return
 
-    if (sendOtpMutation.isPending) return
-
+    // toast được xử lý trong useSendOtpMutation onSuccess
     sendOtpMutation.mutate(
-      { email },
+      { email: form.getValues('email') },
       {
-        onSuccess: () => {
-          startCountdown()
-          toast.success('Mã OTP đã được gửi đến email của bạn!')
+        onSuccess: () => startCountdown(),
+        onError: (error) => {
+          if (isAxiosError<ApiErrorResponse>(error) && error.response?.status === HttpStatusCode.UnprocessableEntity) {
+            const { message } = error.response.data
+            if (Array.isArray(message)) {
+              message.forEach((err: ApiFieldError) => {
+                if (err.path in form.getValues()) {
+                  form.setError(err.path as keyof RegisterInput, { message: err.message })
+                }
+              })
+            }
+          }
         }
       }
     )
@@ -57,22 +59,18 @@ export default function RegisterPage() {
   function onSubmit(values: RegisterInput) {
     if (registerMutation.isPending) return
 
-    const { otpCode, ...rest } = values
+    const { code, ...rest } = values
 
+    // toast + redirect được xử lý trong useRegisterMutation onSuccess
     registerMutation.mutate(
-      { ...rest, code: otpCode },
+      { ...rest, code },
       {
-        onSuccess: () => {
-          toast.success('Đăng ký thành công!')
-          router.push('/')
-        },
         onError: (error) => {
           if (isAxiosError<ApiErrorResponse>(error) && error.response?.status === HttpStatusCode.UnprocessableEntity) {
             const { message } = error.response.data
             if (Array.isArray(message)) {
               message.forEach((err: ApiFieldError) => {
-                const fieldMap: Record<string, keyof RegisterInput> = { code: 'otpCode' }
-                const field = (fieldMap[err.path] ?? err.path) as keyof RegisterInput
+                const field = err.path as keyof RegisterInput
                 if (field in form.getValues()) {
                   form.setError(field, { message: err.message })
                 }
@@ -101,7 +99,12 @@ export default function RegisterPage() {
                 <FormItem>
                   <FormLabel className='text-foreground font-medium'>Họ và Tên</FormLabel>
                   <FormControl>
-                    <Input placeholder='Nguyen Van A' className='bg-input rounded-md focus:ring-ring' {...field} />
+                    <Input
+                      autoComplete='name'
+                      placeholder='Nguyen Van A'
+                      className='bg-input rounded-md focus:ring-ring'
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage className='text-xs' />
                 </FormItem>
@@ -116,6 +119,7 @@ export default function RegisterPage() {
                   <FormLabel className='text-foreground font-medium'>Email</FormLabel>
                   <FormControl>
                     <Input
+                      autoComplete='email'
                       placeholder='example@gmail.com'
                       className='bg-input rounded-md focus:ring-ring'
                       {...field}
@@ -134,7 +138,13 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel className='text-foreground font-medium'>Mật khẩu</FormLabel>
                     <FormControl>
-                      <Input type='password' placeholder='••••••••' className='bg-input rounded-md' {...field} />
+                      <Input
+                        type='password'
+                        autoComplete='new-password'
+                        placeholder='••••••••'
+                        className='bg-input rounded-md'
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage className='text-xs' />
                   </FormItem>
@@ -147,7 +157,13 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel className='text-foreground font-medium'>Xác nhận</FormLabel>
                     <FormControl>
-                      <Input type='password' placeholder='••••••••' className='bg-input rounded-md' {...field} />
+                      <Input
+                        type='password'
+                        autoComplete='new-password'
+                        placeholder='••••••••'
+                        className='bg-input rounded-md'
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage className='text-xs' />
                   </FormItem>
@@ -157,22 +173,32 @@ export default function RegisterPage() {
 
             <FormField
               control={form.control}
-              name='otpCode'
+              name='code'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='text-foreground font-medium'>Mã OTP</FormLabel>
                   <div className='flex gap-2'>
                     <FormControl>
-                      <Input placeholder='123456' maxLength={6} className='bg-input rounded-md flex-1' {...field} />
+                      <Input
+                        autoComplete='one-time-code'
+                        placeholder='123456'
+                        maxLength={6}
+                        className='bg-input rounded-md flex-1'
+                        {...field}
+                      />
                     </FormControl>
                     <Button
                       type='button'
-                      variant='secondary'
+                      variant={countdown > 0 ? 'outline' : 'secondary'}
                       disabled={countdown > 0 || sendOtpMutation.isPending}
                       onClick={handleSendOtp}
-                      className='rounded-md whitespace-nowrap min-w-[100px]'
+                      className='rounded-md whitespace-nowrap min-w-[110px] tabular-nums'
                     >
-                      {sendOtpMutation.isPending ? 'Đang gửi...' : countdown > 0 ? `${countdown}s` : 'Gửi OTP'}
+                      {sendOtpMutation.isPending
+                        ? 'Đang gửi...'
+                        : countdown > 0
+                          ? `Gửi lại (${countdown}s)`
+                          : 'Gửi OTP'}
                     </Button>
                   </div>
                   <FormMessage className='text-xs' />

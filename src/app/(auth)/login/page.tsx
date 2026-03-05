@@ -4,8 +4,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isAxiosError } from 'axios'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,7 +15,6 @@ import { HttpStatusCode } from '@/constants/http-status'
 import { ApiErrorResponse, ApiFieldError } from '../_types/auth'
 
 export default function LoginPage() {
-  const router = useRouter()
   const loginMutation = useLoginMutation()
 
   const form = useForm<LoginInput>({
@@ -32,10 +29,6 @@ export default function LoginPage() {
     if (loginMutation.isPending) return
 
     loginMutation.mutate(values, {
-      onSuccess: () => {
-        toast.success('Đăng nhập thành công!')
-        router.push('/')
-      },
       onError: (error) => {
         if (isAxiosError<ApiErrorResponse>(error) && error.response?.status === HttpStatusCode.UnprocessableEntity) {
           const { message } = error.response.data
@@ -53,7 +46,6 @@ export default function LoginPage() {
 
   return (
     <div className='min-h-screen bg-background flex items-center justify-center p-4'>
-      {/* Container Card */}
       <div className='w-full max-w-md bg-card p-8 rounded-lg border border-border shadow-sm'>
         <div className='text-center mb-8'>
           <h1 className='text-2xl font-bold text-foreground'>Chào mừng trở lại</h1>
@@ -62,7 +54,6 @@ export default function LoginPage() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5'>
-            {/* Trường Email */}
             <FormField
               control={form.control}
               name='email'
@@ -71,6 +62,7 @@ export default function LoginPage() {
                   <FormLabel className='text-foreground font-medium'>Email</FormLabel>
                   <FormControl>
                     <Input
+                      autoComplete='email'
                       placeholder='name@example.com'
                       className='bg-input border-border rounded-md focus:ring-ring focus:border-ring'
                       {...field}
@@ -81,7 +73,6 @@ export default function LoginPage() {
               )}
             />
 
-            {/* Trường Mật khẩu */}
             <FormField
               control={form.control}
               name='password'
@@ -99,6 +90,7 @@ export default function LoginPage() {
                   <FormControl>
                     <Input
                       type='password'
+                      autoComplete='current-password'
                       placeholder='••••••••'
                       className='bg-input border-border rounded-md focus:ring-ring'
                       {...field}
@@ -109,18 +101,16 @@ export default function LoginPage() {
               )}
             />
 
-            {/* Nút Đăng nhập chính */}
             <Button
               type='submit'
               disabled={loginMutation.isPending}
-              className='w-full bg-primary text-primary-foreground rounded-md  py-6 text-base font-bold hover:bg-primary/90 transition-all active:scale-[0.98]'
+              className='w-full bg-primary text-primary-foreground rounded-md py-6 text-base font-bold hover:bg-primary/90 transition-all active:scale-[0.98]'
             >
               {loginMutation.isPending ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </Button>
           </form>
         </Form>
 
-        {/* Ngăn cách hoặc */}
         <div className='relative my-8'>
           <div className='absolute inset-0 flex items-center'>
             <span className='w-full border-t border-border'></span>
@@ -130,7 +120,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Nút Google (UI Only) */}
         <Button
           variant='outline'
           type='button'
@@ -140,7 +129,6 @@ export default function LoginPage() {
           <span className='font-medium'>Google</span>
         </Button>
 
-        {/* Link chuyển sang Đăng ký */}
         <p className='text-center text-sm text-muted-foreground mt-8'>
           Chưa có tài khoản?{' '}
           <Link href='/register' className='text-primary font-semibold hover:underline'>
