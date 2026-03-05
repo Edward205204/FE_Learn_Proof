@@ -12,3 +12,9 @@ export function useRegisterMutation() {
     mutationFn: authApi.register
   })
 }
+
+export function useSendOtpMutation() {
+  return useMutation({
+    mutationFn: authApi.sendOtpRegister
+  })
+}
