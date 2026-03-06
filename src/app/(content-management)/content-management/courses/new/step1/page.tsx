@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { createCourseSchema, CreateCourseValues } from '../../_utils/zod'
+import { createCourseSchema, CreateCourseValues } from '@/app/(content-management)/_utils/zod'
 
 export default function CreateCourseBasicInfo() {
   const form = useForm<CreateCourseValues>({
