@@ -36,3 +36,15 @@ export const quizSchema = z.object({
 })
 
 export type QuizFormValues = z.infer<typeof quizSchema>
+
+export const independentQuizSchema = quizSchema.extend({
+  lessonId: z.string().optional(), // Override: quiz độc lập không cần lessonId
+  title: z.string().min(1, 'Tiêu đề không được để trống'),
+  shortDescription: z.string().optional(),
+  description: z.string().optional(), // AI Context
+  passingScore: z.number().min(0).max(100),
+  issueCertificate: z.boolean(),
+  unlockNextCourse: z.boolean(),
+})
+
+export type IndependentQuizValues = z.infer<typeof independentQuizSchema>
