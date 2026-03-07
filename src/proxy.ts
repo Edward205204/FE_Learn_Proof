@@ -7,7 +7,7 @@ import { Role } from './@types/user'
 const AUTH_ONLY_PATHS = [PATH.LOGIN, PATH.REGISTER, PATH.FORGOT_PASSWORD, PATH.RESET_PASSWORD]
 
 // Chỉ CONTENT_MANAGER và ADMIN mới vào được
-const CONTENT_MANAGER_PATHS = [PATH.CONTENT_MANAGEMENT]
+const CONTENT_MANAGER_PATHS = ['/abc']
 
 // Chỉ ADMIN mới vào được
 const ADMIN_PATHS = [PATH.ADMIN]
