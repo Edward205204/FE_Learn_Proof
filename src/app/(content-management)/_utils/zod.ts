@@ -48,3 +48,21 @@ export const independentQuizSchema = quizSchema.extend({
 })
 
 export type IndependentQuizValues = z.infer<typeof independentQuizSchema>
+
+export const interactionSchema = z.object({
+  id: z.string(),
+  type: z.enum(['qa', 'review']), // Phân loại theo yêu cầu PB13
+  user: z.object({
+    name: z.string(),
+    avatar: z.string().optional(),
+    courseName: z.string()
+  }),
+  content: z.string().min(1, 'Nội dung không được để trống'),
+  rating: z.number().min(1).max(5).optional(), // Chỉ dành cho Review
+  status: z.enum(['unresolved', 'resolved']).optional(), // Chỉ dành cho QA
+  lessonUrl: z.string(), // Link dẫn đến bài học của đánh giá/hỏi đáp đó
+  reply: z.string().optional(),
+  isPinned: z.boolean().default(false) // Tính năng ghim bình luận
+})
+
+export type InteractionValues = z.infer<typeof interactionSchema>
