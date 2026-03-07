@@ -31,11 +31,11 @@ export function AnswerList({ questionIndex, form }: AnswerListProps) {
             <Input
               {...form.register(`questions.${questionIndex}.answers.${index}.text`)}
               placeholder={`Đáp án ${index + 1}`}
-              className='pr-10'
+              className='pr-24'
             />
             {form.watch(`questions.${questionIndex}.answers.${index}.isCorrect`) && (
               <span className='absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-primary uppercase'>
-                Correct Answer
+                Đáp án đúng
               </span>
             )}
           </div>
