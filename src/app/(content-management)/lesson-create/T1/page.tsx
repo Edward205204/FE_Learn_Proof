@@ -54,7 +54,7 @@ const DEFAULT_QUESTION: LessonForm['questions'][number] = {
 /* ---------------- PAGE ---------------- */
 
 export default function LessonEditorPage() {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState<1 | 2>(1)
 
   const form = useForm<LessonForm>({
     resolver: zodResolver(lessonSchema),
@@ -82,6 +82,7 @@ export default function LessonEditorPage() {
   const onSubmit = (data: LessonForm) => {
     console.log('SAVE LESSON', data)
   }
+  const isTypeLocked = step === 2
 
   return (
     <div className='max-w-4xl mx-auto p-8'>
@@ -111,6 +112,7 @@ export default function LessonEditorPage() {
             </div>
 
             <Select
+              disabled={isTypeLocked}
               onValueChange={(value) => form.setValue('type', value as any)}
               defaultValue={form.getValues('type')}
             >
