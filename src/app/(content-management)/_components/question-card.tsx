@@ -3,7 +3,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { AnswerList } from './answer-list'
+import { AnswerList } from './answer-List'
 import { QuizFormValues } from '../_utils/zod'
 
 interface QuestionCardProps {
