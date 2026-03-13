@@ -35,20 +35,27 @@ export function CurriculumSidebar({ chapters, currentLessonId, prevLessonId, nex
 
     return (
         <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 h-full flex flex-col overflow-hidden">
-            {/* Header */}
-            <div className="mb-6 shrink-0">
-                <h3 className="font-bold text-lg text-slate-800">Nội dung khóa học</h3>
-                <p className="text-xs text-slate-500 mt-1">
+            {/* Header — PB24 */}
+            <div className="mb-8 px-2 shrink-0">
+                <h3 className="font-extrabold text-lg text-slate-800 tracking-tight">
+                    Nội dung khóa học
+                </h3>
+                <p className="text-[11px] font-medium text-slate-500 mt-1 uppercase tracking-wide">
                     Hoàn thành {completedLessons} trên {totalLessons} bài học
                 </p>
-                {/* Progress bar */}
-                <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-                    <div
-                        className="bg-primary h-full rounded-full transition-all duration-500"
-                        style={{ width: `${progressPercent}%` }}
-                    />
+
+                {/* Thanh Progress Bar */}
+                <div className="relative mt-5">
+                    <span className="absolute -top-5 right-0 text-[10px] font-extrabold text-primary">
+                        {progressPercent}%
+                    </span>
+                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                        <div
+                            className="bg-primary h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(225,29,72,0.25)]"
+                            style={{ width: `${progressPercent}%` }}
+                        />
+                    </div>
                 </div>
-                <p className="text-[10px] text-primary font-bold mt-1.5 text-right">{progressPercent}%</p>
             </div>
 
             {/* Danh sách chương & bài học — cuộn được */}
