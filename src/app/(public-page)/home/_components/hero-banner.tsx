@@ -3,6 +3,16 @@ import Link from 'next/link'
 export default function HeroBanner() {
   return (
     <section className='relative overflow-hidden bg-[oklch(0.141_0.005_285.823)] rounded-b-3xl'>
+
+      {/* Banner image */}
+      <div
+        className='absolute inset-0 bg-cover bg-center opacity-40'
+        style={{
+          backgroundImage:
+            "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCuwHw3dsedRQeyFxU1F1LArDnMKnE5zlSsFTgtC9pShmdjoiLoeDYtTq2gVIpdVtqFQTvHwMPcHNm_tG88HmC9rzCIhJT2wTGaYClZD9UbJ-mUuBENnE7JjTRj17fd8eANYKbAHbHXmwLWZxsHP5BMvRYiPfL24IM1Q9NAHJywCH5Pn4P2vIBvn5sfwFmzZ2SLgc7nBLQa_SOt0Wir1lNLyeDbll9NkTmPQoSRK4o8lOPLvT6sXr4sMNc6H27s5DYOzomErmRq2mE')"
+        }}
+      />
+
       {/* Background glow orbs */}
       <div className='absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 rounded-full bg-primary/10 blur-3xl pointer-events-none' />
       <div className='absolute top-1/4 right-1/4 w-48 h-48 rounded-full bg-blue-500/10 blur-3xl pointer-events-none' />
@@ -11,21 +21,16 @@ export default function HeroBanner() {
         {/* Content */}
         <div className='flex flex-col gap-6'>
 
-          {/* Title */}
           <h1 className='text-4xl md:text-5xl font-black leading-[1.1] tracking-tight text-white'>
             Chứng chỉ
             <br />
-            <span className='text-primary relative'>
-              xác thực Blockchain
-            </span>
+            <span className='text-primary'>xác thực Blockchain</span>
           </h1>
 
-          {/* Desc */}
           <p className='text-[oklch(0.75_0.01_285)] text-base leading-relaxed max-w-[40ch]'>
             Học từ các chuyên gia hàng đầu. Nhận chứng chỉ được xác thực trên Blockchain — không thể làm giả, không thể mất, mãi mãi thuộc về bạn.
           </p>
 
-          {/* Actions */}
           <div className='flex gap-3 flex-wrap'>
             <Link
               href='/courses'
@@ -40,42 +45,15 @@ export default function HeroBanner() {
               Xem hoạt động
             </Link>
           </div>
-
-          {/* Stats */}
-          <div className='flex items-center gap-4 pt-2'>
-            <div className='text-center'>
-              <p className='text-xl font-black text-white'>10k+</p>
-              <p className='text-[0.65rem] uppercase tracking-widest text-[oklch(0.6_0.01_285)]'>Học viên</p>
-            </div>
-            <div className='w-px h-8 bg-white/15' />
-            <div className='text-center'>
-              <p className='text-xl font-black text-white'>200+</p>
-              <p className='text-[0.65rem] uppercase tracking-widest text-[oklch(0.6_0.01_285)]'>Khóa học</p>
-            </div>
-            <div className='w-px h-8 bg-white/15' />
-            <div className='text-center'>
-              <p className='text-xl font-black text-white'>50+</p>
-              <p className='text-[0.65rem] uppercase tracking-widest text-[oklch(0.6_0.01_285)]'>Chuyên gia</p>
-            </div>
-          </div>
         </div>
 
-        {/* Decorative — blockchain nodes */}
-        <div className='hidden md:block relative h-72' aria-hidden='true'>
-          {[
-            { top: '15%', left: '25%', delay: '0s' },
-            { top: '35%', left: '60%', delay: '0.4s' },
-            { top: '60%', left: '30%', delay: '0.8s' },
-            { top: '75%', left: '70%', delay: '1.2s' },
-            { top: '20%', left: '75%', delay: '1.6s' },
-            { top: '50%', left: '15%', delay: '2s' },
-            { top: '85%', left: '45%', delay: '2.4s' },
-            { top: '10%', left: '50%', delay: '2.8s' },
-          ].map((n, i) => (
+        {/* Decorative nodes */}
+        <div className='hidden md:block relative h-72'>
+          {[{ top: '15%', left: '25%' }, { top: '35%', left: '60%' }].map((n, i) => (
             <span
               key={i}
               className='absolute w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_12px_currentColor] text-primary animate-pulse'
-              style={{ top: n.top, left: n.left, animationDelay: n.delay }}
+              style={{ top: n.top, left: n.left }}
             />
           ))}
         </div>

@@ -4,6 +4,7 @@ export const PATH = {
   REGISTER: '/register',
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',
+  ONBOARDING: '/onboarding',
 
   // Public SSR
   COURSES: '/courses',
