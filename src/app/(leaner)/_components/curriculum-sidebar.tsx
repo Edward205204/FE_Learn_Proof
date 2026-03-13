@@ -9,7 +9,7 @@ interface Lesson {
     duration: string
     isCompleted: boolean
     isLocked: boolean
-    type: 'video' | 'quiz'
+    type: 'video' | 'quiz' | 'reading'
 }
 
 interface Chapter {
