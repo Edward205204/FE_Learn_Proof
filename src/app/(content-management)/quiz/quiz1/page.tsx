@@ -10,13 +10,13 @@ import { QuizSidebar } from '../../_components/quiz-sidebar'
 import { QuestionCard } from '../../_components/question-card'
 import { useSaveLessonQuizMutation } from '../../_hooks/use-quiz-mutation'
 
+
 interface LessonData {
   id: string
   title: string
   courseName: string
 }
 
-// TODO: Thay LESSON_ID bằng dynamic route param khi tích hợp: /quiz/[lessonId]
 const LESSON_ID = 'quiz1'
 
 const MOCK_LESSON: LessonData = {
@@ -36,6 +36,8 @@ const DEFAULT_QUESTION = {
 
 export default function LessonQuizEditorPage() {
   const [lessonData] = useState<LessonData>(MOCK_LESSON)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false) 
+  
   const { mutate: saveQuiz, isPending } = useSaveLessonQuizMutation(lessonData.id)
 
   const form = useForm<QuizFormValues>({
@@ -72,7 +74,13 @@ export default function LessonQuizEditorPage() {
               <h1 className='text-3xl font-extrabold tracking-tight'>Chỉnh sửa Quiz: {lessonData.title}</h1>
               <p className='text-muted-foreground italic'>Thuộc khóa học: {lessonData.courseName}</p>
             </div>
-            <Button variant='outline'>
+            
+            {/* PB10-T1: Nút Xem trước mở Dialog */}
+            <Button 
+              variant='outline' 
+              type='button' 
+              onClick={() => setIsPreviewOpen(true)}
+            >
               <Eye className='mr-2 h-4 w-4' /> Xem trước
             </Button>
           </header>
