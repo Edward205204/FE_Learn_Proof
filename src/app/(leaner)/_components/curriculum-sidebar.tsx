@@ -1,7 +1,7 @@
 'use client'
 
-import { CheckCircle2, PlayCircle, Lock } from 'lucide-react'
-import { cn } from '@/lib/utils' // Giả định bạn dùng shadcn/ui utils
+import { CheckCircle2, PlayCircle, Lock, ChevronRight, ChevronLeft } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface Lesson {
     id: string
@@ -21,63 +21,101 @@ interface Chapter {
 interface CurriculumSidebarProps {
     chapters: Chapter[]
     currentLessonId: string
+    prevLessonId?: string | null
+    nextLessonId?: string | null
+    onLessonClick?: (lessonId: string) => void
 }
 
-export function CurriculumSidebar({ chapters, currentLessonId }: CurriculumSidebarProps) {
+export function CurriculumSidebar({ chapters, currentLessonId, prevLessonId, nextLessonId, onLessonClick }: CurriculumSidebarProps) {
+    // Tính tổng số bài & bài hoàn thành
+    const allLessons = chapters.flatMap((c) => c.lessons)
+    const totalLessons = allLessons.length
+    const completedLessons = allLessons.filter((l) => l.isCompleted).length
+    const progressPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0
+
     return (
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 h-full overflow-y-auto">
-            <div className="mb-6">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 h-full flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="mb-6 shrink-0">
                 <h3 className="font-bold text-lg text-slate-800">Nội dung khóa học</h3>
-                <p className="text-xs text-slate-500 mt-1">Hoàn thành 4 trên 12 bài học</p>
+                <p className="text-xs text-slate-500 mt-1">
+                    Hoàn thành {completedLessons} trên {totalLessons} bài học
+                </p>
+                {/* Progress bar */}
                 <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
-                    <div className="bg-primary h-full w-1/3 transition-all" /> {/* Progress bar hồng */}
+                    <div
+                        className="bg-primary h-full rounded-full transition-all duration-500"
+                        style={{ width: `${progressPercent}%` }}
+                    />
                 </div>
+                <p className="text-[10px] text-primary font-bold mt-1.5 text-right">{progressPercent}%</p>
             </div>
 
-            <div className="space-y-6">
+            {/* Danh sách chương & bài học — cuộn được */}
+            <div className="space-y-6 flex-1 overflow-y-auto pr-1 -mr-1">
                 {chapters.map((chapter, index) => (
-                    <div key={chapter.id} className="space-y-3">
-                        <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <div key={chapter.id} className="space-y-2">
+                        {/* Tiêu đề chương */}
+                        <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">
                             Chương {index + 1}: {chapter.title}
                         </h4>
 
-                        <div className="space-y-2">
+                        {/* Danh sách bài */}
+                        <div className="space-y-1">
                             {chapter.lessons.map((lesson) => {
                                 const isActive = lesson.id === currentLessonId
 
                                 return (
-                                    <div
+                                    <button
                                         key={lesson.id}
+                                        disabled={lesson.isLocked}
+                                        onClick={() => !lesson.isLocked && onLessonClick?.(lesson.id)}
                                         className={cn(
-                                            "group flex items-center justify-between p-3 rounded-xl transition-all cursor-pointer border border-transparent",
+                                            'w-full group flex items-center justify-between p-3 rounded-xl transition-all border text-left',
                                             isActive
-                                                ? "bg-rose-50 text-primary border-rose-100 shadow-sm" // Highlight bài hiện tại
-                                                : "hover:bg-slate-50 text-slate-600",
-                                            lesson.isLocked && "opacity-50 cursor-not-allowed"
+                                                ? 'bg-rose-50 border-rose-100 shadow-sm'
+                                                : lesson.isLocked
+                                                ? 'opacity-50 cursor-not-allowed border-transparent'
+                                                : 'hover:bg-slate-50 border-transparent cursor-pointer'
                                         )}
                                     >
-                                        <div className="flex items-center gap-3">
-                                            {/* Trạng thái Icon */}
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            {/* Trạng thái icon */}
                                             {lesson.isCompleted ? (
-                                                <CheckCircle2 className="h-4 w-4 text-emerald-500" /> // Icon tích xanh
+                                                // Hoàn thành: tích xanh lá
+                                                <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
                                             ) : lesson.isLocked ? (
-                                                <Lock className="h-4 w-4 text-slate-400" />
+                                                // Bị khóa: icon khóa
+                                                <Lock className="h-4 w-4 text-slate-400 shrink-0" />
                                             ) : (
-                                                <PlayCircle className={cn("h-4 w-4", isActive ? "text-primary" : "text-slate-400")} />
+                                                // Có thể xem: icon play, hồng nếu đang xem
+                                                <PlayCircle
+                                                    className={cn(
+                                                        'h-4 w-4 shrink-0',
+                                                        isActive ? 'text-primary' : 'text-slate-400 group-hover:text-primary transition-colors'
+                                                    )}
+                                                />
                                             )}
 
-                                            <span className={cn(
-                                                "text-sm font-medium line-clamp-1",
-                                                isActive ? "font-bold" : "font-normal"
-                                            )}>
+                                            <span
+                                                className={cn(
+                                                    'text-sm line-clamp-1 truncate',
+                                                    isActive
+                                                        ? 'font-bold text-primary'
+                                                        : lesson.isCompleted
+                                                        ? 'font-medium text-slate-500'
+                                                        : 'font-medium text-slate-600'
+                                                )}
+                                            >
                                                 {lesson.title}
                                             </span>
                                         </div>
 
-                                        <span className="text-[10px] font-mono text-slate-400">
-                                            {lesson.isLocked ? 'Quiz' : lesson.duration}
+                                        {/* Thời lượng / loại */}
+                                        <span className="text-[10px] font-mono text-slate-400 shrink-0 ml-2">
+                                            {lesson.type === 'quiz' ? 'Quiz' : lesson.duration}
                                         </span>
-                                    </div>
+                                    </button>
                                 )
                             })}
                         </div>
@@ -85,11 +123,27 @@ export function CurriculumSidebar({ chapters, currentLessonId }: CurriculumSideb
                 ))}
             </div>
 
-            {/* Nút điều hướng cuối trang như trong thiết kế */}
-            <button className="w-full mt-8 bg-primary text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-rose-200">
-                Bài học tiếp theo
-                <span className="text-xl">→</span>
-            </button>
+            {/* THANH ĐIỀU HƯỚNG TRƯỚC - SAU */}
+            <div className="flex items-center justify-between px-2 pt-6 pb-2 border-t border-slate-100 mt-4 shrink-0">
+                <button
+                    disabled={!prevLessonId}
+                    onClick={() => prevLessonId && onLessonClick?.(prevLessonId)}
+                    className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-widest transition-colors group disabled:opacity-30 disabled:cursor-not-allowed text-slate-400 hover:text-primary disabled:hover:text-slate-400"
+                >
+                    <ChevronLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+                    Trước
+                </button>
+
+                <button
+                    disabled={!nextLessonId}
+                    onClick={() => nextLessonId && onLessonClick?.(nextLessonId)}
+                    className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-widest transition-colors group disabled:opacity-30 disabled:cursor-not-allowed text-slate-400 hover:text-primary disabled:hover:text-slate-400"
+                >
+                    Sau
+                    <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                </button>
+            </div>
+
         </div>
     )
 }

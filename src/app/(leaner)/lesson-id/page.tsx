@@ -1,62 +1,91 @@
-import { VideoPlayer } from '../_components/video-player';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+'use client'
 
-export default function LessonPage({ params }: { params: { id: string } }) {
-    const lessonData = {
-        id: params.id,
-        title: "Thiết kế với OKLCH: Tương lai của không gian màu",
-        videoUrl: "https://your-video-url.mp4",
-        lastPosition: 125, // Ví dụ: 2 phút 5 giây
-        content: "Trong bài học này, chúng ta sẽ đi sâu vào mô hình màu OKLCH..."
-    };
+import { VideoPlayer } from '../_components/video-player'
+import { LessonTabs } from '../_components/lesson-tabs'
+import { CurriculumSidebar } from '../_components/curriculum-sidebar'
+
+// Dữ liệu mẫu — thay bằng fetch API thực tế
+const MOCK_CHAPTERS = [
+    {
+        id: 'ch1',
+        title: 'Nền tảng thiết kế màu sắc',
+        lessons: [
+            { id: 'l1', title: 'Giới thiệu khóa học', duration: '5:30', isCompleted: true, isLocked: false, type: 'video' as const },
+            { id: 'l2', title: 'Lý thuyết màu cơ bản', duration: '12:45', isCompleted: true, isLocked: false, type: 'video' as const },
+            { id: 'l3', title: 'Thiết kế với OKLCH', duration: '32:10', isCompleted: false, isLocked: false, type: 'video' as const },
+            { id: 'l4', title: 'Quiz: Kiểm tra chương 1', duration: '10:00', isCompleted: false, isLocked: true, type: 'quiz' as const },
+        ],
+    },
+    {
+        id: 'ch2',
+        title: 'Ứng dụng thực tế',
+        lessons: [
+            { id: 'l5', title: 'Xây dựng palette màu', duration: '20:00', isCompleted: false, isLocked: true, type: 'video' as const },
+            { id: 'l6', title: 'Dark mode với OKLCH', duration: '18:30', isCompleted: false, isLocked: true, type: 'video' as const },
+        ],
+    },
+]
+
+const MOCK_LESSON = {
+    id: 'l3',
+    title: 'Thiết kế với OKLCH: Tương lai của không gian màu',
+    videoUrl: 'https://your-video-url.mp4',
+    lastPosition: 125,
+    description: `Trong bài học này, chúng ta sẽ đi sâu vào mô hình màu OKLCH — một bước tiến vượt bậc so với HSL/RGB truyền thống.
+
+Bạn sẽ học được:
+• Cách OKLCH biểu diễn màu sắc theo cảm nhận con người
+• Tại sao OKLCH cho kết quả đồng đều hơn khi tạo palette
+• Cách viết giá trị OKLCH trong CSS hiện đại
+• Công cụ và workflow thực tế khi làm dự án`,
+    materials: [
+        { title: 'Giao diện mẫu OKLCH.fig', size: '12.4 MB', url: '#' },
+        { title: 'Cheat-sheet mã màu CSS.pdf', size: '2.1 MB', url: '#' },
+    ],
+}
+
+export default function LessonPage() {
+    // Tính prev/next lesson từ danh sách phẳng
+    const allLessons = MOCK_CHAPTERS.flatMap((c) => c.lessons)
+    const currentIndex = allLessons.findIndex((l) => l.id === MOCK_LESSON.id)
+    const prevLessonId = allLessons[currentIndex - 1]?.id ?? null
+    const nextLessonId = allLessons[currentIndex + 1]?.id ?? null
+
+    const handleNavigate = (id: string) => {
+        // TODO: thay bằng router.push(`/lesson/${id}`) khi có dynamic route
+        console.log('Navigating to lesson:', id)
+    }
 
     return (
         <main className="max-w-[1400px] mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            {/* PHẦN 1: VIDEO & TIÊU ĐỀ (Chiếm 2/3) */}
+            {/* PHẦN 1: VIDEO & TABS — chiếm 2/3 */}
             <div className="lg:col-span-2 space-y-6">
-                <VideoPlayer url={lessonData.videoUrl} lastPosition={lessonData.lastPosition} lessonId={lessonData.id} />
+                <VideoPlayer
+                    url={MOCK_LESSON.videoUrl}
+                    lastPosition={MOCK_LESSON.lastPosition}
+                    lessonId={MOCK_LESSON.id}
+                />
 
-                <h1 className="text-2xl font-extrabold text-slate-900">{lessonData.title}</h1>
+                <h1 className="text-2xl font-extrabold text-slate-900">{MOCK_LESSON.title}</h1>
 
-                {/* PHẦN 3: TABS NỘI DUNG / HỎI ĐÁP AI */}
-                <Tabs defaultValue="mote" className="w-full">
-                    <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0">
-                        <TabsTrigger value="mote" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent pb-2 font-bold">Mô tả</TabsTrigger>
-                        <TabsTrigger value="ai" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent pb-2 font-bold">Hỏi đáp AI <span className="ml-1 bg-rose-100 text-primary text-[10px] px-1 rounded">MỚI</span></TabsTrigger>
-                        <TabsTrigger value="thaoluan" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent pb-2 font-bold">Thảo luận</TabsTrigger>
-                        <TabsTrigger value="tailieu" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent pb-2 font-bold">Tài liệu</TabsTrigger>
-
-                    </TabsList>
-
-                    <TabsContent value="mote" className="py-6 text-slate-600 leading-relaxed">
-                        {lessonData.content}
-                    </TabsContent>
-                    <TabsContent value="ai">
-                        {/* Tích hợp component AI Chat tại đây */}
-                    </TabsContent>
-                </Tabs>
+                <LessonTabs
+                    lessonId={MOCK_LESSON.id}
+                    description={MOCK_LESSON.description}
+                    materials={MOCK_LESSON.materials}
+                />
             </div>
 
-            {/* PHẦN 2: DANH SÁCH BÀI HỌC (Sidebar 1/3) */}
-            <div className="space-y-4">
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-                    <h3 className="font-bold text-lg mb-4">Nội dung khóa học</h3>
-                    <div className="space-y-2">
-                        {/* Map qua danh sách chương/bài học tại đây */}
-                        <div className="flex items-center justify-between p-3 bg-rose-50 rounded-xl text-primary font-medium border border-rose-100">
-                            <span className="text-sm">3. Thiết kế với OKLCH</span>
-                            <span className="text-xs">32:10</span>
-                        </div>
-                        {/* Các bài học khác... */}
-                    </div>
-
-                    <button className="w-full mt-6 bg-primary text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors">
-                        Bài học tiếp theo
-                        <span className="text-xl">→</span>
-                    </button>
-                </div>
+            {/* PHẦN 2: SIDEBAR DANH SÁCH BÀI HỌC — 1/3 */}
+            <div className="lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)]">
+                <CurriculumSidebar
+                    chapters={MOCK_CHAPTERS}
+                    currentLessonId={MOCK_LESSON.id}
+                    prevLessonId={prevLessonId}
+                    nextLessonId={nextLessonId}
+                    onLessonClick={handleNavigate}
+                />
             </div>
         </main>
-    );
+    )
 }
