@@ -24,7 +24,7 @@ export default function CreateCourseStep3Page() {
     defaultValues: {
       isFree: false,
       price: 299000,
-      discount: undefined,
+      originalPrice: undefined,
       status: 'PUBLISHED'
     }
   })
@@ -73,10 +73,7 @@ export default function CreateCourseStep3Page() {
                 <p className='text-sm text-muted-foreground'>Học viên phải thanh toán để đăng ký học.</p>
               </div>
             </div>
-            <Switch
-              checked={!isFree}
-              onCheckedChange={(checked) => setValue('isFree', !checked)}
-            />
+            <Switch checked={!isFree} onCheckedChange={(checked) => setValue('isFree', !checked)} />
           </div>
 
           {!isFree && (
@@ -99,7 +96,7 @@ export default function CreateCourseStep3Page() {
                   type='number'
                   min={0}
                   placeholder='Để trống nếu không giảm giá'
-                  {...register('discount', { valueAsNumber: true })}
+                  {...register('originalPrice', { valueAsNumber: true })}
                 />
                 <p className='text-xs text-muted-foreground'>Học viên sẽ thấy giá này trên trang khóa học.</p>
               </div>

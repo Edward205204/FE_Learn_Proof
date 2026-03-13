@@ -1,10 +1,11 @@
 import http from '@/utils/http'
-import type { HomeSectionsResponse, CategoryWithCount } from '@/schemas/course.schema'
+import type { CategoryWithCount } from '@/schemas/course.schema'
+import { config } from '@/constants/config'
 
 const homeApi = {
-  getHomeSections: () => http.get<HomeSectionsResponse>('/courses/home-sections'),
+  getHomeSections: () => fetch(`${config.BE_URL}/courses/home-sections`),
 
-  getCategories: () => http.get<CategoryWithCount[]>('/categories'),
+  getCategories: () => http.get<CategoryWithCount[]>('/categories')
 }
 
 export default homeApi

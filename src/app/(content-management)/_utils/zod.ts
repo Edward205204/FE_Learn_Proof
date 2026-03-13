@@ -10,20 +10,30 @@ export const createCourseStep1Schema = z.object({
   title: z.string().min(1, 'Tiêu đề khóa học là bắt buộc').max(100, 'Tiêu đề không được vượt quá 100 ký tự'),
   category: z.string().min(1, 'Vui lòng chọn danh mục'),
   level: CourseLevelEnum,
-  shortDescription: z.string().max(250, 'Mô tả ngắn không được vượt quá 250 ký tự').optional(),
-  description: z.string().optional(),
+  shortDesc: z.string().max(250, 'Mô tả ngắn không được vượt quá 250 ký tự').optional(),
+  fullDesc: z.string().optional(),
   thumbnail: z.string().optional()
 })
 
 export type CreateCourseStep1Values = z.infer<typeof createCourseStep1Schema>
 
 // --- Schema tạo khóa học - Bước 3: Giá & Trạng thái ---
-export const createCourseStep3Schema = z.object({
-  isFree: z.boolean(),
-  price: z.number().min(0, 'Giá không hợp lệ').optional(),
-  discount: z.number().min(0, 'Giá giảm không hợp lệ').optional(),
-  status: CourseStatusEnum
-})
+export const createCourseStep3Schema = z
+  .object({
+    isFree: z.boolean(),
+    price: z.number().min(0, 'Giá không hợp lệ').optional(),
+    originalPrice: z.number().min(0, 'Giá giảm không hợp lệ').optional(),
+    status: CourseStatusEnum
+  })
+  .superRefine((data, ctx) => {
+    if (data.price && data.originalPrice && data.price > data.originalPrice) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Giá sau khi giảm không được cao hơn giá gốc',
+        path: ['price']
+      })
+    }
+  })
 
 export type CreateCourseStep3Values = z.infer<typeof createCourseStep3Schema>
 

@@ -30,13 +30,13 @@ export default function CreateCourseStep1Page() {
       title: '',
       category: '',
       level: 'BEGINNER',
-      shortDescription: '',
-      description: '',
+      shortDesc: '',
+      fullDesc: '',
       thumbnail: ''
     }
   })
 
-  const shortDescriptionLength = form.watch('shortDescription')?.length ?? 0
+  const shortDescriptionLength = form.watch('shortDesc')?.length ?? 0
 
   const onNext = (data: CreateCourseStep1Values) => {
     // TODO: Lưu data vào state/context hoặc session storage khi tích hợp multi-step form
@@ -133,7 +133,7 @@ export default function CreateCourseStep1Page() {
 
             <FormField
               control={form.control}
-              name='shortDescription'
+              name='shortDesc'
               render={({ field }) => (
                 <FormItem>
                   <div className='flex justify-between items-end'>
@@ -169,7 +169,7 @@ export default function CreateCourseStep1Page() {
               </p>
               <FormField
                 control={form.control}
-                name='description'
+                name='fullDesc'
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>

@@ -1,8 +1,21 @@
 import type { HomeCourseCard } from '@/schemas/course.schema'
 
-const BASE: Omit<HomeCourseCard, 'id' | 'title' | 'slug' | 'thumbnail' | 'price' | 'originalPrice' | 'shortDesc' | 'createdAt' | 'category' | 'creator' | 'overallAnalytics'> = {
+const BASE: Omit<
+  HomeCourseCard,
+  | 'id'
+  | 'title'
+  | 'slug'
+  | 'thumbnail'
+  | 'price'
+  | 'originalPrice'
+  | 'shortDesc'
+  | 'createdAt'
+  | 'category'
+  | 'creator'
+  | 'overallAnalytics'
+> = {
   isFree: false,
-  level: 'BEGINNER',
+  level: 'BEGINNER'
 }
 
 export const MOCK_TRENDING: HomeCourseCard[] = [
@@ -19,7 +32,7 @@ export const MOCK_TRENDING: HomeCourseCard[] = [
     createdAt: new Date('2024-11-01'),
     category: { name: 'Blockchain', slug: 'blockchain' },
     creator: { fullName: 'Lê Bình', avatar: null },
-    overallAnalytics: { avgRating: 4.8, totalStudents: 3200, avgInterestScore: 9.2 },
+    overallAnalytics: { avgRating: 4.8, totalStudents: 3200, avgInterestScore: 9.2 }
   },
   {
     ...BASE,
@@ -34,7 +47,7 @@ export const MOCK_TRENDING: HomeCourseCard[] = [
     createdAt: new Date('2024-10-15'),
     category: { name: 'Web3', slug: 'web3' },
     creator: { fullName: 'Danbi Chen', avatar: null },
-    overallAnalytics: { avgRating: 4.7, totalStudents: 2150, avgInterestScore: 8.9 },
+    overallAnalytics: { avgRating: 4.7, totalStudents: 2150, avgInterestScore: 8.9 }
   },
   {
     ...BASE,
@@ -49,7 +62,7 @@ export const MOCK_TRENDING: HomeCourseCard[] = [
     createdAt: new Date('2024-09-20'),
     category: { name: 'Smart Contract', slug: 'smart-contract' },
     creator: { fullName: 'Nguyen Thanh', avatar: null },
-    overallAnalytics: { avgRating: 4.9, totalStudents: 980, avgInterestScore: 9.5 },
+    overallAnalytics: { avgRating: 4.9, totalStudents: 980, avgInterestScore: 9.5 }
   },
   {
     ...BASE,
@@ -64,7 +77,7 @@ export const MOCK_TRENDING: HomeCourseCard[] = [
     createdAt: new Date('2024-12-01'),
     category: { name: 'Trading', slug: 'trading' },
     creator: { fullName: 'Mia Vu', avatar: null },
-    overallAnalytics: { avgRating: 4.6, totalStudents: 5400, avgInterestScore: 8.7 },
+    overallAnalytics: { avgRating: 4.6, totalStudents: 5400, avgInterestScore: 8.7 }
   },
   {
     ...BASE,
@@ -80,8 +93,8 @@ export const MOCK_TRENDING: HomeCourseCard[] = [
     createdAt: new Date('2024-08-10'),
     category: { name: 'NFT', slug: 'nft' },
     creator: { fullName: 'Alex Park', avatar: null },
-    overallAnalytics: { avgRating: 4.4, totalStudents: 8900, avgInterestScore: 8.5 },
-  },
+    overallAnalytics: { avgRating: 4.4, totalStudents: 8900, avgInterestScore: 8.5 }
+  }
 ]
 
 export const MOCK_TOP_SELLING: HomeCourseCard[] = [
@@ -98,7 +111,7 @@ export const MOCK_TOP_SELLING: HomeCourseCard[] = [
     createdAt: new Date('2024-07-01'),
     category: { name: 'Bitcoin', slug: 'bitcoin' },
     creator: { fullName: 'Lê Lucas Chan', avatar: null },
-    overallAnalytics: { avgRating: 4.7, totalStudents: 12000, avgInterestScore: 8.3 },
+    overallAnalytics: { avgRating: 4.7, totalStudents: 12000, avgInterestScore: 8.3 }
   },
   {
     ...BASE,
@@ -113,7 +126,7 @@ export const MOCK_TOP_SELLING: HomeCourseCard[] = [
     createdAt: new Date('2024-06-15'),
     category: { name: 'Ethereum', slug: 'ethereum' },
     creator: { fullName: 'Nguyen Group', avatar: null },
-    overallAnalytics: { avgRating: 4.8, totalStudents: 9800, avgInterestScore: 8.9 },
+    overallAnalytics: { avgRating: 4.8, totalStudents: 9800, avgInterestScore: 8.9 }
   },
   {
     ...BASE,
@@ -129,7 +142,7 @@ export const MOCK_TOP_SELLING: HomeCourseCard[] = [
     createdAt: new Date('2024-12-10'),
     category: { name: 'Blockchain', slug: 'blockchain' },
     creator: { fullName: 'Lucas Tran', avatar: null },
-    overallAnalytics: { avgRating: 4.5, totalStudents: 7600, avgInterestScore: 7.9 },
+    overallAnalytics: { avgRating: 4.5, totalStudents: 7600, avgInterestScore: 7.9 }
   },
   {
     ...BASE,
@@ -144,7 +157,7 @@ export const MOCK_TOP_SELLING: HomeCourseCard[] = [
     createdAt: new Date('2024-05-20'),
     category: { name: 'DeFi', slug: 'defi' },
     creator: { fullName: 'Lucas Fintech', avatar: null },
-    overallAnalytics: { avgRating: 4.9, totalStudents: 6200, avgInterestScore: 9.1 },
+    overallAnalytics: { avgRating: 4.9, totalStudents: 6200, avgInterestScore: 9.1 }
   },
   {
     ...BASE,
@@ -159,8 +172,8 @@ export const MOCK_TOP_SELLING: HomeCourseCard[] = [
     createdAt: new Date('2024-04-01'),
     category: { name: 'Solidity', slug: 'solidity' },
     creator: { fullName: 'Dev Master', avatar: null },
-    overallAnalytics: { avgRating: 4.6, totalStudents: 5100, avgInterestScore: 8.4 },
-  },
+    overallAnalytics: { avgRating: 4.6, totalStudents: 5100, avgInterestScore: 8.4 }
+  }
 ]
 
 export const MOCK_NEWEST: HomeCourseCard[] = [
@@ -177,7 +190,7 @@ export const MOCK_NEWEST: HomeCourseCard[] = [
     createdAt: new Date('2025-01-15'),
     category: { name: 'TON', slug: 'ton' },
     creator: { fullName: 'Kai Nguyen', avatar: null },
-    overallAnalytics: { avgRating: 4.5, totalStudents: 320, avgInterestScore: 8.1 },
+    overallAnalytics: { avgRating: 4.5, totalStudents: 320, avgInterestScore: 8.1 }
   },
   {
     ...BASE,
@@ -192,7 +205,7 @@ export const MOCK_NEWEST: HomeCourseCard[] = [
     createdAt: new Date('2025-01-10'),
     category: { name: 'AI/Web3', slug: 'ai-web3' },
     creator: { fullName: 'Dr. Sarah AI', avatar: null },
-    overallAnalytics: { avgRating: 4.7, totalStudents: 210, avgInterestScore: 9.0 },
+    overallAnalytics: { avgRating: 4.7, totalStudents: 210, avgInterestScore: 9.0 }
   },
   {
     ...BASE,
@@ -208,7 +221,7 @@ export const MOCK_NEWEST: HomeCourseCard[] = [
     createdAt: new Date('2025-01-05'),
     category: { name: 'Cryptography', slug: 'cryptography' },
     creator: { fullName: 'ZK Labs', avatar: null },
-    overallAnalytics: { avgRating: 4.6, totalStudents: 180, avgInterestScore: 8.7 },
+    overallAnalytics: { avgRating: 4.6, totalStudents: 180, avgInterestScore: 8.7 }
   },
   {
     ...BASE,
@@ -223,7 +236,7 @@ export const MOCK_NEWEST: HomeCourseCard[] = [
     createdAt: new Date('2024-12-28'),
     category: { name: 'Development', slug: 'development' },
     creator: { fullName: 'WalletDev', avatar: null },
-    overallAnalytics: { avgRating: 4.8, totalStudents: 290, avgInterestScore: 8.9 },
+    overallAnalytics: { avgRating: 4.8, totalStudents: 290, avgInterestScore: 8.9 }
   },
   {
     ...BASE,
@@ -238,8 +251,8 @@ export const MOCK_NEWEST: HomeCourseCard[] = [
     createdAt: new Date('2024-12-20'),
     category: { name: 'DAO', slug: 'dao' },
     creator: { fullName: 'Gov Expert', avatar: null },
-    overallAnalytics: { avgRating: 4.4, totalStudents: 150, avgInterestScore: 7.8 },
-  },
+    overallAnalytics: { avgRating: 4.4, totalStudents: 150, avgInterestScore: 7.8 }
+  }
 ]
 
 export const MOCK_TOP_RATED: HomeCourseCard[] = [
@@ -256,7 +269,7 @@ export const MOCK_TOP_RATED: HomeCourseCard[] = [
     createdAt: new Date('2024-05-01'),
     category: { name: 'Smart Contract', slug: 'smart-contract' },
     creator: { fullName: 'Nguyen Thanh', avatar: null },
-    overallAnalytics: { avgRating: 4.98, totalStudents: 1200, avgInterestScore: 9.5 },
+    overallAnalytics: { avgRating: 4.98, totalStudents: 1200, avgInterestScore: 9.5 }
   },
   {
     ...BASE,
@@ -271,7 +284,7 @@ export const MOCK_TOP_RATED: HomeCourseCard[] = [
     createdAt: new Date('2024-03-01'),
     category: { name: 'DeFi', slug: 'defi' },
     creator: { fullName: 'DeFi Pro', avatar: null },
-    overallAnalytics: { avgRating: 4.95, totalStudents: 3400, avgInterestScore: 9.3 },
+    overallAnalytics: { avgRating: 4.95, totalStudents: 3400, avgInterestScore: 9.3 }
   },
   {
     ...BASE,
@@ -286,7 +299,7 @@ export const MOCK_TOP_RATED: HomeCourseCard[] = [
     createdAt: new Date('2024-06-15'),
     category: { name: 'Ethereum', slug: 'ethereum' },
     creator: { fullName: 'Nguyen Group', avatar: null },
-    overallAnalytics: { avgRating: 4.92, totalStudents: 9800, avgInterestScore: 8.9 },
+    overallAnalytics: { avgRating: 4.92, totalStudents: 9800, avgInterestScore: 8.9 }
   },
   {
     ...BASE,
@@ -301,7 +314,7 @@ export const MOCK_TOP_RATED: HomeCourseCard[] = [
     createdAt: new Date('2024-11-01'),
     category: { name: 'Blockchain', slug: 'blockchain' },
     creator: { fullName: 'Lê Bình', avatar: null },
-    overallAnalytics: { avgRating: 4.88, totalStudents: 3200, avgInterestScore: 9.2 },
+    overallAnalytics: { avgRating: 4.88, totalStudents: 3200, avgInterestScore: 9.2 }
   },
   {
     ...BASE,
@@ -316,6 +329,6 @@ export const MOCK_TOP_RATED: HomeCourseCard[] = [
     createdAt: new Date('2024-09-01'),
     category: { name: 'Trading', slug: 'trading' },
     creator: { fullName: 'Trade Master', avatar: null },
-    overallAnalytics: { avgRating: 4.85, totalStudents: 4100, avgInterestScore: 8.8 },
-  },
+    overallAnalytics: { avgRating: 4.85, totalStudents: 4100, avgInterestScore: 8.8 }
+  }
 ]
