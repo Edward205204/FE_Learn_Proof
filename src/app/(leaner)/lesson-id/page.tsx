@@ -24,7 +24,9 @@ export default function LessonPage({ params }: { params: { id: string } }) {
                     <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0">
                         <TabsTrigger value="mote" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent pb-2 font-bold">Mô tả</TabsTrigger>
                         <TabsTrigger value="ai" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent pb-2 font-bold">Hỏi đáp AI <span className="ml-1 bg-rose-100 text-primary text-[10px] px-1 rounded">MỚI</span></TabsTrigger>
-                        <TabsTrigger value="tailieu" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent pb-2 font-bold">Thảo luận</TabsTrigger>
+                        <TabsTrigger value="thaoluan" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent pb-2 font-bold">Thảo luận</TabsTrigger>
+                        <TabsTrigger value="tailieu" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent pb-2 font-bold">Tài liệu</TabsTrigger>
+
                     </TabsList>
 
                     <TabsContent value="mote" className="py-6 text-slate-600 leading-relaxed">
