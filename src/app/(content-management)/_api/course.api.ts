@@ -7,8 +7,7 @@ const courseApi = {
 
   getCourseById: (courseId: string) => http.get<Course>(`/courses/${courseId}`),
 
-  createCourse: (body: CreateCourseStep1Values & CreateCourseStep3Values) =>
-    http.post<Course>('/courses', body),
+  createCourse: (body: CreateCourseStep1Values & CreateCourseStep3Values) => http.post<Course>('/courses', body),
 
   updateCourse: (courseId: string, body: Partial<CreateCourseStep1Values & CreateCourseStep3Values>) =>
     http.patch<Course>(`/courses/${courseId}`, body),
@@ -23,8 +22,7 @@ const courseApi = {
   updateChapter: (courseId: string, chapterId: string, body: { title: string }) =>
     http.patch<Chapter>(`/courses/${courseId}/chapters/${chapterId}`, body),
 
-  deleteChapter: (courseId: string, chapterId: string) =>
-    http.delete(`/courses/${courseId}/chapters/${chapterId}`),
+  deleteChapter: (courseId: string, chapterId: string) => http.delete(`/courses/${courseId}/chapters/${chapterId}`),
 
   reorderChapters: (courseId: string, body: { orderedIds: string[] }) =>
     http.patch(`/courses/${courseId}/chapters/reorder`, body),
@@ -32,8 +30,7 @@ const courseApi = {
   createLesson: (chapterId: string, body: { title: string }) =>
     http.post<Lesson>(`/chapters/${chapterId}/lessons`, body),
 
-  updateLesson: (lessonId: string, body: { title: string }) =>
-    http.patch<Lesson>(`/lessons/${lessonId}`, body),
+  updateLesson: (lessonId: string, body: { title: string }) => http.patch<Lesson>(`/lessons/${lessonId}`, body),
 
   deleteLesson: (lessonId: string) => http.delete(`/lessons/${lessonId}`)
 }
