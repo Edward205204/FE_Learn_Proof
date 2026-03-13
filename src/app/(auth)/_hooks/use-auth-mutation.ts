@@ -11,7 +11,7 @@ export function useLoginMutation() {
     onSuccess: () => {
       toast.success('Đăng nhập thành công!')
       router.refresh()
-      router.replace(PATH.HOME)
+      router.replace(`${PATH.ONBOARDING}/step1`)
     }
   })
 }
@@ -23,7 +23,7 @@ export function useRegisterMutation() {
     onSuccess: () => {
       toast.success('Đăng ký thành công!')
       router.refresh()
-      router.replace(PATH.HOME)
+      router.replace(`${PATH.ONBOARDING}/step1`)
     }
   })
 }
