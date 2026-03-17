@@ -6,10 +6,26 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'cdn.worldvectorlogo.com',
-        pathname: '/logos/**',
+        pathname: '/logos/**'
       },
-    ],
-  },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos'
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'encrypted-tbn0.gstatic.com'
+      }
+    ]
+  }
 }
 
 export default nextConfig

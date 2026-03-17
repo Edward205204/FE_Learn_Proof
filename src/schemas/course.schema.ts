@@ -9,13 +9,13 @@ export const GetCoursesQuery = z
     price: z.enum(['true', 'false']).optional(),
     rating: z.coerce.number().optional(),
     search: z.string().optional(),
-    sort: z.enum(['newest', 'popular', 'rating', 'price-asc', 'price-desc']).optional(),
+    sort: z.enum(['newest', 'popular', 'rating', 'price-asc', 'price-desc']).optional()
   })
   .strict()
 
 export const GetCourseDetailQuery = z
   .object({
-    slug: z.string(),
+    slug: z.string()
   })
   .strict()
 
@@ -31,18 +31,18 @@ export const CourseItemResponseSchema = z.object({
   createdAt: z.date(),
   category: z.object({
     name: z.string(),
-    slug: z.string(),
+    slug: z.string()
   }),
   creator: z.object({
     fullName: z.string(),
-    avatar: z.string().nullable(),
+    avatar: z.string().nullable()
   }),
   overallAnalytics: z
     .object({
       avgRating: z.number(),
-      totalStudents: z.number(),
+      totalStudents: z.number()
     })
-    .nullable(),
+    .nullable()
 })
 
 export const GetCoursesResponseSchema = z.object({
@@ -51,8 +51,8 @@ export const GetCoursesResponseSchema = z.object({
     total: z.number(),
     page: z.number(),
     limit: z.number(),
-    totalPages: z.number(),
-  }),
+    totalPages: z.number()
+  })
 })
 
 export const CurriculumLessonSchema = z.object({
@@ -60,14 +60,14 @@ export const CurriculumLessonSchema = z.object({
   title: z.string(),
   order: z.number().int(),
   type: z.enum(['VIDEO', 'TEXT', 'QUIZ']),
-  duration: z.number().int(),
+  duration: z.number().int()
 })
 
 export const CurriculumChapterSchema = z.object({
   id: z.string(),
   title: z.string(),
   order: z.number().int(),
-  lessons: z.array(CurriculumLessonSchema),
+  lessons: z.array(CurriculumLessonSchema)
 })
 
 export const CourseReviewSchema = z.object({
@@ -77,8 +77,8 @@ export const CourseReviewSchema = z.object({
   createdAt: z.date(),
   user: z.object({
     fullName: z.string(),
-    avatar: z.string().nullable(),
-  }),
+    avatar: z.string().nullable()
+  })
 })
 
 export const CourseDetailResponseSchema = z.object({
@@ -101,22 +101,22 @@ export const CourseDetailResponseSchema = z.object({
   updatedAt: z.date(),
   category: z.object({
     name: z.string(),
-    slug: z.string(),
+    slug: z.string()
   }),
   creator: z.object({
     id: z.string(),
     fullName: z.string(),
-    avatar: z.string().nullable(),
+    avatar: z.string().nullable()
   }),
   chapters: z.array(CurriculumChapterSchema),
   overallAnalytics: z
     .object({
       totalStudents: z.number().int(),
       avgRating: z.number(),
-      completionRate: z.number(),
+      completionRate: z.number()
     })
     .nullable(),
-  reviews: z.array(CourseReviewSchema),
+  reviews: z.array(CourseReviewSchema)
 })
 
 /** Card nhỏ dùng chung cho tất cả các section trên trang chủ */
@@ -137,23 +137,23 @@ export const HomeCourseCardSchema = z.object({
     .object({
       avgRating: z.number(),
       totalStudents: z.number(),
-      avgInterestScore: z.number(),
+      avgInterestScore: z.number()
     })
-    .nullable(),
+    .nullable()
 })
 
 export const HomeSectionsResponseSchema = z.object({
   trending: z.array(HomeCourseCardSchema),
   topSelling: z.array(HomeCourseCardSchema),
   newest: z.array(HomeCourseCardSchema),
-  topRated: z.array(HomeCourseCardSchema),
+  topRated: z.array(HomeCourseCardSchema)
 })
 
 export const CategoryWithCountSchema = z.object({
   id: z.string(),
   name: z.string(),
   slug: z.string(),
-  _count: z.object({ courses: z.number().int() }),
+  _count: z.object({ courses: z.number().int() })
 })
 
 export const GetCategoriesResponseSchema = z.array(CategoryWithCountSchema)
@@ -163,7 +163,7 @@ export const GetSearchSuggestionsQuery = z.object({ q: z.string().min(1) }).stri
 export const SearchSuggestionSchema = z.object({
   title: z.string(),
   slug: z.string(),
-  thumbnail: z.string().nullable(),
+  thumbnail: z.string().nullable()
 })
 export const AllSlugsResponseSchema = z.array(z.string())
 export const GetSearchSuggestionsResponseSchema = z.array(SearchSuggestionSchema)

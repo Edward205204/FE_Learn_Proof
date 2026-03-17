@@ -2,6 +2,7 @@ import Header from '@/components/common/header'
 import Footer from '@/components/common/footer'
 import { Button } from '@/components/ui/button'
 import { PlayCircle, ArrowRight, Clock, Users } from 'lucide-react'
+import Image from 'next/image'
 
 const courses = [
   {
@@ -74,7 +75,8 @@ export default function Home() {
           <div className='lg:w-1/2'>
             <div className='relative aspect-video w-full overflow-hidden rounded-[0.5rem] shadow-2xl'>
               <div className='absolute inset-0 bg-gradient-to-tr from-[oklch(0.577_0.245_27.325)]/20 to-transparent'></div>
-              <img
+              <Image
+                fill
                 className='h-full w-full object-cover'
                 src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80'
                 alt='Students collaborating'
@@ -115,7 +117,8 @@ export default function Home() {
                 className='group flex flex-col gap-4 rounded-[0.5rem] bg-[oklch(1_0_0)] dark:bg-[oklch(0.141_0.005_285.823)] p-3 shadow-sm border border-[oklch(0.92_0.004_286.32)] hover:shadow-md transition-shadow'
               >
                 <div className='relative aspect-video w-full overflow-hidden rounded-[calc(0.5rem-2px)]'>
-                  <img
+                  <Image
+                    fill
                     className='h-full w-full object-cover transition-transform group-hover:scale-105'
                     src={course.img}
                     alt={course.title}
