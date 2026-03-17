@@ -47,7 +47,7 @@ export default function CreateCourseStep1Page() {
       backLabel='Quay lại danh sách khóa học'
       title='Tạo khóa học mới'
       description='Bắt đầu với những thông tin cơ bản về khóa học của bạn.'
-      onBack={() => router.push(PATH.STUDIO)}
+      onBack={() => router.push(PATH.STUDIO_COURSES)}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onNext)} className='space-y-8'>
@@ -63,7 +63,7 @@ export default function CreateCourseStep1Page() {
               variant='ghost'
               type='button'
               className='font-semibold text-muted-foreground'
-              onClick={() => router.push(PATH.STUDIO)}
+              onClick={() => router.push(PATH.STUDIO_COURSES)}
             >
               Hủy
             </Button>

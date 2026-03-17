@@ -63,7 +63,7 @@ export default function EditCourseStep2Page() {
     const parsed = updateCourseChaptersFrameSchema.safeParse(body)
     if (!parsed.success) return
     await updateChaptersMutation.mutateAsync(parsed.data)
-    router.push(`${PATH.STUDIO}/courses/${courseId}/edit/step3`)
+    router.push(`${PATH.STUDIO_COURSES}/courses/${courseId}/edit/step3`)
   }
 
   return (
@@ -71,7 +71,7 @@ export default function EditCourseStep2Page() {
       <div className='space-y-2'>
         <button
           type='button'
-          onClick={() => router.push(`${PATH.STUDIO}/courses/${courseId}/edit/step1`)}
+          onClick={() => router.push(`${PATH.STUDIO_COURSES}/courses/${courseId}/edit/step1`)}
           className='flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors'
         >
           <ChevronLeft className='w-4 h-4 mr-1' />
@@ -137,7 +137,7 @@ export default function EditCourseStep2Page() {
       </Card>
 
       <div className='flex border-t justify-between pt-6'>
-        <Button variant='outline' onClick={() => router.push(`${PATH.STUDIO}/courses/${courseId}/edit/step1`)}>
+        <Button variant='outline' onClick={() => router.push(`${PATH.STUDIO_COURSES}/courses/${courseId}/edit/step1`)}>
           <ChevronLeft className='w-4 h-4 mr-1' />
           Quay lại
         </Button>

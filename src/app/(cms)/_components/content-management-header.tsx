@@ -12,11 +12,11 @@ import { useEffect, useRef } from 'react'
 
 const TITLE_BY_PREFIX: Array<{ prefix: string; title: string }> = [
   { prefix: PATH.COURSE_NEW_STEP1, title: 'Tạo khóa học' },
-  { prefix: PATH.STUDIO + '/courses/', title: 'Khóa học' },
+  { prefix: PATH.STUDIO_COURSES, title: 'Khóa học' },
   { prefix: PATH.FEEDBACK_LIST, title: 'Feedback' },
   { prefix: PATH.QUIZ_LESSON, title: 'Quiz' },
   { prefix: PATH.QUIZ_STANDALONE, title: 'Quiz' },
-  { prefix: PATH.STUDIO, title: 'Khóa học' }
+  { prefix: PATH.STUDIO_COURSES, title: 'Khóa học' }
 ]
 
 function pickTitle(pathname: string) {
@@ -69,10 +69,10 @@ export function ContentManagementHeader() {
 
         <div className='flex items-center gap-3 relative' ref={menuRef}>
           <Link
-            href={PATH.STUDIO}
+            href={PATH.STUDIO_COURSES}
             className={cn(
               'text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap',
-              pathname === PATH.STUDIO && 'text-foreground'
+              pathname === PATH.STUDIO_COURSES && 'text-foreground'
             )}
           >
             Về khóa học

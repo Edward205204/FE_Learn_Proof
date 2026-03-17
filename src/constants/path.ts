@@ -1,5 +1,5 @@
 export const PATH = {
-  STUDIO: '/studio',
+  STUDIO_COURSES: '/studio/courses',
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
@@ -16,13 +16,13 @@ export const PATH = {
 
   // CONTENT_MANAGER + ADMIN
 
-  COURSE_NEW_STEP1: '/studio/courses/new/step1',
-  COURSE_NEW_STEP2: '/studio/courses/new/step2',
-  COURSE_NEW_STEP3: '/studio/courses/new/step3',
+  COURSE_NEW_STEP1: '/studio/courses/new/step-1',
+  COURSE_NEW_STEP2: '/studio/courses/new/step-2',
+  COURSE_NEW_STEP3: '/studio/courses/new/step-3',
   COURSE_NEW_FINISH: '/studio/courses/new/finish',
-  FEEDBACK_LIST: '/studio/feedback-list',
-  QUIZ_LESSON: '/studio/quiz/quiz1',
-  QUIZ_STANDALONE: '/studio/quiz/quiz2',
+  FEEDBACK_LIST: '/studio/courses/feedbacks',
+  QUIZ_LESSON: '/studio/courses/quiz/quiz1',
+  QUIZ_STANDALONE: '/studio/courses/quiz/quiz2',
 
   // ADMIN only
   ADMIN: '/admin'

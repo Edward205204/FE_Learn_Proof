@@ -22,16 +22,16 @@ const NAV_ITEMS: NavItem[] = [
     match: () => false
   },
   {
-    href: PATH.STUDIO + '/courses/new/step1',
+    href: PATH.COURSE_NEW_STEP1,
     label: 'Tạo khóa học',
     icon: PlusCircle,
-    match: (p) => p.startsWith(PATH.STUDIO + '/courses/new/')
+    match: (p) => p.startsWith(PATH.COURSE_NEW_STEP1)
   },
   {
-    href: PATH.STUDIO,
+    href: PATH.STUDIO_COURSES,
     label: 'Khóa học',
     icon: BookOpen,
-    match: (p) => p === PATH.STUDIO || p.startsWith(PATH.STUDIO + '/courses/')
+    match: (p) => p === PATH.STUDIO_COURSES || p.startsWith(PATH.STUDIO_COURSES + '/courses/')
   },
   {
     href: PATH.FEEDBACK_LIST,
@@ -42,7 +42,7 @@ const NAV_ITEMS: NavItem[] = [
     href: PATH.QUIZ_LESSON,
     label: 'Quiz',
     icon: HelpCircle,
-    match: (p) => p.startsWith(PATH.STUDIO + '/quiz/')
+    match: (p) => p.startsWith(PATH.STUDIO_COURSES + '/quiz/')
   }
 ]
 

@@ -55,7 +55,7 @@ export default function CourseFinishPage() {
             size='lg'
             className='h-14 px-8 rounded-full font-bold text-base shadow-lg shadow-primary/20 transition-all hover:scale-[1.02]'
           >
-            <Link href={PATH.STUDIO}>
+            <Link href={PATH.STUDIO_COURSES}>
               <LayoutGrid className='w-5 h-5 mr-2' />
               Quản lý khóa học
             </Link>
@@ -80,7 +80,7 @@ export default function CourseFinishPage() {
               label='Tạo bài kiểm tra'
               href={PATH.QUIZ_LESSON}
             />
-            <QuickActionLink icon={<Settings className='w-6 h-6' />} label='Cài đặt' href={PATH.STUDIO} />
+            <QuickActionLink icon={<Settings className='w-6 h-6' />} label='Cài đặt' href={PATH.STUDIO_COURSES} />
           </div>
         </div>
       </Card>
