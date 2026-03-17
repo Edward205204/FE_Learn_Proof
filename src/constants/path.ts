@@ -20,9 +20,9 @@ export const PATH = {
   COURSE_NEW_STEP2: '/studio/courses/new/step-2',
   COURSE_NEW_STEP3: '/studio/courses/new/step-3',
   COURSE_NEW_FINISH: '/studio/courses/new/finish',
-  FEEDBACK_LIST: '/studio/courses/feedbacks',
-  QUIZ_LESSON: '/studio/courses/quiz/quiz1',
-  QUIZ_STANDALONE: '/studio/courses/quiz/quiz2',
+  FEEDBACK_LIST: '/studio/feedbacks',
+  QUIZ_LESSON: '/studio/quiz/quiz1',
+  QUIZ_STANDALONE: '/studio/quiz/quiz2',
 
   // ADMIN only
   ADMIN: '/admin'
