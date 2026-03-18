@@ -283,3 +283,19 @@ export type PaginationMeta = z.infer<typeof PaginationMetaSchema>
 export type CourseStatus = z.infer<typeof CourseStatusEnum>
 export type CourseLevel = z.infer<typeof CourseLevelEnum>
 export type ManagerFilterStatus = z.infer<typeof ManagerFilterStatusEnum>
+
+// --- Reorder payloads (khớp BE ReorderLessonBodySchema / ReorderChapterBodySchema) ---
+export interface ReorderChapterPayload {
+  courseId: string
+  chapterId: string
+  prevChapterId: string | null
+  nextChapterId: string | null
+}
+
+export interface ReorderLessonPayload {
+  courseId: string
+  lessonId: string
+  targetChapterId: string
+  prevLessonId: string | null
+  nextLessonId: string | null
+}

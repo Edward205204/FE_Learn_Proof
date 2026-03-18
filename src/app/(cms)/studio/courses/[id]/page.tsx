@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import { Plus, GripVertical, Pencil, Trash2, FileText, LayoutGrid, ChevronDown, ChevronRight } from 'lucide-react'
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { useGetManagerCourseDetailQuery } from '@/app/(cms)/_hooks/use-course-mutation'
+import { useReorderQueue } from '@/app/(cms)/_hooks/use-reorder'
 
 interface LessonItem {
   id: string
@@ -123,6 +124,19 @@ export default function ChaptersPage() {
     setInputText('')
   }
 
+  const lastConfirmedRef = useRef<ChapterItem[]>(chapters)
+  useEffect(() => {
+    if (mappedChaptersFromServer.length) {
+      lastConfirmedRef.current = mappedChaptersFromServer
+    }
+  }, [mappedChaptersFromServer])
+
+  const handleRollback = useCallback(() => {
+    setChapters(lastConfirmedRef.current)
+  }, [])
+
+  const { enqueue } = useReorderQueue(handleRollback)
+
   const toggleChapter = (chapterId: string) => {
     setExpandedChapters((prev) => ({ ...prev, [chapterId]: !prev[chapterId] }))
   }
@@ -137,6 +151,17 @@ export default function ChaptersPage() {
       const [movedChapter] = newChapters.splice(source.index, 1)
       newChapters.splice(destination.index, 0, movedChapter)
       setChapters(newChapters)
+
+      const destIdx = destination.index
+      enqueue({
+        kind: 'chapter',
+        payload: {
+          courseId,
+          chapterId: movedChapter.id,
+          prevChapterId: destIdx > 0 ? newChapters[destIdx - 1].id : null,
+          nextChapterId: destIdx < newChapters.length - 1 ? newChapters[destIdx + 1].id : null
+        }
+      })
       return
     }
 
@@ -145,24 +170,47 @@ export default function ChaptersPage() {
       const destChapter = chapters.find((ch) => ch.id === destination.droppableId)
       if (!sourceChapter || !destChapter) return
 
+      let newChapters: ChapterItem[]
+      let targetLessons: LessonItem[]
+      let movedLessonId: string
+
       if (source.droppableId === destination.droppableId) {
         const newLessons = Array.from(sourceChapter.lessons)
         const [movedLesson] = newLessons.splice(source.index, 1)
         newLessons.splice(destination.index, 0, movedLesson)
-        setChapters(chapters.map((ch) => (ch.id === sourceChapter.id ? { ...ch, lessons: newLessons } : ch)))
+        movedLessonId = movedLesson.id
+        targetLessons = newLessons
+        newChapters = chapters.map((ch) => (ch.id === sourceChapter.id ? { ...ch, lessons: newLessons } : ch))
       } else {
         const sourceLessons = Array.from(sourceChapter.lessons)
         const [movedLesson] = sourceLessons.splice(source.index, 1)
         const destLessons = Array.from(destChapter.lessons)
         destLessons.splice(destination.index, 0, movedLesson)
-        setChapters(
-          chapters.map((ch) => {
-            if (ch.id === sourceChapter.id) return { ...ch, lessons: sourceLessons }
-            if (ch.id === destChapter.id) return { ...ch, lessons: destLessons }
-            return ch
-          })
-        )
+        movedLessonId = movedLesson.id
+        targetLessons = destLessons
+
+        setExpandedChapters((prev) => ({ ...prev, [destChapter.id]: true }))
+
+        newChapters = chapters.map((ch) => {
+          if (ch.id === sourceChapter.id) return { ...ch, lessons: sourceLessons }
+          if (ch.id === destChapter.id) return { ...ch, lessons: destLessons }
+          return ch
+        })
       }
+
+      setChapters(newChapters)
+
+      const destIdx = destination.index
+      enqueue({
+        kind: 'lesson',
+        payload: {
+          courseId,
+          lessonId: movedLessonId,
+          targetChapterId: destination.droppableId,
+          prevLessonId: destIdx > 0 ? targetLessons[destIdx - 1].id : null,
+          nextLessonId: destIdx < targetLessons.length - 1 ? targetLessons[destIdx + 1].id : null
+        }
+      })
     }
   }
 

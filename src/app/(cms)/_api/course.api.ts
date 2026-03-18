@@ -9,7 +9,9 @@ import type {
   CourseBaseInfo,
   PublishCourseBody,
   UpdateCourseChaptersFrameBody,
-  ManagerCourseDetail
+  ManagerCourseDetail,
+  ReorderChapterPayload,
+  ReorderLessonPayload
 } from '../_utils/zod'
 
 const courseApi = {
@@ -42,7 +44,11 @@ const courseApi = {
 
   publishCourse: (courseId: string, body: PublishCourseBody) => http.patch(`/courses/${courseId}/publish`, body),
 
-  deleteCourse: (courseId: string) => http.delete(`/courses/${courseId}`)
+  deleteCourse: (courseId: string) => http.delete(`/courses/${courseId}`),
+
+  reorderChapter: (body: ReorderChapterPayload) => http.patch('/courses/reorder/chapters', body),
+
+  reorderLesson: (body: ReorderLessonPayload) => http.patch('/courses/reorder/lessons', body)
 }
 
 export default courseApi
