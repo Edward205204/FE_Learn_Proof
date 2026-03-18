@@ -30,3 +30,15 @@ export const orderConfirmationSchema = z.object({
 // Xuất các Type để dùng cho TypeScript an toàn
 export type CouponValues = z.infer<typeof couponSchema>;
 export type OrderConfirmationValues = z.infer<typeof orderConfirmationSchema>;
+
+export const transactionSchema = z.object({
+    id: z.string(),
+    orderCode: z.string(),
+    courseName: z.string(),
+    amount: z.number(),
+    paymentDate: z.string(),
+    paymentMethod: z.string(),
+    status: z.enum(['SUCCESS', 'PENDING', 'FAILED']), //
+});
+
+export type Transaction = z.infer<typeof transactionSchema>;
