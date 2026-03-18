@@ -74,10 +74,12 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-6">
-          <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)]" aria-label="Main navigation">
-            <Link className="hover:text-[oklch(0.577_0.245_27.325)] transition-colors" href="/courses">Courses</Link>
-            <Link className="hover:text-[oklch(0.577_0.245_27.325)] transition-colors" href="/mentors">Mentors</Link>
-            <Link className="hover:text-[oklch(0.577_0.245_27.325)] transition-colors" href="/pricing">Pricing</Link>
+          <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)]" aria-label="Main navigation">
+            <Link className="hover:text-[oklch(0.577_0.245_27.325)] transition-colors" href="/courses">Khám phá</Link>
+            <Link className="hover:text-[oklch(0.577_0.245_27.325)] transition-colors" href={PATH.MY_COURSES || "/courses/list"}>Học tập</Link>
+            <Link className="hover:text-[oklch(0.577_0.245_27.325)] transition-colors" href="/wishlist">Yêu thích</Link>
+            <Link className="hover:text-[oklch(0.577_0.245_27.325)] transition-colors" href="/cart">Giỏ hàng</Link>
+            <Link className="hover:text-[oklch(0.577_0.245_27.325)] transition-colors" href="/notifications">Thông báo</Link>
           </nav>
 
           <div className="flex items-center gap-4 relative" ref={menuRef}>
@@ -110,32 +112,32 @@ export default function Header() {
                     </div>
 
                     <div className="p-1">
-                      <Link 
-                        href={PATH.PROFILE || "/profile"} 
+                      <Link
+                        href={PATH.PROFILE || "/profile"}
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
                         onClick={closeMenu}
                       >
                         <UserIcon size={16} />
                         Hồ sơ của tôi
                       </Link>
-                      <Link 
-                        href={PATH.MY_COURSES || "/courses/list"} 
+                      <Link
+                        href={PATH.MY_COURSES || "/courses/list"}
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
                         onClick={closeMenu}
                       >
                         <BookOpen size={16} />
                         Khóa học của tôi
                       </Link>
-                      <Link 
-                        href={PATH.PAYMENT_HISTORY || "/payment-history"} 
+                      <Link
+                        href={PATH.PAYMENT_HISTORY || "/payment-history"}
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
                         onClick={closeMenu}
                       >
                         <HistoryIcon size={16} />
                         Lịch sử thanh toán
                       </Link>
-                      <Link 
-                        href={PATH.SETTINGS || "/settings"} 
+                      <Link
+                        href={PATH.SETTINGS || "/settings"}
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
                         onClick={closeMenu}
                       >
@@ -145,7 +147,7 @@ export default function Header() {
                     </div>
 
                     <div className="border-t p-1 dark:border-[oklch(0.274_0.006_286.033)]">
-                      <button 
+                      <button
                         onClick={handleLogout}
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
                       >
