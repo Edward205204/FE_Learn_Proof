@@ -1,8 +1,24 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import authApi from '@/app/(auth)/_api/auth.api'
 import { PATH } from '@/constants/path'
+import { useAuthStore } from '@/store/auth.store'
+
+export function useGetMeQuery() {
+  const { accessToken, setAuth, refreshToken } = useAuthStore()
+  return useQuery({
+    queryKey: ['me'],
+    queryFn: async () => {
+      const res = await authApi.getMe()
+      // sync store để giữ user luôn up-to-date với DB
+      setAuth({ user: res.data, accessToken, refreshToken })
+      return res.data
+    },
+    enabled: !!accessToken,
+    staleTime: 1000 * 60 * 5 // 5 phút
+  })
+}
 
 export function useLoginMutation() {
   const router = useRouter()
@@ -62,3 +78,4 @@ export function useResetPasswordMutation() {
     }
   })
 }
+

@@ -19,7 +19,9 @@ const authApi = {
     http.post<{ message: string }>('/auth/reset-password', body),
 
   getProfile: (accessToken: string) =>
-    http.get<User>('/auth/me', { headers: { Authorization: `Bearer ${accessToken}` } })
+    http.get<User>('/auth/me', { headers: { Authorization: `Bearer ${accessToken}` } }),
+
+  getMe: () => http.get<User>('/auth/me')
 }
 
 export default authApi
