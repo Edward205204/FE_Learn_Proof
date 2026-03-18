@@ -12,6 +12,7 @@ const MY_COURSES = [
     {
         id: '1',
         title: 'Lập trình ReactJS: Từ cơ bản đến nâng cao',
+        slug: 'lap-trinh-reactjs-pro',
         category: 'PHÁT TRIỂN WEB',
         image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80',
         nextLesson: 'Tìm hiểu React Hooks',
@@ -21,6 +22,7 @@ const MY_COURSES = [
     {
         id: '2',
         title: 'Mastering Figma for UI/UX Designers',
+        slug: 'mastering-figma-design',
         category: 'THIẾT KẾ',
         image: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&q=80',
         nextLesson: 'Hệ thống Auto Layout 3.0',
@@ -30,6 +32,7 @@ const MY_COURSES = [
     {
         id: '3',
         title: 'Data Science with Python & Seaborn',
+        slug: 'data-science-python-pro',
         category: 'DỮ LIỆU',
         image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80',
         nextLesson: 'Trực quan hóa với Seaborn',
@@ -187,7 +190,7 @@ function CourseCard({ course }: { course: typeof MY_COURSES[0] }) {
                     asChild
                     className="mt-10 w-full h-[64px] rounded-full bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white font-black text-base gap-2 border-none shadow-none group/btn transition-all active:scale-[0.98]"
                 >
-                    <Link href={`/courses/${course.id}`}>
+                    <Link href={`/courses/${course.slug}`}>
                         Tiếp tục học
                         <ArrowRight size={20} className="transition-transform group-hover/btn:translate-x-2" />
                     </Link>
