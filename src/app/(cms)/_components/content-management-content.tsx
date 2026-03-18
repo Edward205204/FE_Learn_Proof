@@ -13,12 +13,13 @@ import { useQueryParams } from '@/hooks/use-query-params'
 import { CourseCard } from './course-card'
 import { CourseListSkeleton } from './course-list-skeleton'
 import CourseManagerFilter from './course-manager-filter'
-import { useGetMyCoursesManagerQuery } from '../_hooks/use-course-mutation'
+import { useGetMyCoursesManagerQuery, usePrefetchManagerCourseDetail } from '../_hooks/use-course-mutation'
 import { GetMyCoursesManagerQuerySchema, type ManagerFilterStatus } from '../_utils/zod'
 
 export function ContentManagementContent() {
   const [queryParams, setQueryParams] = useQueryParams(GetMyCoursesManagerQuerySchema)
   const { data, isLoading, isFetching, isError, error, refetch } = useGetMyCoursesManagerQuery(queryParams)
+  const prefetchCourseDetail = usePrefetchManagerCourseDetail()
 
   const courses = data?.items ?? []
   const meta = data?.meta
@@ -87,7 +88,7 @@ export function ContentManagementContent() {
         ) : (
           <div className='space-y-3'>
             {courses.map((course) => (
-              <CourseCard key={course.id} course={course} />
+              <CourseCard key={course.id} course={course} onPrefetch={prefetchCourseDetail} />
             ))}
           </div>
         )}
