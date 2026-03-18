@@ -2,22 +2,23 @@
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Search, Star, LogOut, User as UserIcon, Settings } from "lucide-react";
+import { Search, Star, LogOut, User as UserIcon, Settings, BookOpen, History as HistoryIcon } from "lucide-react";
 import Link from 'next/link'
+import { PATH } from "@/constants/path";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useHeader } from "@/hooks/use-header";
 import { useRef, useEffect } from "react";
 
 export default function Header() {
-  const { 
-    user, 
-    isLoggedIn, 
-    isMenuOpen, 
-    toggleMenu, 
-    handleLogout, 
-    closeMenu 
+  const {
+    user,
+    isLoggedIn,
+    isMenuOpen,
+    toggleMenu,
+    handleLogout,
+    closeMenu
   } = useHeader();
-  
+
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside
@@ -31,7 +32,7 @@ export default function Header() {
     if (isMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -82,7 +83,7 @@ export default function Header() {
           <div className="flex items-center gap-4 relative" ref={menuRef}>
             {isLoggedIn && user ? (
               <>
-                <button 
+                <button
                   onClick={toggleMenu}
                   className="flex items-center gap-2 focus:outline-none transition-transform active:scale-95"
                   aria-expanded={isMenuOpen}
@@ -107,23 +108,39 @@ export default function Header() {
                         {user.email}
                       </p>
                     </div>
-                    
+
                     <div className="p-1">
                       <Link 
-                        href="/profile" 
+                        href={PATH.PROFILE || "/profile"} 
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
                         onClick={closeMenu}
                       >
                         <UserIcon size={16} />
-                        Profile
+                        Hồ sơ của tôi
                       </Link>
                       <Link 
-                        href="/settings" 
+                        href={PATH.MY_COURSES || "/courses/list"} 
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
+                        onClick={closeMenu}
+                      >
+                        <BookOpen size={16} />
+                        Khóa học của tôi
+                      </Link>
+                      <Link 
+                        href={PATH.PAYMENT_HISTORY || "/payment-history"} 
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
+                        onClick={closeMenu}
+                      >
+                        <HistoryIcon size={16} />
+                        Lịch sử thanh toán
+                      </Link>
+                      <Link 
+                        href={PATH.SETTINGS || "/settings"} 
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
                         onClick={closeMenu}
                       >
                         <Settings size={16} />
-                        Settings
+                        Cài đặt
                       </Link>
                     </div>
 
@@ -133,7 +150,7 @@ export default function Header() {
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
                       >
                         <LogOut size={16} />
-                        Log out
+                        Đăng xuất
                       </button>
                     </div>
                   </div>
@@ -152,4 +169,4 @@ export default function Header() {
       </div>
     </header>
   );
-}
+}

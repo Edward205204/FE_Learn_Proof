@@ -12,7 +12,9 @@ export const PATH = {
 
   // Protected — mọi role
   PROFILE: '/profile',
-  MY_COURSES: '/my-courses',
+  MY_COURSES: '/courses/list',
+  SETTINGS: '/settings',
+  PAYMENT_HISTORY: '/payment-history',
 
   // CONTENT_MANAGER + ADMIN
 
