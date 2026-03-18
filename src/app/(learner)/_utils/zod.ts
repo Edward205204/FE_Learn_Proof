@@ -42,3 +42,21 @@ export const transactionSchema = z.object({
 });
 
 export type Transaction = z.infer<typeof transactionSchema>;
+
+export const certificateSchema = z.object({
+    courseId: z.string().min(1, "ID khóa học là bắt buộc"),
+    courseName: z.string().min(1, "Tên khóa học không được để trống"),
+    learnerName: z.string().min(1, "Tên học viên không được để trống"),
+
+    // Logic quan trọng nhất: Ràng buộc Progress phải đạt đúng 100%
+    progress: z.number().refine((val) => val === 100, {
+        message: "Tiến độ học tập phải đạt 100% để kích hoạt quá trình cấp chứng chỉ trên Blockchain",
+    }),
+
+    // Dữ liệu sau khi tạo Hash thành công (Optional khi bắt đầu, Required khi lưu trữ)
+    blockchainHash: z.string().optional(),
+    txId: z.string().optional(), // Transaction ID trên Blockchain
+    issueDate: z.string().optional(),
+});
+
+export type Certificate = z.infer<typeof certificateSchema>;
