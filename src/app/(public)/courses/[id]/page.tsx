@@ -13,7 +13,9 @@ import {
   PlayCircle,
   FileText,
   ShieldCheck,
-  Zap
+  Zap,
+  ShoppingCart,
+  Heart
 } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -107,6 +109,7 @@ Xuyên suốt các mô-đun, chúng tôi tập trung vào bảo mật, tối ưu
 
 export default function CourseDetailPage() {
   const [expandedChapters, setExpandedChapters] = useState<string[]>(['ch1'])
+  const [isWishlisted, setIsWishlisted] = useState(false)
 
   const toggleChapter = (id: string) => {
     setExpandedChapters(prev => 
@@ -328,9 +331,35 @@ export default function CourseDetailPage() {
                    )}
                 </div>
 
-                <Button className="w-full h-14 bg-rose-600 hover:bg-rose-700 text-white font-black text-base rounded-2xl shadow-xl shadow-rose-200 dark:shadow-rose-900/20 active:scale-[0.98] transition-all mb-8">
+                <Button className="w-full h-14 bg-rose-600 hover:bg-rose-700 text-white font-black text-base rounded-2xl shadow-xl shadow-rose-200 dark:shadow-rose-900/20 active:scale-[0.98] transition-all">
                   Đăng ký ngay
                 </Button>
+
+                <div className="flex gap-3 mt-3 mb-8">
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-12 rounded-2xl border-2 border-slate-200 dark:border-slate-700 font-black text-sm text-slate-700 dark:text-slate-200 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all gap-2 active:scale-[0.98]"
+                  >
+                    <ShoppingCart size={16} />
+                    Thêm giỏ hàng
+                  </Button>
+
+                  <button
+                    onClick={() => setIsWishlisted(prev => !prev)}
+                    className={`h-12 w-12 shrink-0 rounded-2xl border-2 flex items-center justify-center transition-all active:scale-[0.92] ${
+                      isWishlisted
+                        ? 'border-rose-400 bg-rose-50 dark:bg-rose-500/10 text-rose-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-rose-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10'
+                    }`}
+                    title={isWishlisted ? 'Bỏ yêu thích' : 'Yêu thích'}
+                  >
+                    <Heart
+                      size={18}
+                      className="transition-all duration-200"
+                      fill={isWishlisted ? 'currentColor' : 'none'}
+                    />
+                  </button>
+                </div>
 
                 <div className="space-y-5">
                   <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]">Khóa học bao gồm:</p>
