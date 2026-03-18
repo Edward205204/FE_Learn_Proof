@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-import { QuestionCard } from '../../../_components/question-card'
+import { QuestionCard } from '../../../../../_components/question-card'
 
 /* ---------------- SCHEMA ---------------- */
 

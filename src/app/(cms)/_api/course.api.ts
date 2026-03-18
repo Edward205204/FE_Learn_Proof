@@ -8,7 +8,8 @@ import type {
   CreateCourseStep1,
   CourseBaseInfo,
   PublishCourseBody,
-  UpdateCourseChaptersFrameBody
+  UpdateCourseChaptersFrameBody,
+  ManagerCourseDetail
 } from '../_utils/zod'
 
 const courseApi = {
@@ -25,6 +26,9 @@ const courseApi = {
     }),
 
   getCourseById: (courseId: string) => http.get<Course>(`/courses/${courseId}`),
+
+  getManagerCourseDetail: (courseId: string) =>
+    http.get<ManagerCourseDetail>(`/courses/manager/course-detail/${courseId}`),
 
   getCourseBaseInfo: (courseId: string) => http.get<CourseBaseInfo>(`/courses/base-info/${courseId}`),
 

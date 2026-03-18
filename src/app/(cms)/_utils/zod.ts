@@ -4,6 +4,7 @@ import { z } from 'zod'
 export const CourseLevelEnum = z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED'])
 export const CourseStatusEnum = z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED'])
 export const QuestionTypeEnum = z.enum(['multiple_choice', 'single_choice'])
+export const LessonTypeEnum = z.enum(['VIDEO', 'TEXT', 'QUIZ'])
 
 // lấy category
 export const CategorySchema = z.object({
@@ -127,6 +128,49 @@ export const CourseBaseInfoSchema = z.object({
 })
 
 export type CourseBaseInfo = z.infer<typeof CourseBaseInfoSchema>
+
+// --- Schema chi tiết khóa học cho Studio (Manager) ---
+export const ManagerLessonSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  order: z.number(),
+  type: LessonTypeEnum,
+  duration: z.number().int()
+})
+
+export const ManagerChapterSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  order: z.number(),
+  lessons: z.array(ManagerLessonSchema)
+})
+
+export const ManagerCourseDetailSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  slug: z.string(),
+  shortDesc: z.string(),
+  fullDesc: z.string(),
+  thumbnail: z.string().nullable(),
+  level: CourseLevelEnum,
+  status: CourseStatusEnum,
+  isFree: z.boolean(),
+  price: z.number(),
+  originalPrice: z.number().nullable(),
+  publishedLessonsCount: z.number().int(),
+  totalPlannedLessons: z.number().int().nullable(),
+  expectedDays: z.number().int().nullable(),
+  // BE dùng Date, nhưng ra JSON là string
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  category: z.object({
+    name: z.string(),
+    slug: z.string()
+  }),
+  chapters: z.array(ManagerChapterSchema)
+})
+
+export type ManagerCourseDetail = z.infer<typeof ManagerCourseDetailSchema>
 
 // --- Schema Quiz ---
 const answerSchema = z.object({

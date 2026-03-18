@@ -20,13 +20,12 @@ import {
 
 export default function EditCourseStep1Page() {
   const router = useRouter()
-  const params = useParams<{ courseId: string }>()
-  const courseId = params.courseId
+  const params = useParams<{ id: string }>()
+  const courseId = params.id
 
   const { data: categories } = useGetCategoriesQuery()
   const { data: baseInfo, isLoading } = useGetCourseBaseInfoQuery(courseId)
   const updateBaseInfoMutation = useUpdateCourseBaseInfoMutation(courseId)
-
   const form = useForm<CreateCourseStep1>({
     resolver: zodResolver(createCourseStep1Schema),
     defaultValues: {
