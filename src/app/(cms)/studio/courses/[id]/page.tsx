@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { toast } from 'sonner'
 import { useGetManagerCourseDetailQuery } from '@/app/(cms)/_hooks/use-course-mutation'
 import { useReorderQueue } from '@/app/(cms)/_hooks/use-reorder'
+import Link from 'next/link'
+import { PATH } from '@/constants/path'
 
 interface LessonItem {
   id: string
@@ -315,14 +317,15 @@ export default function ChaptersPage() {
                                         Bài {lIndex + 1}: {lesson.title}
                                       </span>
                                       <div className='flex opacity-0 group-hover/lesson:opacity-100 transition-opacity'>
-                                        <Button
-                                          variant='ghost'
-                                          size='icon'
-                                          className='h-7 w-7'
-                                          onClick={() => handleOpenLessonDialog(chapter.id, lesson)}
+                                        <Link
+                                          href={PATH.CREATE_LESSON.replace(':id', courseId).replace(
+                                            ':lessonId',
+                                            lesson.id
+                                          )}
+                                          className='h-7 w-7 flex items-center justify-center'
                                         >
-                                          <Pencil className='w-3.5 h-3.5' />
-                                        </Button>
+                                          <Pencil className='size-4' />
+                                        </Link>
                                         <Button
                                           variant='ghost'
                                           size='icon'
