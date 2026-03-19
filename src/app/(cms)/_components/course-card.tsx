@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { BookOpen, Pencil, Star, TrendingUp, Trash2, Users } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
@@ -25,6 +26,7 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, onPrefetch }: CourseCardProps) {
+  const router = useRouter()
   const deleteMutation = useDeleteCourseMutation()
   const analytics = course.overallAnalytics
 
@@ -58,10 +60,16 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
 
                 <div className='flex items-center gap-1 shrink-0' onClick={(e) => e.preventDefault()}>
                   {course.status === 'DRAFT' && (
-                    <Button variant='ghost' size='icon-sm' asChild>
-                      <Link href={PATH.COURSE_EDIT_STEP1.replace(':id', course.id)}>
-                        <Pencil className='size-3.5' />
-                      </Link>
+                    <Button
+                      variant='ghost'
+                      size='icon-sm'
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        router.push(PATH.COURSE_EDIT_STEP1.replace(':id', course.id))
+                      }}
+                    >
+                      <Pencil className='size-3.5' />
                     </Button>
                   )}
                   <Button
