@@ -7,6 +7,7 @@ import { CloudUpload, Sparkles } from 'lucide-react'
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { SimpleEditor } from '@/components/common/simple-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import { LEVEL_OPTIONS } from '@/app/(cms)/_constants/course-workflow'
@@ -106,11 +107,11 @@ export function CourseStep1Fields({ form, categories, shortDescriptionLength, th
               </span>
             </div>
             <FormControl>
-              <Textarea
+              <SimpleEditor
+                value={field.value}
+                onChange={field.onChange}
                 placeholder='Mô tả ngắn gọn nội dung và lợi ích khóa học mang lại cho học viên...'
-                className='min-h-[100px] resize-none'
-                maxLength={250}
-                {...field}
+                minHeight='min-h-[100px]'
               />
             </FormControl>
             <FormDescription className='text-xs italic'>

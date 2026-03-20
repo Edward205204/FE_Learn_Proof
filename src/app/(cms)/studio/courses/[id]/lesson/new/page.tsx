@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-
+import { ProfessionalEditor } from "@/components/common/professional-editor"
 import { QuestionCard } from '../../../../../_components/question-card'
 
 /* ---------------- SCHEMA ---------------- */
@@ -140,30 +140,50 @@ export default function LessonEditorPage() {
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
           {/* VIDEO */}
 
+          {/* VIDEO - Thay Textarea bằng ProfessionalEditor nếu cần mô tả chuyên sâu */}
           {lessonType === 'video' && (
             <Card>
               <CardHeader>
                 <CardTitle>Nội dung Video</CardTitle>
               </CardHeader>
-
               <CardContent className='space-y-4'>
                 <Input placeholder='Video URL' {...form.register('videoUrl')} />
 
-                <Textarea placeholder='Mô tả dài (context cho AI)' {...form.register('content')} />
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Mô tả bài học (AI Context)</label>
+                  <Controller
+                    name="content"
+                    control={form.control}
+                    render={({ field }) => (
+                      <ProfessionalEditor value={field.value || ''} onChange={field.onChange} />
+                    )}
+                  />
+                </div>
               </CardContent>
             </Card>
           )}
 
-          {/* TEXT */}
-
+          {/* TEXT - Thay thế hoàn toàn Textarea bằng ProfessionalEditor */}
           {lessonType === 'text' && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Nội dung Text</CardTitle>
+            <Card className="border-none shadow-none bg-transparent">
+              <CardHeader className="px-0">
+                <CardTitle className="text-xl font-black italic uppercase">Nội dung Text (Bài đọc)</CardTitle>
               </CardHeader>
 
-              <CardContent>
-                <Textarea className='min-h-[200px]' placeholder='Nhập nội dung bài học' {...form.register('content')} />
+              <CardContent className="px-0">
+                <Controller
+                  name="content"
+                  control={form.control}
+                  render={({ field }) => (
+                    <ProfessionalEditor
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+                {form.formState.errors.content && (
+                  <p className="text-sm text-red-500 mt-2">{form.formState.errors.content.message}</p>
+                )}
               </CardContent>
             </Card>
           )}
