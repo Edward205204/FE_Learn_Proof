@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Star, Mail, Github, Twitter, Linkedin } from "lucide-react";
+import { Mail, Github, Twitter, Linkedin } from "lucide-react";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -13,9 +14,9 @@ export default function Footer() {
       <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-10 md:grid-cols-4">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2 text-[oklch(0.577_0.245_27.325)]">
-            <Star size={24} fill="currentColor" />
+            <Image src="/images/leaner/logo (2).png" alt="Learn Proof Logo" width={56} height={56} className="object-contain" />
             <h2 className="text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] text-lg font-bold">
-              LearnPoorf
+              Learn Proof
             </h2>
           </div>
           <p className="text-sm text-[oklch(0.552_0.016_285.938)] leading-relaxed">
@@ -76,7 +77,7 @@ export default function Footer() {
 
       <div className="mx-auto mt-12 max-w-[1200px] border-t pt-8 text-center text-xs text-[oklch(0.552_0.016_285.938)]
         border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)]">
-        © {new Date().getFullYear()} LearnPoorf Inc. All rights reserved.
+        © {new Date().getFullYear()} Learn Proof Inc. All rights reserved.
       </div>
     </footer>
   );

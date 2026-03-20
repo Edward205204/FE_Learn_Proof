@@ -291,9 +291,9 @@ export default function CourseDetailPage() {
           </section>
         </div>
 
-        {/* Right Column / Sticky Sidebar */}
+        {/* Right Column */}
         <div className="relative">
-          <div className="lg:sticky lg:top-24 space-y-6">
+          <div className="space-y-6">
             
             {/* Preview Card */}
             <div className="bg-white dark:bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800 group">

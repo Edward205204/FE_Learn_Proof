@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Star, Clock, BookOpen, Trash2 } from 'lucide-react';
+import { Star, Clock, BookOpen, Trash2, ChevronRight } from 'lucide-react';
 
 const MOCK_WISHLIST = [
   {
@@ -43,6 +43,11 @@ const MOCK_WISHLIST = [
 export default function WishlistPage() {
   return (
     <div className="container mx-auto py-10 px-6 max-w-[1200px]">
+      <nav className="flex items-center gap-2 text-[12px] font-black tracking-widest uppercase text-slate-400 mb-8 mt-2">
+        <Link href="/" className="hover:text-[oklch(0.577_0.245_27.325)] transition-colors">Trang chủ</Link>
+        <ChevronRight size={14} />
+        <span className="text-[oklch(0.577_0.245_27.325)]">Yêu thích</span>
+      </nav>
       <h1 className="text-3xl font-bold mb-8 text-[oklch(0.141_0.005_285.823)] dark:text-white">
         Khóa học Yêu thích
       </h1>

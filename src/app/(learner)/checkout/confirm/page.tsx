@@ -67,7 +67,7 @@ export default function OrderConfirmationPage() {
 
                 {/* CỘT PHẢI: Tóm tắt thanh toán */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-50 sticky top-6">
+                    <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-50">
                         <h2 className="font-bold text-slate-800 mb-6 text-lg">Tóm tắt thanh toán</h2>
 
                         <div className="space-y-4 pb-6 border-b border-slate-100">

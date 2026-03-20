@@ -1,6 +1,6 @@
 'use client'
 
-import { Search, Bell, PlayCircle, PlusCircle, ArrowRight } from 'lucide-react'
+import { Search, Bell, PlayCircle, PlusCircle, ArrowRight, ChevronRight } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -47,6 +47,11 @@ export default function MyCoursesPage() {
             <div className="max-w-[1240px] mx-auto px-6">
 
                 {/* Header Section */}
+                <nav className="flex items-center gap-2 text-[12px] font-black tracking-widest uppercase text-slate-400 mb-8 mt-2">
+                    <Link href="/" className="hover:text-[oklch(0.577_0.245_27.325)] transition-colors">Trang chủ</Link>
+                    <ChevronRight size={14} />
+                    <span className="text-[oklch(0.577_0.245_27.325)]">Học tập</span>
+                </nav>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
                     <div className="space-y-2">
                         <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tight">
