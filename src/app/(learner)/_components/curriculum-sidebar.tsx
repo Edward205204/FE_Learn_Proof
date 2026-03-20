@@ -34,24 +34,24 @@ export function CurriculumSidebar({ chapters, currentLessonId, prevLessonId, nex
     const progressPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0
 
     return (
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 h-full flex flex-col overflow-hidden">
+        <div className="bg-background rounded-xl p-6 shadow-sm border border-border h-full flex flex-col overflow-hidden">
             {/* Header — PB24 */}
             <div className="mb-8 px-2 shrink-0">
-                <h3 className="font-extrabold text-lg text-slate-800 tracking-tight">
+                <h3 className="font-bold text-lg text-foreground tracking-tight">
                     Nội dung khóa học
                 </h3>
-                <p className="text-[11px] font-medium text-slate-500 mt-1 uppercase tracking-wide">
+                <p className="text-[11px] font-medium text-muted-foreground mt-1 uppercase tracking-wide">
                     Hoàn thành {completedLessons} trên {totalLessons} bài học
                 </p>
 
                 {/* Thanh Progress Bar */}
                 <div className="relative mt-5">
-                    <span className="absolute -top-5 right-0 text-[10px] font-extrabold text-primary">
+                    <span className="absolute -top-5 right-0 text-[10px] font-bold text-primary">
                         {progressPercent}%
                     </span>
-                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
                         <div
-                            className="bg-primary h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(225,29,72,0.25)]"
+                            className="bg-primary h-full rounded-full transition-all duration-500 ease-out"
                             style={{ width: `${progressPercent}%` }}
                         />
                     </div>
@@ -61,9 +61,9 @@ export function CurriculumSidebar({ chapters, currentLessonId, prevLessonId, nex
             {/* Danh sách chương & bài học — cuộn được */}
             <div className="space-y-6 flex-1 overflow-y-auto pr-1 -mr-1">
                 {chapters.map((chapter, index) => (
-                    <div key={chapter.id} className="space-y-2">
+                    <div key={chapter.id} className="space-y-3">
                         {/* Tiêu đề chương */}
-                        <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">
+                        <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest px-1">
                             Chương {index + 1}: {chapter.title}
                         </h4>
 
@@ -78,40 +78,37 @@ export function CurriculumSidebar({ chapters, currentLessonId, prevLessonId, nex
                                         disabled={lesson.isLocked}
                                         onClick={() => !lesson.isLocked && onLessonClick?.(lesson.id)}
                                         className={cn(
-                                            'w-full group flex items-center justify-between p-3 rounded-xl transition-all border text-left',
+                                            'w-full group flex items-start justify-between p-3 rounded-md transition-all border text-left',
                                             isActive
-                                                ? 'bg-rose-50 border-rose-100 shadow-sm'
+                                                ? 'bg-primary/5 border-primary/20'
                                                 : lesson.isLocked
                                                 ? 'opacity-50 cursor-not-allowed border-transparent'
-                                                : 'hover:bg-slate-50 border-transparent cursor-pointer'
+                                                : 'hover:bg-muted/50 border-transparent cursor-pointer'
                                         )}
                                     >
-                                        <div className="flex items-center gap-3 min-w-0">
+                                        <div className="flex items-start gap-3 min-w-0 flex-1">
                                             {/* Trạng thái icon */}
                                             {lesson.isCompleted ? (
-                                                // Hoàn thành: tích xanh lá
-                                                <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                                                <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
                                             ) : lesson.isLocked ? (
-                                                // Bị khóa: icon khóa
-                                                <Lock className="h-4 w-4 text-slate-400 shrink-0" />
+                                                <Lock className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                                             ) : (
-                                                // Có thể xem: icon play, hồng nếu đang xem
                                                 <PlayCircle
                                                     className={cn(
-                                                        'h-4 w-4 shrink-0',
-                                                        isActive ? 'text-primary' : 'text-slate-400 group-hover:text-primary transition-colors'
+                                                        'h-4 w-4 shrink-0 mt-0.5',
+                                                        isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-primary transition-colors'
                                                     )}
                                                 />
                                             )}
 
                                             <span
                                                 className={cn(
-                                                    'text-sm line-clamp-1 truncate',
+                                                    'text-[13px] leading-snug break-words',
                                                     isActive
                                                         ? 'font-bold text-primary'
                                                         : lesson.isCompleted
-                                                        ? 'font-medium text-slate-500'
-                                                        : 'font-medium text-slate-600'
+                                                        ? 'font-medium text-muted-foreground'
+                                                        : 'font-medium text-foreground/90'
                                                 )}
                                             >
                                                 {lesson.title}
@@ -119,7 +116,7 @@ export function CurriculumSidebar({ chapters, currentLessonId, prevLessonId, nex
                                         </div>
 
                                         {/* Thời lượng / loại */}
-                                        <span className="text-[10px] font-mono text-slate-400 shrink-0 ml-2">
+                                        <span className="text-[10px] font-mono text-muted-foreground shrink-0 ml-3 pt-0.5">
                                             {lesson.type === 'quiz' ? 'Quiz' : lesson.duration}
                                         </span>
                                     </button>
@@ -131,23 +128,23 @@ export function CurriculumSidebar({ chapters, currentLessonId, prevLessonId, nex
             </div>
 
             {/* THANH ĐIỀU HƯỚNG TRƯỚC - SAU */}
-            <div className="flex items-center justify-between px-2 pt-6 pb-2 border-t border-slate-100 mt-4 shrink-0">
+            <div className="flex items-center justify-between px-2 pt-6 pb-2 border-t border-border mt-4 shrink-0">
                 <button
                     disabled={!prevLessonId}
                     onClick={() => prevLessonId && onLessonClick?.(prevLessonId)}
-                    className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-widest transition-colors group disabled:opacity-30 disabled:cursor-not-allowed text-slate-400 hover:text-primary disabled:hover:text-slate-400"
+                    className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest transition-colors group disabled:opacity-30 disabled:cursor-not-allowed text-muted-foreground hover:text-primary disabled:hover:text-muted-foreground"
                 >
-                    <ChevronLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+                    <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
                     Trước
                 </button>
 
                 <button
                     disabled={!nextLessonId}
                     onClick={() => nextLessonId && onLessonClick?.(nextLessonId)}
-                    className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-widest transition-colors group disabled:opacity-30 disabled:cursor-not-allowed text-slate-400 hover:text-primary disabled:hover:text-slate-400"
+                    className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest transition-colors group disabled:opacity-30 disabled:cursor-not-allowed text-muted-foreground hover:text-primary disabled:hover:text-muted-foreground"
                 >
                     Sau
-                    <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                    <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
                 </button>
             </div>
 

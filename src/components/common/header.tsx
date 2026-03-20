@@ -118,29 +118,31 @@ export default function Header() {
               </button>
 
               {isNotifOpen && (
-                <div className="absolute right-0 top-full mt-4 w-80 overflow-hidden rounded-xl border bg-white shadow-xl dark:bg-[oklch(0.141_0.005_285.823)] dark:border-[oklch(0.274_0.006_286.033)] animate-in fade-in zoom-in-95 duration-200 origin-top-right">
-                  <div className="px-4 py-3 border-b dark:border-[oklch(0.274_0.006_286.033)] flex justify-between items-center bg-gray-50/50 dark:bg-transparent">
-                    <p className="font-semibold text-sm text-[oklch(0.141_0.005_285.823)] dark:text-white">
-                      Thông báo mới
-                    </p>
-                    <span className="text-[10px] text-white bg-rose-500 px-2 py-0.5 rounded-full font-bold">2</span>
-                  </div>
-                  <div className="max-h-[320px] overflow-y-auto">
-                    <div className="p-4 border-b dark:border-[oklch(0.274_0.006_286.033)] hover:bg-[oklch(0.967_0.001_0)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors cursor-pointer bg-rose-50/30 dark:bg-rose-900/10">
-                      <p className="text-sm font-semibold text-[oklch(0.141_0.005_285.823)] dark:text-gray-100">Cập nhật khóa học mới</p>
-                      <p className="text-xs text-[oklch(0.552_0.016_285.938)] mt-1 line-clamp-2">Khóa học "Mastering Figma" vừa có bài giảng mới. Hãy vào xem ngay!</p>
-                      <p className="text-[10px] text-[oklch(0.577_0.245_27.325)] mt-2 font-bold">2 giờ trước</p>
+                <div className="absolute right-0 top-full pt-4 w-80 z-50">
+                  <div className="overflow-hidden rounded-xl border bg-white shadow-xl dark:bg-[oklch(0.141_0.005_285.823)] dark:border-[oklch(0.274_0.006_286.033)] animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+                    <div className="px-4 py-3 border-b dark:border-[oklch(0.274_0.006_286.033)] flex justify-between items-center bg-gray-50/50 dark:bg-transparent">
+                      <p className="font-semibold text-sm text-[oklch(0.141_0.005_285.823)] dark:text-white">
+                        Thông báo mới
+                      </p>
+                      <span className="text-[10px] text-white bg-rose-500 px-2 py-0.5 rounded-full font-bold">2</span>
                     </div>
-                    <div className="p-4 border-b/50 dark:border-[oklch(0.274_0.006_286.033)] hover:bg-[oklch(0.967_0.001_0)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors cursor-pointer">
-                      <p className="text-sm font-medium text-[oklch(0.141_0.005_285.823)] dark:text-gray-100">Thanh toán thành công</p>
-                      <p className="text-xs text-[oklch(0.552_0.016_285.938)] mt-1 line-clamp-2">Đơn hàng #12938 đã được xác nhận. Bạn đã có thể bắt đầu học khóa UI/UX.</p>
-                      <p className="text-[10px] text-[oklch(0.552_0.016_285.938)] mt-2 font-medium">1 ngày trước</p>
+                    <div className="max-h-[320px] overflow-y-auto">
+                      <div className="p-4 border-b dark:border-[oklch(0.274_0.006_286.033)] hover:bg-[oklch(0.967_0.001_0)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors cursor-pointer bg-rose-50/30 dark:bg-rose-900/10">
+                        <p className="text-sm font-semibold text-[oklch(0.141_0.005_285.823)] dark:text-gray-100">Cập nhật khóa học mới</p>
+                        <p className="text-xs text-[oklch(0.552_0.016_285.938)] mt-1 line-clamp-2">Khóa học "Mastering Figma" vừa có bài giảng mới. Hãy vào xem ngay!</p>
+                        <p className="text-[10px] text-[oklch(0.577_0.245_27.325)] mt-2 font-bold">2 giờ trước</p>
+                      </div>
+                      <div className="p-4 border-b/50 dark:border-[oklch(0.274_0.006_286.033)] hover:bg-[oklch(0.967_0.001_0)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors cursor-pointer">
+                        <p className="text-sm font-medium text-[oklch(0.141_0.005_285.823)] dark:text-gray-100">Thanh toán thành công</p>
+                        <p className="text-xs text-[oklch(0.552_0.016_285.938)] mt-1 line-clamp-2">Đơn hàng #12938 đã được xác nhận. Bạn đã có thể bắt đầu học khóa UI/UX.</p>
+                        <p className="text-[10px] text-[oklch(0.552_0.016_285.938)] mt-2 font-medium">1 ngày trước</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-3 border-t dark:border-[oklch(0.274_0.006_286.033)] text-center bg-gray-50/50 dark:bg-transparent">
-                    <Link href="/notifications" className="text-xs text-[oklch(0.577_0.245_27.325)] font-bold hover:underline transition-all">
-                      Xem tất cả thông báo
-                    </Link>
+                    <div className="p-3 border-t dark:border-[oklch(0.274_0.006_286.033)] text-center bg-gray-50/50 dark:bg-transparent">
+                      <Link href="/notifications" className="text-xs text-[oklch(0.577_0.245_27.325)] font-bold hover:underline transition-all">
+                        Xem tất cả thông báo
+                      </Link>
+                    </div>
                   </div>
                 </div>
               )}
@@ -172,59 +174,61 @@ export default function Header() {
 
                 {/* Dropdown Menu */}
                 {isMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border bg-white shadow-xl dark:bg-[oklch(0.141_0.005_285.823)] dark:border-[oklch(0.274_0.006_286.033)] animate-in fade-in zoom-in-95 duration-200 origin-top-right">
-                    <div className="px-4 py-3 border-b dark:border-[oklch(0.274_0.006_286.033)]">
-                      <p className="text-sm font-semibold text-[oklch(0.141_0.005_285.823)] dark:text-white truncate">
-                        {user.fullName}
-                      </p>
-                      <p className="text-xs text-[oklch(0.552_0.016_285.938)] truncate">
-                        {user.email}
-                      </p>
-                    </div>
+                  <div className="absolute right-0 top-full pt-3 w-56 z-50">
+                    <div className="overflow-hidden rounded-xl border bg-white shadow-xl dark:bg-[oklch(0.141_0.005_285.823)] dark:border-[oklch(0.274_0.006_286.033)] animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+                      <div className="px-4 py-3 border-b dark:border-[oklch(0.274_0.006_286.033)]">
+                        <p className="text-sm font-semibold text-[oklch(0.141_0.005_285.823)] dark:text-white truncate">
+                          {user.fullName}
+                        </p>
+                        <p className="text-xs text-[oklch(0.552_0.016_285.938)] truncate">
+                          {user.email}
+                        </p>
+                      </div>
 
-                    <div className="p-1">
-                      <Link
-                        href={PATH.PROFILE || "/profile"}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
-                        onClick={closeMenu}
-                      >
-                        <UserIcon size={16} />
-                        Hồ sơ của tôi
-                      </Link>
-                      <Link
-                        href={PATH.MY_COURSES || "/courses/list"}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
-                        onClick={closeMenu}
-                      >
-                        <BookOpen size={16} />
-                        Khóa học của tôi
-                      </Link>
-                      <Link
-                        href={PATH.PAYMENT_HISTORY || "/payment-history"}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
-                        onClick={closeMenu}
-                      >
-                        <HistoryIcon size={16} />
-                        Lịch sử thanh toán
-                      </Link>
-                      <Link
-                        href={PATH.SETTINGS || "/settings"}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
-                        onClick={closeMenu}
-                      >
-                        <Settings size={16} />
-                        Cài đặt
-                      </Link>
-                    </div>
+                      <div className="p-1">
+                        <Link
+                          href={PATH.PROFILE || "/profile"}
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
+                          onClick={closeMenu}
+                        >
+                          <UserIcon size={16} />
+                          Hồ sơ của tôi
+                        </Link>
+                        <Link
+                          href={PATH.MY_COURSES || "/courses/list"}
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
+                          onClick={closeMenu}
+                        >
+                          <BookOpen size={16} />
+                          Khóa học của tôi
+                        </Link>
+                        <Link
+                          href={PATH.PAYMENT_HISTORY || "/payment-history"}
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
+                          onClick={closeMenu}
+                        >
+                          <HistoryIcon size={16} />
+                          Lịch sử thanh toán
+                        </Link>
+                        <Link
+                          href={PATH.SETTINGS || "/settings"}
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors"
+                          onClick={closeMenu}
+                        >
+                          <Settings size={16} />
+                          Cài đặt
+                        </Link>
+                      </div>
 
-                    <div className="border-t p-1 dark:border-[oklch(0.274_0.006_286.033)]">
-                      <button
-                        onClick={handleLogout}
-                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
-                      >
-                        <LogOut size={16} />
-                        Đăng xuất
-                      </button>
+                      <div className="border-t p-1 dark:border-[oklch(0.274_0.006_286.033)]">
+                        <button
+                          onClick={handleLogout}
+                          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                        >
+                          <LogOut size={16} />
+                          Đăng xuất
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}

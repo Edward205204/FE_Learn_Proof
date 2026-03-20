@@ -175,7 +175,7 @@ export default function LessonPage() {
   }
 
   return (
-    <main className='max-w-[1400px] mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8'>
+    <main className='max-w-[1200px] mx-auto py-10 px-4 md:px-8 grid grid-cols-1 lg:grid-cols-3 gap-10'>
       {/* Lõi Render theo loại bài học */}
       <div className='lg:col-span-2 space-y-6'>
         {activeLesson.type === 'video' && (
@@ -185,7 +185,7 @@ export default function LessonPage() {
               lastPosition={activeLesson.lastPosition}
               lessonId={activeLesson.id}
             />
-            <h1 className='text-2xl font-extrabold text-slate-900 mt-6'>{activeLesson.title}</h1>
+            <h1 className='text-3xl font-bold text-foreground mt-6'>{activeLesson.title}</h1>
             <LessonTabs
               lessonId={activeLesson.id}
               description={activeLesson.description}
