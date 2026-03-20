@@ -31,27 +31,27 @@ export default function PublicProfilePage() {
   return (
     <div className="w-full bg-background min-h-screen">
       {/* Banner Section */}
-      <div className="bg-primary/5 dark:bg-muted w-full h-[220px] relative border-b border-border/50">
-        <div className="max-w-6xl mx-auto h-full flex items-center px-4 md:px-0 relative">
+      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent dark:from-muted/50 dark:to-transparent w-full h-[240px] relative border-b border-border">
+        <div className="max-w-6xl mx-auto h-full flex items-center px-6 md:px-0 relative">
           
-          <div className="space-y-2">
-            <h5 className="text-[13px] font-bold text-muted-foreground uppercase tracking-wide">
+          <div className="space-y-3">
+            <h5 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest">
               LEARNER
             </h5>
-            <h1 className="text-[32px] md:text-4xl font-bold text-foreground">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight">
               Mạnh Cường Trương
             </h1>
           </div>
 
           {/* Right Floating Card (Avatar & Edit Button) */}
-          <div className="hidden md:flex absolute right-4 lg:right-0 top-16 w-[280px] bg-card shadow-lg border border-border rounded-lg p-8 flex-col items-center gap-6 z-10">
-            <Avatar className="w-[120px] h-[120px] bg-primary text-primary-foreground text-4xl font-bold">
-              <AvatarFallback className="bg-primary text-primary-foreground">M</AvatarFallback>
+          <div className="hidden md:flex absolute right-6 lg:right-0 top-16 w-[300px] bg-background shadow-sm border border-border rounded-2xl p-8 flex-col items-center gap-6 z-10 transition-shadow hover:shadow-md">
+            <Avatar className="w-[140px] h-[140px] bg-primary/10 text-primary border-4 border-background shadow-sm text-5xl font-bold flex items-center justify-center">
+              <AvatarFallback className="bg-primary text-primary-foreground select-none">M</AvatarFallback>
             </Avatar>
             <Link href="/profile" className="w-full">
-              <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 h-10 font-bold rounded-sm text-sm flex items-center gap-2">
-                <Edit2 size={15} />
-                Edit profile
+              <Button className="w-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground border-none font-bold rounded-xl h-12 text-[15px] flex items-center justify-center gap-2 shadow-none transition-all active:scale-[0.98]">
+                <Edit2 size={16} />
+                Chỉnh sửa hồ sơ
               </Button>
             </Link>
           </div>
@@ -59,47 +59,47 @@ export default function PublicProfilePage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-6xl mx-auto px-4 md:px-0 py-12 md:py-20 mt-8 md:mt-0">
+      <div className="max-w-6xl mx-auto px-6 md:px-0 py-12 md:py-20">
         
         {/* Mobile Info (shows only on small screens) */}
-        <div className="md:hidden flex flex-col items-center mb-12 space-y-4">
-          <Avatar className="w-24 h-24 bg-primary text-primary-foreground text-3xl font-bold">
+        <div className="md:hidden flex flex-col items-center mb-12 space-y-6">
+          <Avatar className="w-28 h-28 bg-primary text-primary-foreground border-4 border-background shadow-sm text-4xl font-bold">
             <AvatarFallback className="bg-primary text-primary-foreground">M</AvatarFallback>
           </Avatar>
-          <Link href="/profile" className="w-full max-w-[200px]">
-            <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10 h-10 font-bold rounded-sm text-sm">
-              <Edit2 size={15} className="mr-2" />
-              Edit profile
+          <Link href="/profile" className="w-full max-w-[280px]">
+            <Button className="w-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground border-none font-bold rounded-xl h-12 text-[15px] shadow-none flex items-center gap-2 transition-all">
+              <Edit2 size={16} />
+              Chỉnh sửa hồ sơ
             </Button>
           </Link>
         </div>
 
         {/* Dashboard Content */}
         <div className="w-full md:w-2/3">
-          <h2 className="text-2xl font-bold text-foreground mb-6">
+          <h2 className="text-2xl font-bold text-foreground mb-8 tracking-tight">
             Khóa học đã mua
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
             {purchasedCourses.map((course) => (
               <div 
                 key={course.id} 
-                className="group border border-transparent hover:border-border rounded-lg overflow-hidden cursor-pointer transition-all flex flex-col h-full bg-card shadow-sm"
+                className="group bg-background rounded-2xl overflow-hidden shadow-sm border border-border hover:shadow-md hover:border-primary/50 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full cursor-pointer"
               >
-                <div className="w-full h-[160px] bg-muted relative overflow-hidden">
+                <div className="w-full aspect-[4/3] relative overflow-hidden bg-muted">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
                     src={course.image} 
                     alt={course.title} 
-                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" 
+                    className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700" 
                   />
-                  <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+                  <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors"></div>
                 </div>
-                <div className="p-4 flex flex-col flex-1">
-                  <h3 className="font-bold text-[15px] text-foreground leading-snug line-clamp-2 mb-1 group-hover:text-primary transition-colors">
+                <div className="p-6 pt-5 flex flex-col flex-1">
+                  <h3 className="font-bold text-[16px] text-foreground leading-snug line-clamp-2 mb-2 group-hover:text-primary transition-colors">
                     {course.title}
                   </h3>
-                  <p className="text-[13px] text-muted-foreground flex-1">
+                  <p className="text-[13px] font-medium text-muted-foreground flex-1">
                     {course.instructor}
                   </p>
                 </div>
