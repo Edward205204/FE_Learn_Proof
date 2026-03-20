@@ -227,7 +227,8 @@ export const interactionSchema = z.object({
   status: z.enum(['unresolved', 'resolved']).optional(),
   lessonUrl: z.string().optional(),
   reply: z.string().optional(),
-  isPinned: z.boolean().default(false)
+  isPinned: z.boolean().default(false),
+  createdAt: z.union([z.string(), z.date()]).optional()
 })
 
 export type InteractionValues = z.infer<typeof interactionSchema>
@@ -299,3 +300,88 @@ export interface ReorderLessonPayload {
   prevLessonId: string | null
   nextLessonId: string | null
 }
+
+// --- Discussion (Q&A) schemas — map từ BE GetAllCommentsResponseSchema ---
+export const DiscussionUserSchema = z.object({
+  id: z.string(),
+  fullName: z.string(),
+  avatar: z.string().nullable()
+})
+
+export const DiscussionReplySchema = z.object({
+  id: z.string(),
+  content: z.string(),
+  discussionId: z.string(),
+  userId: z.string(),
+  isDeleted: z.boolean(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  user: DiscussionUserSchema.optional()
+})
+
+export const DiscussionItemSchema = z.object({
+  id: z.string(),
+  lessonId: z.string(),
+  courseId: z.string(),
+  userId: z.string(),
+  content: z.string(),
+  isPinned: z.boolean(),
+  isDeleted: z.boolean(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  user: DiscussionUserSchema.optional(),
+  replies: z.array(DiscussionReplySchema).optional(),
+  lesson: z
+    .object({
+      id: z.string(),
+      title: z.string(),
+      chapter: z.object({
+        course: z.object({
+          id: z.string(),
+          title: z.string()
+        })
+      })
+    })
+    .optional()
+})
+
+export const GetDiscussionsResponseSchema = z.object({
+  data: z.array(DiscussionItemSchema),
+  page: z.number(),
+  limit: z.number(),
+  total: z.number(),
+  totalPages: z.number()
+})
+
+export type DiscussionUser = z.infer<typeof DiscussionUserSchema>
+export type DiscussionReply = z.infer<typeof DiscussionReplySchema>
+export type DiscussionItem = z.infer<typeof DiscussionItemSchema>
+export type GetDiscussionsResponse = z.infer<typeof GetDiscussionsResponseSchema>
+
+// --- Review schemas ---
+export const ReviewItemSchema = z.object({
+  id: z.string(),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().nullable(),
+  userId: z.string(),
+  courseId: z.string(),
+  createdAt: z.coerce.date(),
+  user: DiscussionUserSchema.optional(),
+  course: z
+    .object({
+      id: z.string(),
+      title: z.string()
+    })
+    .optional()
+})
+
+export const GetReviewsResponseSchema = z.object({
+  data: z.array(ReviewItemSchema),
+  page: z.number(),
+  limit: z.number(),
+  total: z.number(),
+  totalPages: z.number()
+})
+
+export type ReviewItem = z.infer<typeof ReviewItemSchema>
+export type GetReviewsResponse = z.infer<typeof GetReviewsResponseSchema>

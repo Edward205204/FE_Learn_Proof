@@ -28,7 +28,7 @@ export const CourseItemResponseSchema = z.object({
   originalPrice: z.number().nullable(),
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
   shortDesc: z.string(),
-  createdAt: z.date(),
+  createdAt: z.coerce.date(),
   category: z.object({
     name: z.string(),
     slug: z.string()
@@ -58,7 +58,7 @@ export const GetCoursesResponseSchema = z.object({
 export const CurriculumLessonSchema = z.object({
   id: z.string(),
   title: z.string(),
-  order: z.number().int(),
+  order: z.number(),
   type: z.enum(['VIDEO', 'TEXT', 'QUIZ']),
   duration: z.number().int()
 })
@@ -66,7 +66,7 @@ export const CurriculumLessonSchema = z.object({
 export const CurriculumChapterSchema = z.object({
   id: z.string(),
   title: z.string(),
-  order: z.number().int(),
+  order: z.number(),
   lessons: z.array(CurriculumLessonSchema)
 })
 
@@ -74,7 +74,7 @@ export const CourseReviewSchema = z.object({
   id: z.string(),
   rating: z.number().int().min(1).max(5),
   comment: z.string().nullable(),
-  createdAt: z.date(),
+  createdAt: z.coerce.date(),
   user: z.object({
     fullName: z.string(),
     avatar: z.string().nullable()
@@ -97,8 +97,8 @@ export const CourseDetailResponseSchema = z.object({
   publishedLessonsCount: z.number().int(),
   totalPlannedLessons: z.number().int().nullable(),
   expectedDays: z.number().int().nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
   category: z.object({
     name: z.string(),
     slug: z.string()
@@ -130,7 +130,7 @@ export const HomeCourseCardSchema = z.object({
   isFree: z.boolean(),
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
   shortDesc: z.string(),
-  createdAt: z.date(),
+  createdAt: z.coerce.date(),
   category: z.object({ name: z.string(), slug: z.string() }),
   creator: z.object({ fullName: z.string(), avatar: z.string().nullable() }),
   overallAnalytics: z
