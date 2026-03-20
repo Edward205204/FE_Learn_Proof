@@ -1,4 +1,5 @@
-import { Star, Trash2, Tag, ArrowRight, ShieldCheck } from 'lucide-react';
+import Link from 'next/link';
+import { Star, Trash2, Tag, ArrowRight, ShieldCheck, ChevronRight } from 'lucide-react';
 
 const MOCK_CART = [
   {
@@ -30,6 +31,11 @@ export default function CartPage() {
 
   return (
     <div className="container mx-auto py-10 px-6 max-w-[1200px]">
+      <nav className="flex items-center gap-2 text-[12px] font-black tracking-widest uppercase text-slate-400 mb-8 mt-2">
+        <Link href="/" className="hover:text-[oklch(0.577_0.245_27.325)] transition-colors">Trang chủ</Link>
+        <ChevronRight size={14} />
+        <span className="text-[oklch(0.577_0.245_27.325)]">Giỏ hàng</span>
+      </nav>
       <h1 className="text-3xl font-bold mb-8 text-[oklch(0.141_0.005_285.823)] dark:text-white">
         Giỏ hàng của bạn ({MOCK_CART.length})
       </h1>
@@ -97,7 +103,7 @@ export default function CartPage() {
 
         {/* Checkout Summary */}
         <div className="lg:w-1/3">
-          <div className="sticky top-28 p-6 rounded-2xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] bg-white dark:bg-[oklch(0.141_0.005_285.823)] shadow-sm">
+          <div className="p-6 rounded-2xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] bg-white dark:bg-[oklch(0.141_0.005_285.823)] shadow-sm">
             <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Tổng cộng</h2>
 
             <div className="space-y-4 mb-6 text-sm text-gray-600 dark:text-[oklch(0.552_0.016_285.938)]">

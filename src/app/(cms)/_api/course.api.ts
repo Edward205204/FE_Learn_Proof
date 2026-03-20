@@ -8,7 +8,10 @@ import type {
   CreateCourseStep1,
   CourseBaseInfo,
   PublishCourseBody,
-  UpdateCourseChaptersFrameBody
+  UpdateCourseChaptersFrameBody,
+  ManagerCourseDetail,
+  ReorderChapterPayload,
+  ReorderLessonPayload
 } from '../_utils/zod'
 
 const courseApi = {
@@ -26,6 +29,9 @@ const courseApi = {
 
   getCourseById: (courseId: string) => http.get<Course>(`/courses/${courseId}`),
 
+  getManagerCourseDetail: (courseId: string) =>
+    http.get<ManagerCourseDetail>(`/courses/manager/course-detail/${courseId}`),
+
   getCourseBaseInfo: (courseId: string) => http.get<CourseBaseInfo>(`/courses/base-info/${courseId}`),
 
   createCourseStep1: (body: CreateCourseStep1) => http.post<CreateCourseStep1Res>('/courses/create-course/st1', body),
@@ -38,7 +44,11 @@ const courseApi = {
 
   publishCourse: (courseId: string, body: PublishCourseBody) => http.patch(`/courses/${courseId}/publish`, body),
 
-  deleteCourse: (courseId: string) => http.delete(`/courses/${courseId}`)
+  deleteCourse: (courseId: string) => http.delete(`/courses/${courseId}`),
+
+  reorderChapter: (body: ReorderChapterPayload) => http.patch('/courses/reorder/chapters', body),
+
+  reorderLesson: (body: ReorderLessonPayload) => http.patch('/courses/reorder/lessons', body)
 }
 
 export default courseApi
