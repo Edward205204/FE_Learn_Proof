@@ -22,15 +22,51 @@ export default function Header() {
 
   const menuRef = useRef<HTMLDivElement>(null);
   
-  // Notification state
+  // Notification logic
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [showAllNotifs, setShowAllNotifs] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+
+  const NOTIFICATIONS = [
+    {
+      id: 1,
+      title: 'Cập nhật khóa học mới',
+      message: 'Khóa học "Mastering Figma" vừa có bài giảng mới. Hãy vào xem ngay!',
+      time: '2 giờ trước',
+      unread: true,
+    },
+    {
+      id: 2,
+      title: 'Thanh toán thành công',
+      message: 'Đơn hàng #12938 đã được xác nhận. Bạn đã có thể bắt đầu học khóa UI/UX.',
+      time: '1 ngày trước',
+      unread: false,
+    },
+    {
+      id: 3,
+      title: 'Chào mừng bạn đến với LearnProof!',
+      message: 'Khám phá ngay hàng ngàn khóa học chất lượng để bắt đầu hành trình nâng cấp bản thân.',
+      time: '2 ngày trước',
+      unread: false,
+    },
+    {
+      id: 4,
+      title: 'Giảm giá cuối tuần lên đến 50%',
+      message: 'Áp dụng mã WEEKEND50 cho tất cả khóa học Lập trình. Số lượng có hạn!',
+      time: '3 ngày trước',
+      unread: false,
+    }
+  ];
+
+  const displayedNotifs = showAllNotifs ? NOTIFICATIONS : NOTIFICATIONS.slice(0, 2);
+  const unreadCount = NOTIFICATIONS.filter(n => n.unread).length;
 
   // Close notif when clicking outside
   useEffect(() => {
     const handleClickOutsideNotif = (event: MouseEvent) => {
       if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
         setIsNotifOpen(false);
+        setTimeout(() => setShowAllNotifs(false), 200);
       }
     };
 
@@ -106,7 +142,7 @@ export default function Header() {
               className="relative group flex items-center" 
               ref={notifRef}
               onMouseEnter={() => setIsNotifOpen(true)}
-              onMouseLeave={() => setIsNotifOpen(false)}
+              onMouseLeave={() => { setIsNotifOpen(false); setShowAllNotifs(false); }}
             >
               <button
                 className="hover:text-[oklch(0.577_0.245_27.325)] transition-colors focus:outline-none"
@@ -124,25 +160,31 @@ export default function Header() {
                       <p className="font-semibold text-sm text-[oklch(0.141_0.005_285.823)] dark:text-white">
                         Thông báo mới
                       </p>
-                      <span className="text-[10px] text-white bg-rose-500 px-2 py-0.5 rounded-full font-bold">2</span>
+                      {unreadCount > 0 && (
+                        <span className="text-[10px] text-white bg-rose-500 px-2 py-0.5 rounded-full font-bold">{unreadCount}</span>
+                      )}
                     </div>
-                    <div className="max-h-[320px] overflow-y-auto">
-                      <div className="p-4 border-b dark:border-[oklch(0.274_0.006_286.033)] hover:bg-[oklch(0.967_0.001_0)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors cursor-pointer bg-rose-50/30 dark:bg-rose-900/10">
-                        <p className="text-sm font-semibold text-[oklch(0.141_0.005_285.823)] dark:text-gray-100">Cập nhật khóa học mới</p>
-                        <p className="text-xs text-[oklch(0.552_0.016_285.938)] mt-1 line-clamp-2">Khóa học "Mastering Figma" vừa có bài giảng mới. Hãy vào xem ngay!</p>
-                        <p className="text-[10px] text-[oklch(0.577_0.245_27.325)] mt-2 font-bold">2 giờ trước</p>
+                    
+                    <div className="max-h-[360px] overflow-y-auto">
+                      {displayedNotifs.map(noti => (
+                        <div key={noti.id} className={`p-4 border-b dark:border-[oklch(0.274_0.006_286.033)] hover:bg-[oklch(0.967_0.001_0)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors cursor-pointer ${noti.unread ? 'bg-rose-50/30 dark:bg-rose-900/10' : ''}`}>
+                          <p className={`text-sm ${noti.unread ? 'font-semibold' : 'font-medium'} text-[oklch(0.141_0.005_285.823)] dark:text-gray-100`}>{noti.title}</p>
+                          <p className="text-xs text-[oklch(0.552_0.016_285.938)] mt-1 line-clamp-2">{noti.message}</p>
+                          <p className={`text-[10px] mt-2 ${noti.unread ? 'text-[oklch(0.577_0.245_27.325)] font-bold' : 'text-[oklch(0.552_0.016_285.938)] font-medium'}`}>{noti.time}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {!showAllNotifs && NOTIFICATIONS.length > 2 && (
+                      <div className="p-3 border-t dark:border-[oklch(0.274_0.006_286.033)] text-center bg-gray-50/50 dark:bg-transparent">
+                        <button 
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowAllNotifs(true); }}
+                          className="text-xs text-[oklch(0.577_0.245_27.325)] font-bold hover:underline transition-all"
+                        >
+                          Xem tất cả thông báo
+                        </button>
                       </div>
-                      <div className="p-4 border-b/50 dark:border-[oklch(0.274_0.006_286.033)] hover:bg-[oklch(0.967_0.001_0)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors cursor-pointer">
-                        <p className="text-sm font-medium text-[oklch(0.141_0.005_285.823)] dark:text-gray-100">Thanh toán thành công</p>
-                        <p className="text-xs text-[oklch(0.552_0.016_285.938)] mt-1 line-clamp-2">Đơn hàng #12938 đã được xác nhận. Bạn đã có thể bắt đầu học khóa UI/UX.</p>
-                        <p className="text-[10px] text-[oklch(0.552_0.016_285.938)] mt-2 font-medium">1 ngày trước</p>
-                      </div>
-                    </div>
-                    <div className="p-3 border-t dark:border-[oklch(0.274_0.006_286.033)] text-center bg-gray-50/50 dark:bg-transparent">
-                      <Link href="/notifications" className="text-xs text-[oklch(0.577_0.245_27.325)] font-bold hover:underline transition-all">
-                        Xem tất cả thông báo
-                      </Link>
-                    </div>
+                    )}
                   </div>
                 </div>
               )}
