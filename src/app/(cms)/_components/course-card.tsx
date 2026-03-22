@@ -36,33 +36,46 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
       prefetch={false}
       onMouseEnter={() => onPrefetch?.(course.id)}
       onFocus={() => onPrefetch?.(course.id)}
-      className='block cursor-pointer'
+      className='block cursor-pointer group'
     >
-      <Card className='border shadow-sm hover:shadow-md transition-shadow'>
-        <CardContent className='p-5'>
-          <div className='flex items-start gap-4'>
-            <div className='relative h-20 w-32 rounded-lg bg-muted overflow-hidden shrink-0'>
+      <Card className='border border-border/50 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300 bg-card overflow-hidden'>
+        <CardContent className='p-4 sm:p-5'>
+          <div className='flex flex-col sm:flex-row items-start gap-4 sm:gap-6'>
+            {/* Image Section */}
+            <div className='relative aspect-video w-full sm:w-44 shrink-0 rounded-xl bg-muted/50 overflow-hidden border border-border/50'>
               {course.thumbnail ? (
-                <Image fill src={course.thumbnail} alt={course.title} className='object-cover' sizes='128px' />
+                <Image 
+                  fill 
+                  src={course.thumbnail} 
+                  alt={course.title} 
+                  className='object-cover transition-transform duration-500 group-hover:scale-105' 
+                  sizes='(max-width: 640px) 100vw, 176px' 
+                />
               ) : (
-                <div className='flex items-center justify-center h-full'>
-                  <BookOpen className='size-6 text-muted-foreground' />
+                <div className='flex items-center justify-center h-full text-muted-foreground/30'>
+                  <BookOpen className='size-8' />
                 </div>
               )}
             </div>
 
-            <div className='flex-1 min-w-0'>
+            {/* Content Section */}
+            <div className='flex-1 min-w-0 w-full py-0.5'>
               <div className='flex items-start justify-between gap-3'>
                 <div className='min-w-0'>
-                  <h3 className='font-semibold text-base truncate'>{course.title}</h3>
-                  <p className='text-sm text-muted-foreground line-clamp-1 mt-0.5'>{course.shortDesc}</p>
+                  <h3 className='font-bold text-[17px] text-foreground group-hover:text-primary transition-colors line-clamp-1'>
+                    {course.title}
+                  </h3>
+                  <p className='text-sm text-foreground/60 line-clamp-2 mt-1 leading-relaxed'>
+                    {course.shortDesc?.replace(/<[^>]*>?/gm, '') || 'Chưa có mô tả'}
+                  </p>
                 </div>
 
-                <div className='flex items-center gap-1 shrink-0' onClick={(e) => e.preventDefault()}>
+                <div className='flex items-center gap-1.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity' onClick={(e) => e.preventDefault()}>
                   {course.status === 'DRAFT' && (
                     <Button
-                      variant='ghost'
+                      variant='outline'
                       size='icon-sm'
+                      className='bg-background hover:bg-muted hover:text-foreground text-muted-foreground border-border/50 h-8 w-8 rounded-full shadow-sm'
                       onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
@@ -73,9 +86,9 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                     </Button>
                   )}
                   <Button
-                    variant='ghost'
+                    variant='outline'
                     size='icon-sm'
-                    className='text-destructive hover:text-destructive'
+                    className='bg-background text-muted-foreground border-border/50 h-8 w-8 rounded-full shadow-sm hover:text-destructive hover:bg-destructive/10 hover:border-destructive/20'
                     onClick={(e) => {
                       e.preventDefault()
                       deleteMutation.mutate(course.id)
@@ -87,43 +100,49 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                 </div>
               </div>
 
-              <div className='flex items-center gap-2 mt-2.5 flex-wrap'>
-                <Badge variant={STATUS_VARIANT[course.status]}>{STATUS_LABEL[course.status]}</Badge>
-                <Badge variant='outline' className={LEVEL_CLASS[course.level]}>
+              <div className='flex items-center gap-2 mt-3.5 flex-wrap'>
+                <Badge variant={STATUS_VARIANT[course.status]} className="text-[10px] px-2 h-5 shadow-none tracking-wide uppercase">
+                  {STATUS_LABEL[course.status]}
+                </Badge>
+                <Badge variant='outline' className={`text-[10px] px-2 h-5 uppercase tracking-wide shadow-none ${LEVEL_CLASS[course.level]}`}>
                   {LEVEL_LABEL[course.level]}
                 </Badge>
-                <span className='text-xs font-medium text-muted-foreground'>
-                  {formatPrice(course.price, course.isFree)}
-                </span>
-                {course.originalPrice && course.originalPrice > course.price && (
-                  <span className='text-xs text-muted-foreground line-through'>
-                    {course.originalPrice.toLocaleString('vi-VN')}đ
+                
+                <div className='ml-2 flex items-center gap-1.5'>
+                  <span className='text-[13px] font-bold text-foreground'>
+                    {formatPrice(course.price, course.isFree)}
                   </span>
-                )}
+                  {course.originalPrice && course.originalPrice > course.price && (
+                    <span className='text-[11px] font-medium text-muted-foreground line-through opacity-70'>
+                      {course.originalPrice.toLocaleString('vi-VN')}đ
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <div className='flex items-center gap-4 mt-2 text-xs text-muted-foreground'>
+              <div className='flex flex-wrap items-center gap-x-4 gap-y-2 mt-3.5 text-[11px] font-medium text-muted-foreground'>
                 {analytics && (
                   <>
-                    <span className='inline-flex items-center gap-1'>
+                    <span className='inline-flex items-center gap-1.5 bg-muted/30 px-2 py-0.5 rounded-sm'>
                       <Star className='size-3 fill-amber-400 text-amber-400' />
-                      {analytics.avgRating.toFixed(1)}
+                      <span className="text-foreground/80">{analytics.avgRating.toFixed(1)}</span>
                     </span>
-                    <span className='inline-flex items-center gap-1'>
-                      <Users className='size-3' />
-                      {analytics.totalStudents}
+                    <span className='inline-flex items-center gap-1.5'>
+                      <Users className='size-3 opacity-70' />
+                      {analytics.totalStudents} học viên
                     </span>
-                    <span className='inline-flex items-center gap-1'>
-                      <TrendingUp className='size-3' />
-                      {analytics.avgInterestScore.toFixed(1)}
+                    <span className='inline-flex items-center gap-1.5'>
+                      <TrendingUp className='size-3 opacity-70' />
+                      {analytics.avgInterestScore.toFixed(1)} điểm
                     </span>
                   </>
                 )}
-                <span>{formatDate(course.createdAt)}</span>
+                <div className='flex-1' />
+                <span className="opacity-70">{formatDate(course.createdAt)}</span>
                 {!course.isCompleted && (
                   <Badge
                     variant='outline'
-                    className='text-[10px] px-1.5 py-0 bg-amber-50 text-amber-600 border-amber-200'
+                    className='text-[9px] px-1.5 py-0 h-4 bg-amber-500/10 text-amber-600 border-amber-500/20 shadow-none'
                   >
                     Chưa hoàn thiện
                   </Badge>

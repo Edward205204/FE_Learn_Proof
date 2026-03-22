@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 
 import { PATH } from '@/constants/path'
 import { publishCourseSchema, type PublishCourseBody } from '@/app/(cms)/_utils/zod'
-import { CourseStepper } from '@/app/(cms)/_components/course-stepper'
+import { CoursePageShell } from '@/app/(cms)/_components/course-page-shell'
 import { usePublishCourseMutation } from '@/app/(cms)/_hooks/use-course-mutation'
 import { clearDraftCourseId, getDraftCourseId } from '@/app/(cms)/_utils/course-workflow'
 import { CourseStep3PricingFields } from '@/app/(cms)/_components/course-step3-pricing-fields'
@@ -50,52 +50,44 @@ export default function CreateCourseStep3Page() {
   }
 
   return (
-    <div className='max-w-5xl mx-auto p-6 space-y-8'>
-      <div className='space-y-2'>
-        <button
-          type='button'
-          onClick={() => router.push(`${PATH.COURSE_NEW_STEP2}${courseId ? `?courseId=${courseId}` : ''}`)}
-          className='flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors'
-        >
-          <ChevronLeft className='w-4 h-4 mr-1' />
-          Quay lại bước trước
-        </button>
-        <h1 className='text-3xl font-bold tracking-tight'>Tạo khóa học mới</h1>
-        <p className='text-muted-foreground'>Thiết lập giá và trạng thái xuất bản cho khóa học.</p>
-      </div>
-
-      <CourseStepper currentStep={3} />
-
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+    <CoursePageShell
+      currentStep={3}
+      backLabel='Quay lại danh sách chương'
+      title='Xuất bản khóa học'
+      description='Cấu hình giá bán và kiểm tra trước khi công khai khóa học.'
+      onBack={() => router.push(`${PATH.COURSE_NEW_STEP2}${courseId ? `?courseId=${courseId}` : ''}`)}
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
         <CourseStep3PricingFields
           control={control}
           setValue={setValue}
           isFree={isFree}
           priceLabel='Giá gốc (VNĐ)'
-          description='Cấu hình cách tính phí cho khóa học này.'
+          description='Thiết lập mức giá phù hợp cho khóa học của bạn.'
         />
 
-        <div className='flex border-t justify-between pt-6'>
+        <div className='pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4'>
           <Button
-            variant='outline'
+            variant='ghost'
             type='button'
+            className='font-semibold text-muted-foreground w-full sm:w-auto h-11 px-6 rounded-xl hover:bg-muted'
             onClick={() => router.push(`${PATH.COURSE_NEW_STEP2}${courseId ? `?courseId=${courseId}` : ''}`)}
           >
-            <ChevronLeft className='w-4 h-4 mr-1' />
+            <ChevronLeft className='w-4 h-4 mr-2' />
             Quay lại
           </Button>
 
-          <div className='flex gap-3'>
-            <Button variant='outline' type='button'>
+          <div className='flex items-center gap-3 w-full sm:w-auto'>
+            <Button variant='outline' type='button' className='font-bold h-11 px-6 rounded-xl w-full sm:w-auto bg-background'>
               Lưu bản nháp
             </Button>
-            <Button type='submit' disabled={publishMutation.isPending || !courseId}>
-              <Check className='w-4 h-4 mr-1' />
-              Hoàn tất
+            <Button type='submit' className='font-bold h-11 px-8 rounded-xl shadow-md w-full sm:w-auto' disabled={publishMutation.isPending || !courseId}>
+              <Check className='w-5 h-5 mr-2' />
+              Hoàn tất xuất bản
             </Button>
           </div>
         </div>
       </form>
-    </div>
+    </CoursePageShell>
   )
 }

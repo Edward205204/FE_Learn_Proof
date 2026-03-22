@@ -14,14 +14,14 @@ interface CourseStepperProps {
 
 export function CourseStepper({ currentStep }: CourseStepperProps) {
   return (
-    <div className='space-y-4'>
-      <div className='flex items-center justify-between text-sm font-medium'>
-        <span className='uppercase text-muted-foreground tracking-wider'>Tiến trình</span>
-        <span>
-          Bước {currentStep} / {STEPS.length}
+    <div className='space-y-4 mb-8'>
+      <div className='flex items-center justify-between text-sm font-medium px-1'>
+        <span className='uppercase text-muted-foreground tracking-widest text-[11px] font-bold'>Tiến trình</span>
+        <span className='text-muted-foreground text-[11px] font-bold'>
+          BƯỚC {currentStep} / {STEPS.length}
         </span>
       </div>
-      <div className='grid grid-cols-3 gap-2 p-1 bg-secondary/50 rounded-xl border'>
+      <div className='grid grid-cols-3 gap-2 p-1.5 bg-muted/50 rounded-2xl border border-border/50'>
         {STEPS.map((step, index) => {
           const stepNumber = index + 1
           const isActive = stepNumber === currentStep
@@ -30,26 +30,26 @@ export function CourseStepper({ currentStep }: CourseStepperProps) {
           return (
             <div
               key={stepNumber}
-              className={`flex items-center justify-center py-2.5 px-4 rounded-lg font-medium transition-all ${
+              className={`flex items-center justify-center py-3 px-2 md:px-4 rounded-xl text-sm transition-all duration-300 ${
                 isActive
-                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  ? 'bg-background text-foreground shadow-sm ring-1 ring-border/50 font-bold'
                   : isDone
-                    ? 'bg-primary/20 text-primary'
-                    : 'text-muted-foreground'
+                    ? 'text-foreground/80 hover:bg-background/50 font-medium'
+                    : 'text-muted-foreground font-medium'
               }`}
             >
               <span
-                className={`mr-2 flex h-5 w-5 items-center justify-center rounded-full text-xs border ${
+                className={`mr-2.5 flex h-6 w-6 shrink-0 flex-col items-center justify-center rounded-full text-[11px] font-bold transition-colors ${
                   isActive
-                    ? 'border-primary-foreground/30'
+                    ? 'bg-primary text-primary-foreground'
                     : isDone
-                      ? 'border-primary/40'
-                      : 'border-muted-foreground/30'
+                      ? 'bg-primary/10 text-primary'
+                      : 'bg-muted-foreground/10 text-muted-foreground'
                 }`}
               >
                 {stepNumber}
               </span>
-              {step.label}
+              <span className="truncate">{step.label}</span>
             </div>
           )
         })}

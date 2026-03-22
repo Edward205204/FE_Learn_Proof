@@ -17,24 +17,26 @@ export function AnswerList({ questionIndex, form }: AnswerListProps) {
   })
 
   return (
-    <div className='space-y-3'>
+    <div className='space-y-4'>
       {fields.map((field, index) => (
-        <div key={field.id} className='flex items-center gap-3 group'>
-          <Checkbox
-            checked={form.watch(`questions.${questionIndex}.answers.${index}.isCorrect`)}
-            onCheckedChange={(checked) =>
-              form.setValue(`questions.${questionIndex}.answers.${index}.isCorrect`, !!checked)
-            }
-            className='data-[state=checked]:bg-primary data-[state=checked]:border-primary'
-          />
+        <div key={field.id} className='flex items-center gap-3 group bg-muted/20 p-2 rounded-xl border border-transparent focus-within:border-border/50 focus-within:bg-card transition-all'>
+          <div className='pl-2'>
+            <Checkbox
+              checked={form.watch(`questions.${questionIndex}.answers.${index}.isCorrect`)}
+              onCheckedChange={(checked) =>
+                form.setValue(`questions.${questionIndex}.answers.${index}.isCorrect`, !!checked)
+              }
+              className='h-5 w-5 rounded-md data-[state=checked]:bg-primary data-[state=checked]:border-primary shadow-sm'
+            />
+          </div>
           <div className='relative flex-1'>
             <Input
               {...form.register(`questions.${questionIndex}.answers.${index}.text`)}
-              placeholder={`Đáp án ${index + 1}`}
-              className='pr-24'
+              placeholder={`Nhập đáp án ${index + 1}...`}
+              className='pr-28 border-none shadow-none bg-transparent h-11 focus-visible:ring-0 px-2'
             />
             {form.watch(`questions.${questionIndex}.answers.${index}.isCorrect`) && (
-              <span className='absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-primary uppercase'>
+              <span className='absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-primary uppercase bg-primary/15 px-2.5 py-1 rounded-md tracking-wider'>
                 Đáp án đúng
               </span>
             )}
@@ -44,7 +46,7 @@ export function AnswerList({ questionIndex, form }: AnswerListProps) {
             variant='ghost'
             size='icon'
             onClick={() => remove(index)}
-            className='opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive'
+            className='opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive hover:bg-destructive/10'
           >
             <Trash2 className='h-4 w-4' />
           </Button>
@@ -52,12 +54,12 @@ export function AnswerList({ questionIndex, form }: AnswerListProps) {
       ))}
       <Button
         type='button'
-        variant='ghost'
+        variant='outline'
         size='sm'
         onClick={() => append({ text: '', isCorrect: false })}
-        className='text-primary hover:text-primary hover:bg-primary/10 mt-2'
+        className='text-foreground hover:text-primary hover:bg-primary/5 hover:border-primary/20 mt-2 border-border/50 shadow-sm rounded-lg h-9 px-4'
       >
-        <Plus className='mr-2 h-4 w-4' /> Thêm đáp án
+        <Plus className='mr-1.5 h-4 w-4 text-muted-foreground' /> Thêm đáp án
       </Button>
     </div>
   )

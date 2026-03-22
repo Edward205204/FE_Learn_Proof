@@ -31,7 +31,7 @@ interface InteractionItemProps {
 
 export function InteractionItem({ data }: InteractionItemProps) {
   const isResolved = data.status === 'resolved'
-  const accentColor = data.type === 'review' ? 'bg-rose-500' : 'bg-orange-400'
+  const accentColor = data.type === 'review' ? 'bg-primary' : 'bg-orange-400'
 
   return (
     <Card className='border border-border/50 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group bg-card/50 backdrop-blur-sm'>
@@ -59,7 +59,7 @@ export function InteractionItem({ data }: InteractionItemProps) {
                     variant={isResolved ? 'default' : 'secondary'}
                     className={cn(
                       'text-[9px] h-4 uppercase font-bold px-1.5',
-                      isResolved ? 'bg-emerald-500/10 text-emerald-600 border-none' : 'bg-slate-200 text-slate-600 border-none'
+                      isResolved ? 'bg-emerald-500/10 text-emerald-600 border-none' : 'bg-muted text-muted-foreground border-none'
                     )}
                   >
                     {isResolved ? 'Đã giải quyết' : 'Chưa giải quyết'}

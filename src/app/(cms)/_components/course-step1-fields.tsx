@@ -122,12 +122,12 @@ export function CourseStep1Fields({ form, categories, shortDescriptionLength, th
         )}
       />
 
-      <div className='bg-blue-50/50 border border-blue-100 rounded-xl p-6 space-y-4'>
-        <div className='flex items-center gap-2 text-blue-700 font-semibold'>
-          <Sparkles className='w-4 h-4 text-blue-500 fill-blue-500/20' />
+      <div className='bg-primary/5 border border-primary/20 rounded-xl p-6 space-y-4'>
+        <div className='flex items-center gap-2 text-primary font-semibold'>
+          <Sparkles className='w-4 h-4 text-primary fill-primary/20' />
           <span className='text-sm'>Ngữ cảnh cho AI Assistant</span>
         </div>
-        <p className='text-sm text-blue-600/80 leading-relaxed'>
+        <p className='text-sm text-primary/80 leading-relaxed'>
           Dán đề cương, ghi chú hoặc ý tưởng chi tiết vào đây. AI sẽ dùng thông tin này để tự động tạo nội dung chương
           học, mô tả bài học và câu hỏi quiz ở các bước tiếp theo.
         </p>
@@ -139,7 +139,7 @@ export function CourseStep1Fields({ form, categories, shortDescriptionLength, th
               <FormControl>
                 <Textarea
                   placeholder='Ví dụ: Tuần 1: Giới thiệu khái niệm. Tuần 2: Thực hành chuyên sâu... Bao gồm mục tiêu học tập và kiến thức trọng tâm.'
-                  className='min-h-[150px] bg-white border-blue-100 focus-visible:ring-blue-200'
+                  className='min-h-[150px] bg-background border-primary/20 focus-visible:ring-primary/30'
                   {...field}
                 />
               </FormControl>
