@@ -20,11 +20,11 @@ interface ChapterUi {
 
 export default function EditCourseStep2Page() {
   const router = useRouter()
-  const params = useParams<{ courseId: string }>()
-  const courseId = params.courseId
+  const params = useParams<{ id: string }>()
+  const courseId = params.id
 
-  const { data: baseInfo } = useGetCourseBaseInfoQuery(courseId)
-  const updateChaptersMutation = useUpdateCourseChaptersFrameMutation(courseId)
+  const { data: baseInfo } = useGetCourseBaseInfoQuery(courseId ?? '')
+  const updateChaptersMutation = useUpdateCourseChaptersFrameMutation(courseId ?? '')
 
   const initialChapters = useMemo<ChapterUi[]>(
     () =>
@@ -63,7 +63,7 @@ export default function EditCourseStep2Page() {
     const parsed = updateCourseChaptersFrameSchema.safeParse(body)
     if (!parsed.success) return
     await updateChaptersMutation.mutateAsync(parsed.data)
-    router.push(`${PATH.STUDIO_COURSES}/courses/${courseId}/edit/step3`)
+    router.push(`${PATH.COURSE_EDIT_STEP3.replace(':id', courseId)}`)
   }
 
   return (
@@ -71,7 +71,7 @@ export default function EditCourseStep2Page() {
       <div className='space-y-2'>
         <button
           type='button'
-          onClick={() => router.push(`${PATH.STUDIO_COURSES}/courses/${courseId}/edit/step1`)}
+          onClick={() => router.push(`${PATH.COURSE_EDIT_STEP1.replace(':id', courseId)}`)}
           className='flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors'
         >
           <ChevronLeft className='w-4 h-4 mr-1' />
@@ -137,7 +137,7 @@ export default function EditCourseStep2Page() {
       </Card>
 
       <div className='flex border-t justify-between pt-6'>
-        <Button variant='outline' onClick={() => router.push(`${PATH.STUDIO_COURSES}/courses/${courseId}/edit/step1`)}>
+        <Button variant='outline' onClick={() => router.push(`${PATH.COURSE_EDIT_STEP1.replace(':id', courseId)}`)}>
           <ChevronLeft className='w-4 h-4 mr-1' />
           Quay lại
         </Button>

@@ -56,7 +56,7 @@ export default function EditCourseStep3Page() {
       <div className='space-y-2'>
         <button
           type='button'
-          onClick={() => router.push(`${PATH.STUDIO_COURSES}/courses/${courseId}/edit/step2`)}
+          onClick={() => router.push(`${PATH.COURSE_EDIT_STEP2.replace(':id', courseId)}`)}
           className='flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors'
         >
           <ChevronLeft className='w-4 h-4 mr-1' />
@@ -81,7 +81,7 @@ export default function EditCourseStep3Page() {
           <Button
             variant='outline'
             type='button'
-            onClick={() => router.push(`${PATH.STUDIO_COURSES}/courses/${courseId}/edit/step2`)}
+            onClick={() => router.push(`${PATH.COURSE_EDIT_STEP2.replace(':id', courseId)}`)}
           >
             <ChevronLeft className='w-4 h-4 mr-1' />
             Quay lại

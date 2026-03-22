@@ -55,7 +55,7 @@ export default function EditCourseStep1Page() {
 
   const onNext = async (data: CreateCourseStep1) => {
     await updateBaseInfoMutation.mutateAsync(data)
-    router.push(`${PATH.STUDIO_COURSES}/courses/${courseId}/edit/step2`)
+    router.push(`${PATH.COURSE_EDIT_STEP2.replace(':id', courseId)}`)
   }
 
   return (
