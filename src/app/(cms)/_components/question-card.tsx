@@ -16,11 +16,10 @@ interface QuestionCardProps {
 
 export function QuestionCard({ index, form, onRemove, showAnswers = true }: QuestionCardProps) {
   return (
-    <Card className='relative overflow-hidden border-2 focus-within:border-primary transition-all'>
-      <div className='absolute left-0 top-0 bottom-0 w-1 bg-primary' />
-      <CardContent className='p-6'>
-        <div className='flex justify-between items-start mb-4'>
-          <span className='bg-primary text-primary-foreground h-8 w-8 rounded-md flex items-center justify-center font-bold text-sm'>
+    <Card className='relative overflow-visible border border-border/60 shadow-sm rounded-2xl bg-card focus-within:ring-4 focus-within:ring-primary/10 focus-within:border-primary/30 transition-all duration-300'>
+      <CardContent className='p-6 sm:p-8'>
+        <div className='flex justify-between items-start mb-6'>
+          <span className='bg-primary/15 text-primary h-10 w-10 min-w-10 rounded-xl flex items-center justify-center font-extrabold text-base ring-1 ring-primary/20 shadow-sm'>
             {index + 1}
           </span>
           <Button
@@ -28,25 +27,25 @@ export function QuestionCard({ index, form, onRemove, showAnswers = true }: Ques
             variant='ghost'
             size='icon'
             onClick={() => onRemove(index)}
-            className='text-destructive hover:text-destructive'
+            className='text-muted-foreground hover:text-destructive hover:bg-destructive/10 -mt-2 -mr-2 h-9 w-9 rounded-full'
           >
-            <Trash2 className='h-5 w-5' />
+            <Trash2 className='h-4 w-4' />
           </Button>
         </div>
 
-        <div className='space-y-4'>
+        <div className='space-y-6'>
           <div>
-            <label className='text-xs font-bold uppercase text-muted-foreground mb-1 block'>Nội dung câu hỏi</label>
+            <label className='text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2 block'>Nội dung câu hỏi</label>
             <Input
               {...form.register(`questions.${index}.questionText`)}
-              placeholder='Nhập câu hỏi tại đây...'
-              className='text-base py-5'
+              placeholder='VD: Tính chất OOP nào dưới đây cho phép...'
+              className='text-base font-medium py-6 bg-muted/10 border-border/50 focus-visible:ring-primary/20 rounded-xl'
             />
           </div>
 
           {showAnswers && (
-            <div className='space-y-3'>
-              <label className='text-xs font-bold uppercase text-muted-foreground block'>Các đáp án</label>
+            <div className='space-y-3 pt-2 border-t border-border/30'>
+              <label className='text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-2 mt-4'>Các đáp án</label>
               <AnswerList questionIndex={index} form={form as UseFormReturn<QuizFormValues>} />
             </div>
           )}

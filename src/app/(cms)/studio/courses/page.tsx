@@ -8,8 +8,8 @@ export default function ContentManagementPage() {
   return (
     <Suspense
       fallback={
-        <div className='p-8 max-w-5xl mx-auto space-y-6'>
-          <div className='h-20 animate-pulse bg-muted rounded' />
+        <div className='space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
+          <div className='h-24 sm:h-28 animate-pulse bg-muted/40 rounded-xl border border-border/50' />
           <CourseListSkeleton />
         </div>
       }

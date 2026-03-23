@@ -57,8 +57,8 @@ export function ContentManagementHeader() {
       .slice(0, 2) || '??'
 
   return (
-    <header className='sticky top-0 z-20 border-b bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60'>
-      <div className='mx-auto max-w-7xl px-4 md:px-6 h-14 flex items-center justify-between gap-4'>
+    <header className='sticky top-0 z-20 border-b bg-background/95 supports-[backdrop-filter]:bg-background/60 backdrop-blur-md'>
+      <div className='w-full px-4 sm:px-6 h-14 flex items-center justify-between gap-4'>
         <div className='flex items-center gap-2 min-w-0'>
           <LayoutDashboard className='h-5 w-5 text-muted-foreground' />
           <div className='min-w-0'>
@@ -124,7 +124,7 @@ export function ContentManagementHeader() {
                   <div className='border-t p-1'>
                     <button
                       onClick={handleLogout}
-                      className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors'
+                      className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 transition-colors'
                       type='button'
                     >
                       <LogOut size={16} />

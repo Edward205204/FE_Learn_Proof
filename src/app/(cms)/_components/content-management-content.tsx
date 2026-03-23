@@ -44,22 +44,33 @@ export function ContentManagementContent() {
   }
 
   return (
-    <div className='p-8 max-w-5xl mx-auto space-y-6'>
-      <div className='flex justify-between items-center border-b pb-6'>
-        <div>
-          <h1 className='text-3xl font-extrabold tracking-tight'>Quản lý Khóa học</h1>
-          <p className='text-muted-foreground mt-1'>Tạo và quản lý các khóa học của bạn.</p>
+    <div className='space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 border-b border-border/50 pb-6'>
+        <div className='space-y-1.5'>
+          <div className='flex items-center gap-2'>
+            <BookOpen className='w-6 h-6 text-primary' />
+            <h1 className='text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground'>Quản lý Khóa học</h1>
+          </div>
+          <p className='text-sm text-muted-foreground'>Tạo, cập nhật và quản lý tất cả các khóa học của bạn tại đây.</p>
         </div>
-        <Button asChild className='shadow-sm'>
+        <Button asChild className='shadow-md hover:shadow-lg transition-all active:scale-95'>
           <Link href={PATH.COURSE_NEW_STEP1}>
-            <Plus className='w-4 h-4 mr-2' /> Tạo khóa học mới
+            <Plus className='w-4 h-4 mr-1.5' /> Tạo khóa học mới
           </Link>
         </Button>
       </div>
 
-      <div className='flex items-center justify-between'>
-        <CourseManagerFilter status={queryParams.status} onStatusChange={handleStatusChange} />
-        {meta && <p className='text-sm text-muted-foreground'>{meta.total} khóa học</p>}
+      <div className='flex items-center justify-between bg-muted/30 p-2 sm:p-3 rounded-xl border border-border/50'>
+        <div className="flex-1">
+          <CourseManagerFilter status={queryParams.status} onStatusChange={handleStatusChange} />
+        </div>
+        {meta && (
+          <div className='pl-4 pr-2 border-l border-border/50'>
+            <p className='text-xs font-bold text-muted-foreground uppercase tracking-wider'>
+              {meta.total} <span className="hidden sm:inline">khóa học</span>
+            </p>
+          </div>
+        )}
       </div>
 
       <div className={`transition-opacity duration-150 ${isFetching ? 'opacity-60' : 'opacity-100'}`}>

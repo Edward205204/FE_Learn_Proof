@@ -52,7 +52,7 @@ export function ProfessionalEditor({ value, onChange }: { value: string; onChang
     if (!editor) return null
 
     return (
-        <div className="relative border-2 border-border rounded-3xl bg-card shadow-sm hover:shadow-md focus-within:ring-2 focus-within:ring-primary/10 transition-all overflow-hidden group flex flex-col">
+        <div className="relative border-2 border-border rounded-2xl bg-card shadow-sm hover:shadow-md focus-within:ring-4 focus-within:ring-primary/10 focus-within:border-primary/30 transition-all overflow-hidden group flex flex-col">
 
             {/* BUBBLE MENU GỘP TẤT CẢ - Chỉ hiện khi bôi đen */}
             <BubbleMenu

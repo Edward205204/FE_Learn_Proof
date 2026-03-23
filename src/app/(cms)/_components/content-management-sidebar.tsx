@@ -60,8 +60,8 @@ export function ContentManagementSidebar({ variant = 'desktop' }: Props) {
 
   if (variant === 'mobile') {
     return (
-      <nav className='border-b bg-background'>
-        <div className='mx-auto max-w-7xl px-4 md:px-6 h-11 flex items-center gap-2 overflow-x-auto'>
+      <nav className='md:hidden border-b bg-background sticky top-[56px] z-10'>
+        <div className='mx-auto max-w-7xl px-4 h-12 flex items-center gap-2 overflow-x-auto scrollbar-hide'>
           {NAV_ITEMS.map((item) => {
             const active = isActive(item, pathname)
             const disabled = item.href === '#'
@@ -92,10 +92,10 @@ export function ContentManagementSidebar({ variant = 'desktop' }: Props) {
 
   return (
     <aside className='hidden md:flex md:w-64 md:flex-col md:shrink-0 border-r bg-background'>
-      <div className='p-4'>
-        <p className='text-xs font-medium text-muted-foreground uppercase tracking-wide'>Content Management</p>
+      <div className='p-6 pb-2'>
+        <p className='text-[10px] font-bold text-muted-foreground uppercase tracking-wider'>Content Management</p>
       </div>
-      <nav className='px-2 pb-4 space-y-1'>
+      <nav className='px-4 pb-4 space-y-1.5'>
         {NAV_ITEMS.map((item) => {
           const active = isActive(item, pathname)
           const disabled = item.href === '#'
@@ -114,8 +114,10 @@ export function ContentManagementSidebar({ variant = 'desktop' }: Props) {
               key={item.href + item.label}
               href={item.href}
               className={cn(
-                'flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors',
-                active ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                active 
+                  ? 'bg-primary/10 text-primary' 
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
               )}
             >
               <Icon className='h-4 w-4' />
