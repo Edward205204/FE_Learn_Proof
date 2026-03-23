@@ -24,10 +24,18 @@ export function useLoginMutation() {
   const router = useRouter()
   return useMutation({
     mutationFn: authApi.login,
-    onSuccess: () => {
+    onSuccess: (response) => {
       toast.success('Đăng nhập thành công!')
       router.refresh()
-      router.replace(`${PATH.ONBOARDING}/step1`)
+      
+      const { user } = response.data
+      if (user.role === 'CONTENT_MANAGER') {
+        router.replace(PATH.STUDIO_COURSES)
+      } else if (user.role === 'ADMIN') {
+        router.replace(PATH.ADMIN)
+      } else {
+        router.replace(`${PATH.ONBOARDING}/survey/step-1`)
+      }
     }
   })
 }
@@ -36,10 +44,18 @@ export function useRegisterMutation() {
   const router = useRouter()
   return useMutation({
     mutationFn: authApi.register,
-    onSuccess: () => {
+    onSuccess: (response) => {
       toast.success('Đăng ký thành công!')
       router.refresh()
-      router.replace(`${PATH.ONBOARDING}/step1`)
+
+      const { user } = response.data
+      if (user.role === 'CONTENT_MANAGER') {
+        router.replace(PATH.STUDIO_COURSES)
+      } else if (user.role === 'ADMIN') {
+        router.replace(PATH.ADMIN)
+      } else {
+        router.replace(`${PATH.ONBOARDING}/survey/step-1`)
+      }
     }
   })
 }
