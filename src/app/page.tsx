@@ -33,7 +33,7 @@ const courses = [
 
 export default function Home() {
   return (
-    <div className='min-h-screen bg-[oklch(1_0_0)] dark:bg-[oklch(0.141_0.005_285.823)]'>
+    <div className='min-h-screen bg-[oklch(1_0_0)] dark:bg-[oklch(0.141_0.005_285.823)]' suppressHydrationWarning>
       <Header />
       <main className='mx-auto w-full max-w-[1200px] flex-1 font-display'>
         <section className='flex flex-col gap-10 px-6 py-12 md:py-20 lg:flex-row lg:items-center'>
