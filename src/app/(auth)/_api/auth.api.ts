@@ -21,7 +21,10 @@ const authApi = {
   getProfile: (accessToken: string) =>
     http.get<User>('/auth/me', { headers: { Authorization: `Bearer ${accessToken}` } }),
 
-  getMe: () => http.get<User>('/auth/me')
+  getMe: () => http.get<User>('/auth/me'),
+
+  updateProfile: (body: { fullName?: string; bio?: string | null; headline?: string | null; website?: string | null }) =>
+    http.patch<User>('/auth/me', body)
 }
 
 export default authApi

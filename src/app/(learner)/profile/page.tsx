@@ -1,19 +1,71 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Bold, Italic, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useGetMeQuery } from '@/app/(auth)/_hooks/use-auth-mutation'
+import { toast } from 'sonner'
+import { useGetMeQuery, useUpdateProfileMutation } from '@/app/(auth)/_hooks/use-auth-mutation'
+
+type ProfileForm = {
+  firstName: string
+  lastName: string
+  headline: string
+  bio: string
+  website: string
+}
 
 export default function ProfilePage() {
   const { data: user, isLoading } = useGetMeQuery()
+  const updateMutation = useUpdateProfileMutation()
 
-  // Tách fullName thành firstName / lastName (word cuối là họ, phần còn lại là tên)
+  // Tách fullName thành firstName / lastName
   const nameParts = user?.fullName?.trim().split(' ') ?? []
-  const lastName = nameParts.length > 1 ? nameParts[0] : ''
-  const firstName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : nameParts[0] ?? ''
+  const defaultLastName = nameParts.length > 1 ? nameParts[0] : ''
+  const defaultFirstName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : nameParts[0] ?? ''
+
+  const { register, handleSubmit, reset, formState: { isDirty } } = useForm<ProfileForm>({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      headline: '',
+      bio: '',
+      website: '',
+    },
+  })
+
+  // Populate form khi data từ API về
+  useEffect(() => {
+    if (user) {
+      reset({
+        firstName: defaultFirstName,
+        lastName: defaultLastName,
+        headline: user.headline ?? '',
+        bio: user.bio ?? '',
+        website: user.website ?? '',
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id])
+
+  const onSubmit = async (data: ProfileForm) => {
+    const fullName = `${data.lastName} ${data.firstName}`.trim()
+    try {
+      await updateMutation.mutateAsync({
+        fullName: fullName || undefined,
+        headline: data.headline || null,
+        bio: data.bio || null,
+        website: data.website || null,
+      })
+      toast.success('Hồ sơ đã được cập nhật!')
+      reset(data) // clear dirty state
+    } catch {
+      toast.error('Cập nhật thất bại, vui lòng thử lại.')
+    }
+  }
 
   return (
     <div className='flex flex-col w-full'>
@@ -29,7 +81,7 @@ export default function ProfilePage() {
           <Loader2 className='h-8 w-8 animate-spin text-primary' />
         </div>
       ) : (
-        <div className='space-y-10'>
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-10'>
           {/* Basic Info */}
           <div className='space-y-5'>
             <Label className='text-[15px] font-bold text-foreground'>Những điều cơ bản</Label>
@@ -37,14 +89,14 @@ export default function ProfilePage() {
               <div className='space-y-2'>
                 <Input
                   placeholder='Tên'
-                  defaultValue={firstName}
+                  {...register('firstName')}
                   className='h-11 rounded-md border-input bg-background focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary'
                 />
               </div>
               <div className='space-y-2'>
                 <Input
                   placeholder='Họ'
-                  defaultValue={lastName}
+                  {...register('lastName')}
                   className='h-11 rounded-md border-input bg-background focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary'
                 />
               </div>
@@ -54,9 +106,10 @@ export default function ProfilePage() {
               <div className='relative'>
                 <Input
                   placeholder='Tiêu đề chuyên môn'
-                  className='h-11 rounded-md border-input bg-background pr-12 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary'
+                  maxLength={60}
+                  {...register('headline')}
+                  className='h-11 rounded-md border-input bg-background pr-16 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary'
                 />
-                <span className='absolute right-4 top-3 text-muted-foreground text-[15px]'>0/60</span>
               </div>
               <p className='text-[13px] text-muted-foreground'>
                 Hãy thêm tiêu đề chuyên nghiệp như &quot;Giảng viên tại Udemy&quot; hoặc &quot;Kiến trúc sư phần mềm&quot;.
@@ -89,6 +142,7 @@ export default function ProfilePage() {
               </div>
               <Textarea
                 placeholder='Viết một vài dòng về bản thân bạn...'
+                {...register('bio')}
                 className='min-h-[140px] rounded-none border-0 resize-y focus-visible:ring-0 p-4'
               />
             </div>
@@ -97,24 +151,36 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          <div className='h-px bg-border'></div>
+          <div className='h-px bg-border' />
 
           {/* Links */}
           <div className='space-y-3'>
             <Label className='text-[15px] font-bold text-foreground'>Liên kết cá nhân</Label>
-            <Input 
-              placeholder='Trang web (ví dụ: https://portfolio.com)' 
-              className='h-11 rounded-md border-input bg-background focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary' 
+            <Input
+              placeholder='Trang web (ví dụ: https://portfolio.com)'
+              {...register('website')}
+              className='h-11 rounded-md border-input bg-background focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary'
             />
           </div>
 
           {/* Save button */}
           <div className='pt-6 pb-8 flex'>
-            <Button className='bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 px-8 rounded-md transition-colors'>
-              Lưu thay đổi
+            <Button
+              type='submit'
+              disabled={updateMutation.isPending || !isDirty}
+              className='bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 px-8 rounded-md transition-colors disabled:opacity-60'
+            >
+              {updateMutation.isPending ? (
+                <>
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                  Đang lưu...
+                </>
+              ) : (
+                'Lưu thay đổi'
+              )}
             </Button>
           </div>
-        </div>
+        </form>
       )}
     </div>
   )

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import authApi from '@/app/(auth)/_api/auth.api'
@@ -17,6 +17,18 @@ export function useGetMeQuery() {
     },
     enabled: !!accessToken,
     staleTime: 1000 * 60 * 5 // 5 phút
+  })
+}
+
+export function useUpdateProfileMutation() {
+  const queryClient = useQueryClient()
+  const { user, accessToken, refreshToken, setAuth } = useAuthStore()
+  return useMutation({
+    mutationFn: authApi.updateProfile,
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['me'] })
+      setAuth({ user: { ...user!, ...res.data }, accessToken, refreshToken })
+    }
   })
 }
 
