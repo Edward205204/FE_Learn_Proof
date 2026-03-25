@@ -10,7 +10,9 @@ import { PATH } from '@/constants/path'
 
 type CallbackStatus = 'loading' | 'success' | 'error'
 
-export default function GoogleCallbackPage() {
+import { Suspense } from 'react'
+
+function GoogleCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<CallbackStatus>('loading')
@@ -115,5 +117,13 @@ export default function GoogleCallbackPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function GoogleCallbackPage() {
+  return (
+    <Suspense>
+      <GoogleCallbackContent />
+    </Suspense>
   )
 }
