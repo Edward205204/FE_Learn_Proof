@@ -65,9 +65,10 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                   <h3 className='font-bold text-[17px] text-foreground group-hover:text-primary transition-colors line-clamp-1'>
                     {course.title}
                   </h3>
-                  <p className='text-sm text-foreground/60 line-clamp-2 mt-1 leading-relaxed'>
-                    {course.shortDesc?.replace(/<[^>]*>?/gm, '') || 'Chưa có mô tả'}
-                  </p>
+                  <div 
+                    className='text-sm text-foreground/60 line-clamp-2 mt-1 leading-relaxed prose prose-sm max-w-none prose-p:my-0 prose-headings:my-0'
+                    dangerouslySetInnerHTML={{ __html: course.shortDesc || 'Chưa có mô tả' }}
+                  />
                 </div>
 
                 <div className='flex items-center gap-1.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity' onClick={(e) => e.preventDefault()}>
@@ -79,7 +80,7 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                       onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
-                        router.push(PATH.COURSE_EDIT_STEP1.replace(':id', course.id))
+                        router.push(PATH.COURSE_EDIT.replace(':id', course.id))
                       }}
                     >
                       <Pencil className='size-3.5' />

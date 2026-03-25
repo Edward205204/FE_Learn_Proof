@@ -8,7 +8,7 @@ import { ArrowRight } from 'lucide-react'
 import { Form } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { PATH } from '@/constants/path'
-import { CreateCourseStep1, createCourseStep1Schema } from '@/app/(cms)/_utils/zod'
+import { CreateCourseStep1, createCourseStep1Schema, type CreateCourseStep1Res } from '@/app/(cms)/_utils/zod'
 import { persistDraftCourseId } from '@/app/(cms)/_utils/course-workflow'
 import { CoursePageShell } from '@/app/(cms)/_components/course-page-shell'
 import { CourseStep1Fields } from '@/app/(cms)/_components/course-step1-fields'
@@ -36,9 +36,16 @@ export default function CreateCourseStep1Page() {
 
   const onNext = async (data: CreateCourseStep1) => {
     const res = await createCourseMutation.mutateAsync(data)
-    const courseId = res.data.id
-    persistDraftCourseId(courseId)
-    router.push(`${PATH.COURSE_NEW_STEP2}?courseId=${courseId}`)
+    // Handle both direct object { id: ... } and wrapped response { data: { id: ... } }
+    const responseData = res.data as CreateCourseStep1Res & { data?: { id?: string } }
+    const courseId = responseData.data?.id || responseData.id
+    
+    if (courseId) {
+      persistDraftCourseId(courseId)
+      router.push(`${PATH.COURSE_NEW_STEP2}?courseId=${courseId}`)
+    } else {
+      console.error('Không tìm thấy courseId trong response:', res.data)
+    }
   }
 
   return (

@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
@@ -13,6 +14,17 @@ export function SimpleEditor({ value, onChange, placeholder, minHeight }: { valu
         content: value,
         onUpdate: ({ editor }) => onChange(editor.getHTML()),
     })
+
+    // Sync editor content when `value` changes externally (e.g. form.reset() after API load)
+    // Skip when editor is focused to avoid cursor jumps while the user is typing
+    useEffect(() => {
+        if (!editor) return
+        if (editor.isFocused) return
+        const currentHtml = editor.getHTML()
+        if (currentHtml !== value) {
+            editor.commands.setContent(value ?? '')
+        }
+    }, [editor, value])
 
     return (
         <div className="border border-input rounded-xl bg-card overflow-hidden focus-within:ring-2 focus-within:ring-border transition-all shadow-sm">

@@ -40,7 +40,7 @@ export default function Home() {
           <div className='flex flex-col gap-8 lg:w-1/2'>
             <div className='flex flex-col gap-4'>
               <h1 className='text-4xl font-black leading-tight tracking-tight text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] md:text-6xl'>
-                Master New Skills With <span className='text-[oklch(0.577_0.245_27.325)]'>LearnPoorf</span>
+                Master New Skills With <span className='text-[oklch(0.577_0.245_27.325)]'>LearnProof</span>
               </h1>
               <p className='max-w-lg text-lg leading-relaxed text-[oklch(0.552_0.016_285.938)]'>
                 High-fidelity e-learning platform focusing on a clean and professional educational experience. Start

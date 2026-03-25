@@ -5,7 +5,7 @@ import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, Plus, Video, FileText, HelpCircle, ArrowRight, Save, LayoutTemplate } from 'lucide-react'
+import { ChevronLeft, Plus, Video, FileText, HelpCircle, ArrowRight, Save, LayoutTemplate, Upload, Link } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -52,6 +52,7 @@ const DEFAULT_QUESTION: LessonForm['questions'][number] = {
 export default function LessonEditorPage() {
   const router = useRouter()
   const [step, setStep] = useState<1 | 2>(1)
+  const [videoSourceType, setVideoSourceType] = useState<'url' | 'upload'>('url')
 
   const form = useForm<LessonForm>({
     resolver: zodResolver(lessonSchema),
@@ -225,13 +226,59 @@ export default function LessonEditorPage() {
             {lessonType === 'video' && (
               <Card className='border-border/50 shadow-lg rounded-3xl overflow-hidden bg-card/50 backdrop-blur-sm'>
                 <CardContent className='p-6 sm:p-8 space-y-8'>
-                  <div className='space-y-2'>
-                    <label className='text-xs font-bold text-muted-foreground uppercase tracking-wider'>Đường dẫn Video (URL)</label>
-                    <Input 
-                      placeholder='https://youtube.com/... hoặc Vimeo URL' 
-                      {...form.register('videoUrl')} 
-                      className='h-14 font-medium rounded-2xl bg-background border-border/50 focus-visible:ring-primary/20 transition-all font-sans'
-                    />
+                  <div className='space-y-3'>
+                    <label className='text-xs font-bold text-muted-foreground uppercase tracking-wider'>Nguồn Video</label>
+
+                    {/* Tab selector */}
+                    <div className='flex gap-2 p-1 bg-muted rounded-2xl'>
+                      <button
+                        type='button'
+                        onClick={() => setVideoSourceType('url')}
+                        className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-xl text-sm font-semibold transition-all ${
+                          videoSourceType === 'url'
+                            ? 'bg-background shadow text-foreground'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        <Link className='w-4 h-4' />
+                        Link video URL
+                      </button>
+                      <button
+                        type='button'
+                        onClick={() => setVideoSourceType('upload')}
+                        className={`flex-1 flex items-center justify-center gap-2 h-10 rounded-xl text-sm font-semibold transition-all ${
+                          videoSourceType === 'upload'
+                            ? 'bg-background shadow text-foreground'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        <Upload className='w-4 h-4' />
+                        Upload file video
+                      </button>
+                    </div>
+
+                    {/* URL input */}
+                    {videoSourceType === 'url' && (
+                      <Input
+                        placeholder='https://youtube.com/... hoặc Vimeo URL'
+                        {...form.register('videoUrl')}
+                        className='h-14 font-medium rounded-2xl bg-background border-border/50 focus-visible:ring-primary/20 transition-all font-sans'
+                      />
+                    )}
+
+                    {/* File upload */}
+                    {videoSourceType === 'upload' && (
+                      <label className='flex flex-col items-center justify-center gap-3 h-36 border-2 border-dashed border-border/60 rounded-2xl bg-muted/30 hover:bg-muted/60 hover:border-primary/40 transition-all cursor-pointer'>
+                        <div className='p-3 rounded-xl bg-primary/10 text-primary'>
+                          <Upload className='w-6 h-6' />
+                        </div>
+                        <div className='text-center'>
+                          <p className='text-sm font-semibold'>Kéo thả hoặc nhấn để chọn file</p>
+                          <p className='text-xs text-muted-foreground mt-0.5'>MP4, MOV, AVI — tối đa 2 GB</p>
+                        </div>
+                        <input type='file' accept='video/*' className='hidden' />
+                      </label>
+                    )}
                   </div>
 
                   <div className="space-y-2">
