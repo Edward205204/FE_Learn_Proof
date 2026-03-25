@@ -35,7 +35,7 @@ const DEFAULT_QUESTION = {
 
 export default function LessonQuizEditorPage() {
   const [lessonData] = useState<LessonData>(MOCK_LESSON)
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [_isPreviewOpen, setIsPreviewOpen] = useState(false)
 
   const { mutate: saveQuiz, isPending } = useSaveLessonQuizMutation(lessonData.id)
 

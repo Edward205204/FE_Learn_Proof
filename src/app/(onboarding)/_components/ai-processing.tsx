@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export function AIProcessingScreen() {
   const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState("DANG_XU_LY");
+  const [_status, setStatus] = useState("DANG_XU_LY");
 
   useEffect(() => {
     const interval = setInterval(() => {

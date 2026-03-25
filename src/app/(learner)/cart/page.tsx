@@ -1,33 +1,28 @@
+'use client'
+
 import Link from 'next/link';
 import { Star, Trash2, Tag, ArrowRight, ShieldCheck, ChevronRight } from 'lucide-react';
-
-const MOCK_CART = [
-  {
-    id: '1',
-    title: 'Khóa học Lập trình Web Fullstack với Next.js 14 & React',
-    instructor: 'Tiến Sĩ Nguyễn Văn A',
-    rating: 4.8,
-    reviews: 1250,
-    price: 1290000,
-    originalPrice: 2500000,
-    image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=800&auto=format&fit=crop',
-  },
-  {
-    id: '2',
-    title: 'Thiết kế UI/UX Thực chiến với Figma - Từ Cơ bản đến Nâng cao',
-    instructor: 'Trần Thị B',
-    rating: 4.9,
-    reviews: 3420,
-    price: 890000,
-    originalPrice: 1500000,
-    image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?q=80&w=800&auto=format&fit=crop',
-  }
-];
+import { useCartQuery, useRemoveFromCartMutation } from './_hooks/use-cart';
 
 export default function CartPage() {
-  const totalPrice = MOCK_CART.reduce((sum, item) => sum + item.price, 0);
-  const totalOriginalPrice = MOCK_CART.reduce((sum, item) => sum + item.originalPrice, 0);
+  const { data: cartData, isLoading } = useCartQuery();
+  const removeMutation = useRemoveFromCartMutation();
+
+  const cartItems = cartData?.items || [];
+
+  const totalPrice = cartItems.reduce((sum, item) => sum + item.course.price, 0);
+  const totalOriginalPrice = cartItems.reduce((sum, item) => sum + (item.course.originalPrice || item.course.price), 0);
   const discount = totalOriginalPrice - totalPrice;
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-10 px-6 max-w-[1200px]">
+        <div className="h-[400px] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-10 px-6 max-w-[1200px]">
@@ -37,68 +32,88 @@ export default function CartPage() {
         <span className="text-[oklch(0.577_0.245_27.325)]">Giỏ hàng</span>
       </nav>
       <h1 className="text-3xl font-bold mb-8 text-[oklch(0.141_0.005_285.823)] dark:text-white">
-        Giỏ hàng của bạn ({MOCK_CART.length})
+        Giỏ hàng của bạn ({cartItems.length})
       </h1>
 
       <div className="flex flex-col lg:flex-row gap-10">
         {/* Cart Items List */}
         <div className="lg:w-2/3 flex flex-col gap-6">
-          {MOCK_CART.map((course) => (
-            <div key={course.id} className="flex flex-col sm:flex-row gap-4 p-4 rounded-xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] bg-white dark:bg-[oklch(0.141_0.005_285.823)] relative pr-12 group transition-all hover:shadow-sm">
-              <div className="w-full sm:w-40 aspect-video sm:aspect-square md:aspect-[4/3] rounded-lg overflow-hidden shrink-0 bg-gray-100 dark:bg-gray-800">
-                <img
-                  src={course.image}
-                  alt={course.title}
-                  className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-
-              <div className="flex-1 flex flex-col justify-between py-1">
-                <div>
-                  <h3 className="font-semibold text-lg line-clamp-2 text-gray-900 dark:text-white group-hover:text-[oklch(0.577_0.245_27.325)] transition-colors">
-                    {course.title}
-                  </h3>
-                  <p className="text-sm text-[oklch(0.552_0.016_285.938)] mt-1">
-                    bởi <span className="text-blue-500">{course.instructor}</span>
-                  </p>
-
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="font-bold text-[oklch(0.577_0.245_27.325)] text-sm">{course.rating}</span>
-                    <div className="flex text-[oklch(0.577_0.245_27.325)]">
-                      <Star size={14} fill="currentColor" />
-                    </div>
-                    <span className="text-xs text-[oklch(0.552_0.016_285.938)]">({course.reviews} đánh giá)</span>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex sm:hidden items-center gap-3">
-                  <span className="text-xl font-bold text-[oklch(0.577_0.245_27.325)]">
-                    {course.price.toLocaleString('vi-VN')} đ
-                  </span>
-                  <span className="text-sm text-[oklch(0.552_0.016_285.938)] line-through">
-                    {course.originalPrice.toLocaleString('vi-VN')} đ
-                  </span>
-                </div>
-              </div>
-
-              {/* Price Right side */}
-              <div className="hidden sm:flex flex-col items-end gap-2 shrink-0 w-32 justify-between">
-                <div className="text-right">
-                  <div className="text-xl font-bold text-[oklch(0.577_0.245_27.325)] block">
-                    {course.price.toLocaleString('vi-VN')} đ
-                  </div>
-                  <div className="text-sm text-[oklch(0.552_0.016_285.938)] line-through mt-1">
-                    {course.originalPrice.toLocaleString('vi-VN')} đ
-                  </div>
-                </div>
-              </div>
-
-              {/* Remove button */}
-              <button className="absolute top-4 right-4 text-[oklch(0.552_0.016_285.938)] hover:text-red-500 transition-colors p-1" title="Xóa khỏi giỏ hàng">
-                <Trash2 size={20} />
-              </button>
+          {cartItems.length === 0 ? (
+            <div className="p-8 text-center text-slate-500 bg-white dark:bg-slate-900 rounded-xl border border-slate-200">
+              Giỏ hàng của bạn đang trống.
+              <Link href="/" className="block mt-4 text-blue-500 hover:underline">
+                Khám phá khóa học ngay
+              </Link>
             </div>
-          ))}
+          ) : (
+            cartItems.map((item) => (
+              <div key={item.id} className="flex flex-col sm:flex-row gap-4 p-4 rounded-xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] bg-white dark:bg-[oklch(0.141_0.005_285.823)] relative pr-12 group transition-all hover:shadow-sm">
+                <div className="w-full sm:w-40 aspect-video sm:aspect-square md:aspect-[4/3] rounded-lg overflow-hidden shrink-0 bg-gray-100 dark:bg-gray-800">
+                  <img
+                    src={item.course.thumbnail || ''}
+                    alt={item.course.title}
+                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+
+                <div className="flex-1 flex flex-col justify-between py-1">
+                  <div>
+                    <h3 className="font-semibold text-lg line-clamp-2 text-gray-900 dark:text-white hover:text-[oklch(0.577_0.245_27.325)] transition-colors">
+                      <Link href={`/courses/${item.courseId}`}>
+                        {item.course.title}
+                      </Link>
+                    </h3>
+                    <p className="text-sm text-[oklch(0.552_0.016_285.938)] mt-1">
+                      bởi <span className="text-blue-500">{item.course.creator.fullName}</span>
+                    </p>
+
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="font-bold text-[oklch(0.577_0.245_27.325)] text-sm">5.0</span>
+                      <div className="flex text-[oklch(0.577_0.245_27.325)]">
+                        <Star size={14} fill="currentColor" />
+                      </div>
+                      <span className="text-xs text-[oklch(0.552_0.016_285.938)]">(0 đánh giá)</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex sm:hidden items-center gap-3">
+                    <span className="text-xl font-bold text-[oklch(0.577_0.245_27.325)]">
+                      {item.course.price.toLocaleString('vi-VN')} đ
+                    </span>
+                    {(item.course.originalPrice || item.course.price) > item.course.price && (
+                      <span className="text-sm text-[oklch(0.552_0.016_285.938)] line-through">
+                        {item.course.originalPrice!.toLocaleString('vi-VN')} đ
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Price Right side */}
+                <div className="hidden sm:flex flex-col items-end gap-2 shrink-0 w-32 justify-between">
+                  <div className="text-right">
+                    <div className="text-xl font-bold text-[oklch(0.577_0.245_27.325)] block">
+                      {item.course.price.toLocaleString('vi-VN')} đ
+                    </div>
+                    {(item.course.originalPrice || item.course.price) > item.course.price && (
+                      <div className="text-sm text-[oklch(0.552_0.016_285.938)] line-through mt-1">
+                        {item.course.originalPrice!.toLocaleString('vi-VN')} đ
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Remove button */}
+                <button 
+                  className="absolute top-4 right-4 text-[oklch(0.552_0.016_285.938)] hover:text-red-500 transition-colors p-1 disabled:opacity-50" 
+                  title="Xóa khỏi giỏ hàng"
+                  onClick={() => removeMutation.mutate(item.courseId)}
+                  disabled={removeMutation.isPending}
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Checkout Summary */}
@@ -136,7 +151,10 @@ export default function CartPage() {
               <p className="text-xs text-[oklch(0.552_0.016_285.938)] text-right">Đã bao gồm thuế (nếu có)</p>
             </div>
 
-            <button className="w-full py-4 px-6 bg-[oklch(0.577_0.245_27.325)] hover:opacity-90 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-opacity mb-4 shadow-lg shadow-[oklch(0.577_0.245_27.325)]/20">
+            <button 
+              className="w-full py-4 px-6 bg-[oklch(0.577_0.245_27.325)] hover:opacity-90 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-opacity mb-4 shadow-lg shadow-[oklch(0.577_0.245_27.325)]/20 disabled:opacity-50"
+              disabled={cartItems.length === 0}
+            >
               Tiến hành thanh toán <ArrowRight size={20} />
             </button>
 
