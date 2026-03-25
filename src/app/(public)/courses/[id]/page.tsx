@@ -1,37 +1,41 @@
 'use client'
 
-import { 
-  ChevronRight, Star, Play, Check, Layers, Download, Award, Infinity, 
+import {
+  ChevronRight, Star, Play, Check, Layers, Download, Award, Infinity,
   ChevronDown, PlayCircle, FileText, ShieldCheck, Zap, ShoppingCart, Heart, Loader2
 } from 'lucide-react'
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect, useMemo } from 'react'
-import { useParams } from 'next/navigation'
+import { useState, useMemo } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { PATH } from '@/constants/path'
 import { useAddToCartMutation } from '@/app/(learner)/cart/_hooks/use-cart'
 import { useCourseDetailQuery } from '../_hooks/use-course'
 import { useWishlistQuery, useAddToWishlistMutation, useRemoveFromWishlistMutation } from '@/app/(learner)/wishlist/_hooks/use-wishlist'
+import type { WishlistItem } from '@/app/(learner)/wishlist/_api/wishlist.api'
 
 export default function CourseDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const courseSlug = params?.id as string
 
   const { data: courseData, isLoading, isError } = useCourseDetailQuery(courseSlug)
   const { data: wishlistData } = useWishlistQuery()
 
-  const [expandedChapters, setExpandedChapters] = useState<string[]>([])
-  
   const addMutation = useAddToCartMutation()
   const addToWishlistMutation = useAddToWishlistMutation()
   const removeFromWishlistMutation = useRemoveFromWishlistMutation()
 
-  const isWishlisted = useMemo(() => {
-    return wishlistData?.some((item: any) => item.courseId === courseData?.id) || false
-  }, [wishlistData, courseData])
+  const [expandedChapters, setExpandedChapters] = useState<string[]>([])
+
+  const isWishlisted = useMemo(
+    () => (wishlistData as WishlistItem[] | undefined)?.some((item) => item.courseId === courseData?.id) || false,
+    [wishlistData, courseData?.id]
+  )
 
   const toggleWishlist = () => {
     if (!courseData) return
@@ -42,13 +46,6 @@ export default function CourseDetailPage() {
     }
   }
 
-  // Mở rộng chương đầu tiên khi data load xong
-  useEffect(() => {
-    if (courseData && courseData.chapters.length > 0 && expandedChapters.length === 0) {
-      setExpandedChapters([courseData.chapters[0].id])
-    }
-  }, [courseData])
-  
   const courseIdOrSlug = courseData?.id || courseSlug
 
   if (isLoading) {
@@ -238,8 +235,8 @@ export default function CourseDetailPage() {
                         </div>
                       </div>
                     </div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic">
-                      "{review.comment}"
+                    <p className='text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic'>
+                      &ldquo;{review.comment}&rdquo;
                     </p>
                   </div>
                 ))}
@@ -293,8 +290,15 @@ export default function CourseDetailPage() {
                    )}
                 </div>
 
-                <Button className="w-full h-14 bg-rose-600 hover:bg-rose-700 text-white font-black text-base rounded-2xl shadow-xl shadow-rose-200 dark:shadow-rose-900/20 active:scale-[0.98] transition-all">
-                  Đăng ký ngay
+                <Button
+                  className='w-full h-14 bg-rose-600 hover:bg-rose-700 text-white font-black text-base rounded-2xl shadow-xl shadow-rose-200 dark:shadow-rose-900/20 active:scale-[0.98] transition-all disabled:opacity-70'
+                  disabled={addMutation.isPending}
+                  onClick={async () => {
+                    await addMutation.mutateAsync(courseIdOrSlug)
+                    router.push(PATH.CHECKOUT)
+                  }}
+                >
+                  {addMutation.isPending ? 'Đang xử lý...' : 'Đăng ký ngay'}
                 </Button>
 
                 <div className="flex gap-3 mt-3 mb-8">
