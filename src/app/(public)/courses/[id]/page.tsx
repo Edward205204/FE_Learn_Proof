@@ -96,7 +96,7 @@ export default function CourseDetailPage() {
 
           <div className="max-w-[800px] space-y-6">
             <h1 className="text-5xl md:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight">
-              {courseData.title}
+              Làm chủ <span className="text-rose-600">Ethereum</span> & <br />Hợp đồng thông minh
             </h1>
             <p className="text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-2xl">
               {courseData.shortDesc}

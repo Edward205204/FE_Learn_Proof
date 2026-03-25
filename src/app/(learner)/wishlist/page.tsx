@@ -45,10 +45,9 @@ export default function WishlistPage() {
                   className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                 />
                 <button 
-                  className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full text-red-500 hover:bg-red-50 hover:scale-110 transition-all z-10 shadow-sm disabled:opacity-50" 
+                  onClick={() => setDeletingId(course.id)}
+                  className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full text-red-500 hover:bg-red-50 hover:scale-110 transition-all z-10 shadow-sm" 
                   title="Xóa khỏi yêu thích"
-                  onClick={() => removeMutation.mutate(item.courseId)}
-                  disabled={removeMutation.isPending}
                 >
                   <Trash2 size={18} />
                 </button>
@@ -116,6 +115,26 @@ export default function WishlistPage() {
           </Link>
         </div>
       )}
+
+      {/* Confirmation Dialog */}
+      <Dialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn xóa khóa học <span className="font-semibold text-foreground">"{deletingCourse?.title}"</span> khỏi danh sách yêu thích không?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex sm:justify-end gap-2">
+            <Button variant="outline" onClick={() => setDeletingId(null)}>
+              Hủy
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteWishlist}>
+              Xác nhận xóa
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

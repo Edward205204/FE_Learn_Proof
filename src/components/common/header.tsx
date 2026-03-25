@@ -165,7 +165,7 @@ export default function Header() {
                       )}
                     </div>
                     
-                    <div className="max-h-[360px] overflow-y-auto">
+                    <div className="max-h-[360px] overflow-y-auto overscroll-contain">
                       {displayedNotifs.map(noti => (
                         <div key={noti.id} className={`p-4 border-b dark:border-[oklch(0.274_0.006_286.033)] hover:bg-[oklch(0.967_0.001_0)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors cursor-pointer ${noti.unread ? 'bg-rose-50/30 dark:bg-rose-900/10' : ''}`}>
                           <p className={`text-sm ${noti.unread ? 'font-semibold' : 'font-medium'} text-[oklch(0.141_0.005_285.823)] dark:text-gray-100`}>{noti.title}</p>

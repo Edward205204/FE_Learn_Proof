@@ -29,6 +29,24 @@ export function ContentManagementHeader() {
   const { user, isLoggedIn, isMenuOpen, toggleMenu, handleLogout, closeMenu } = useHeader()
 
   const menuRef = useRef<HTMLDivElement>(null)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const openMenu = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    if (!isMenuOpen) toggleMenu()
+  }
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      closeMenu()
+    }, 200)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -67,7 +85,12 @@ export function ContentManagementHeader() {
           </div>
         </div>
 
-        <div className='flex items-center gap-3 relative' ref={menuRef}>
+        <div 
+          className='flex items-center gap-3 relative' 
+          ref={menuRef}
+          onMouseEnter={openMenu}
+          onMouseLeave={handleMouseLeave}
+        >
           <Link
             href={PATH.STUDIO_COURSES}
             className={cn(
@@ -82,6 +105,7 @@ export function ContentManagementHeader() {
             <>
               <button
                 onClick={toggleMenu}
+                onFocus={() => { if (!isMenuOpen) toggleMenu(); }}
                 className='flex items-center gap-2 focus:outline-none transition-transform active:scale-95'
                 aria-expanded={isMenuOpen}
                 aria-haspopup='true'
@@ -96,9 +120,13 @@ export function ContentManagementHeader() {
               </button>
 
               {isMenuOpen && (
-                <div className='absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border bg-background shadow-xl animate-in fade-in zoom-in-95 duration-200 origin-top-right'>
-                  <div className='px-4 py-3 border-b'>
-                    <p className='text-sm font-semibold text-foreground truncate'>{user.fullName}</p>
+                <div className="absolute right-0 top-full mt-2 w-56 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50">
+                  {/* Bridge element to fill the gap - ensures no mouseLeave when moving to menu */}
+                  <div className="absolute -top-2 left-0 right-0 h-4 bg-transparent" />
+                  
+                  <div className='overflow-hidden rounded-xl border bg-background shadow-xl'>
+                    <div className='px-4 py-3 border-b'>
+                      <p className='text-sm font-semibold text-foreground truncate'>{user.fullName}</p>
                     <p className='text-xs text-muted-foreground truncate'>{user.email}</p>
                   </div>
 
@@ -130,6 +158,7 @@ export function ContentManagementHeader() {
                       <LogOut size={16} />
                       Log out
                     </button>
+                    </div>
                   </div>
                 </div>
               )}

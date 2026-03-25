@@ -112,59 +112,78 @@ export default function CartPage() {
                   <Trash2 size={20} />
                 </button>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
 
-        {/* Checkout Summary */}
-        <div className="lg:w-1/3">
-          <div className="p-6 rounded-2xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] bg-white dark:bg-[oklch(0.141_0.005_285.823)] shadow-sm">
-            <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Tổng cộng</h2>
+          {/* Checkout Summary */}
+          <div className="lg:w-1/3">
+            <div className="p-6 rounded-2xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] bg-white dark:bg-[oklch(0.141_0.005_285.823)] shadow-sm">
+              <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Tổng cộng</h2>
 
-            <div className="space-y-4 mb-6 text-sm text-gray-600 dark:text-[oklch(0.552_0.016_285.938)]">
-              <div className="flex items-center justify-between">
-                <span>Tạm tính:</span>
-                <span className="font-medium text-gray-900 dark:text-white">{totalOriginalPrice.toLocaleString('vi-VN')} đ</span>
+              <div className="space-y-4 mb-6 text-sm text-gray-600 dark:text-[oklch(0.552_0.016_285.938)]">
+                <div className="flex items-center justify-between">
+                  <span>Tạm tính:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{totalOriginalPrice.toLocaleString('vi-VN')} đ</span>
+                </div>
+                <div className="flex items-center justify-between text-green-600 dark:text-green-500">
+                  <span>Giảm giá:</span>
+                  <span>-{discount.toLocaleString('vi-VN')} đ</span>
+                </div>
+                <div className="flex items-center gap-2 pt-4 border-t border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)]">
+                  <Tag size={18} className="text-[oklch(0.552_0.016_285.938)]" />
+                  <input
+                    type="text"
+                    placeholder="Nhập mã giảm giá..."
+                    className="bg-transparent border-none outline-none text-sm w-full focus:ring-0 dark:text-white placeholder:text-[oklch(0.552_0.016_285.938)]"
+                  />
+                  <button className="text-blue-600 dark:text-blue-500 font-medium whitespace-nowrap">Áp dụng</button>
+                </div>
               </div>
-              <div className="flex items-center justify-between text-green-600 dark:text-green-500">
-                <span>Giảm giá:</span>
-                <span>-{discount.toLocaleString('vi-VN')} đ</span>
-              </div>
-              <div className="flex items-center gap-2 pt-4 border-t border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)]">
-                <Tag size={18} className="text-[oklch(0.552_0.016_285.938)]" />
-                <input
-                  type="text"
-                  placeholder="Nhập mã giảm giá..."
-                  className="bg-transparent border-none outline-none text-sm w-full focus:ring-0 dark:text-white placeholder:text-[oklch(0.552_0.016_285.938)]"
-                />
-                <button className="text-blue-600 dark:text-blue-500 font-medium whitespace-nowrap">Áp dụng</button>
-              </div>
-            </div>
 
-            <div className="pt-4 border-t border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] mb-6">
-              <div className="flex items-end justify-between mb-2">
-                <span className="font-semibold text-gray-900 dark:text-white">Thành tiền:</span>
-                <span className="text-3xl font-bold text-[oklch(0.577_0.245_27.325)]">
-                  {totalPrice.toLocaleString('vi-VN')} đ
-                </span>
+              <div className="pt-4 border-t border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] mb-6">
+                <div className="flex items-end justify-between mb-2">
+                  <span className="font-semibold text-gray-900 dark:text-white">Thành tiền:</span>
+                  <span className="text-3xl font-bold text-[oklch(0.577_0.245_27.325)]">
+                    {totalPrice.toLocaleString('vi-VN')} đ
+                  </span>
+                </div>
+                <p className="text-xs text-[oklch(0.552_0.016_285.938)] text-right">Đã bao gồm thuế (nếu có)</p>
               </div>
-              <p className="text-xs text-[oklch(0.552_0.016_285.938)] text-right">Đã bao gồm thuế (nếu có)</p>
-            </div>
 
-            <button 
-              className="w-full py-4 px-6 bg-[oklch(0.577_0.245_27.325)] hover:opacity-90 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-opacity mb-4 shadow-lg shadow-[oklch(0.577_0.245_27.325)]/20 disabled:opacity-50"
-              disabled={cartItems.length === 0}
-            >
-              Tiến hành thanh toán <ArrowRight size={20} />
-            </button>
+              <Button asChild className="w-full py-7 bg-[oklch(0.577_0.245_27.325)] hover:opacity-90 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-opacity mb-4 shadow-lg shadow-[oklch(0.577_0.245_27.325)]/20">
+                <Link href={PATH.CHECKOUT}>
+                  Tiến hành thanh toán <ArrowRight size={20} />
+                </Link>
+              </Button>
 
-            <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mt-6">
-              <ShieldCheck size={16} className="text-green-500" />
-              <span>Đảm bảo hoàn tiền trong 30 ngày</span>
+              <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mt-6">
+                <ShieldCheck size={16} className="text-green-500" />
+                <span>Đảm bảo hoàn tiền trong 30 ngày</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Confirmation Dialog */}
+      <Dialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn xóa khóa học <span className="font-semibold text-foreground">"{deletingCourse?.title}"</span> khỏi giỏ hàng không?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex sm:justify-end gap-2">
+            <Button variant="outline" onClick={() => setDeletingId(null)}>
+              Hủy
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteCart}>
+              Xác nhận xóa
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
