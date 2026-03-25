@@ -1,5 +1,18 @@
+"use client"
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { Star, Clock, BookOpen, Trash2, ChevronRight } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const MOCK_WISHLIST = [
   {
@@ -41,6 +54,18 @@ const MOCK_WISHLIST = [
 ];
 
 export default function WishlistPage() {
+  const [wishlist, setWishlist] = useState(MOCK_WISHLIST);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDeleteWishlist = () => {
+    if (!deletingId) return;
+    setWishlist(wishlist.filter((item) => item.id !== deletingId));
+    setDeletingId(null);
+    toast.success('Đã xóa khóa học khỏi danh sách yêu thích');
+  }
+
+  const deletingCourse = wishlist.find(c => c.id === deletingId);
+
   return (
     <div className="container mx-auto py-10 px-6 max-w-[1200px]">
       <nav className="flex items-center gap-2 text-[12px] font-black tracking-widest uppercase text-slate-400 mb-8 mt-2">
@@ -52,9 +77,9 @@ export default function WishlistPage() {
         Khóa học Yêu thích
       </h1>
       
-      {MOCK_WISHLIST.length > 0 ? (
+      {wishlist.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {MOCK_WISHLIST.map((course) => (
+          {wishlist.map((course) => (
             <div key={course.id} className="group relative rounded-xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] bg-white dark:bg-[oklch(0.141_0.005_285.823)] overflow-hidden shadow-sm hover:shadow-md transition-all">
               {/* Image */}
               <div className="aspect-video relative overflow-hidden bg-gray-100 dark:bg-gray-800">
@@ -63,7 +88,11 @@ export default function WishlistPage() {
                   alt={course.title} 
                   className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                 />
-                <button className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full text-red-500 hover:bg-red-50 hover:scale-110 transition-all z-10 shadow-sm" title="Xóa khỏi yêu thích">
+                <button 
+                  onClick={() => setDeletingId(course.id)}
+                  className="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full text-red-500 hover:bg-red-50 hover:scale-110 transition-all z-10 shadow-sm" 
+                  title="Xóa khỏi yêu thích"
+                >
                   <Trash2 size={18} />
                 </button>
               </div>
@@ -125,6 +154,26 @@ export default function WishlistPage() {
           </Link>
         </div>
       )}
+
+      {/* Confirmation Dialog */}
+      <Dialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn xóa khóa học <span className="font-semibold text-foreground">"{deletingCourse?.title}"</span> khỏi danh sách yêu thích không?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex sm:justify-end gap-2">
+            <Button variant="outline" onClick={() => setDeletingId(null)}>
+              Hủy
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteWishlist}>
+              Xác nhận xóa
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
