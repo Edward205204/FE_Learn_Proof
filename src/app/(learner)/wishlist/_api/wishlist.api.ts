@@ -20,7 +20,7 @@ export interface WishlistItem {
 export const wishlistApi = {
   getWishlist: () => http.get<WishlistItem[]>('/wishlist'),
   addToWishlist: (courseId: string) => http.post<WishlistItem>(`/wishlist/${courseId}`),
-  removeFromWishlist: (courseId: string) => http.delete<any>(`/wishlist/${courseId}`)
+  removeFromWishlist: (courseId: string) => http.delete<{ count: number }>(`/wishlist/${courseId}`)
 }
 
 export default wishlistApi
