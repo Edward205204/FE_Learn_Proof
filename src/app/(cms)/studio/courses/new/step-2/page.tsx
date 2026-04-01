@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ChevronLeft, Pencil, Trash2, GripVertical, Plus, ArrowRight } from 'lucide-react'
 import { toast } from 'sonner'
@@ -24,7 +24,7 @@ const DEFAULT_CHAPTERS: Chapter[] = [
   { id: 3, title: 'Thực hành & Bài tập' }
 ]
 
-export default function CreateCourseStep2Page() {
+function CreateCourseStep2Content() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const courseId = getDraftCourseId(searchParams)
@@ -180,5 +180,13 @@ export default function CreateCourseStep2Page() {
         </div>
       </div>
     </CoursePageShell>
+  )
+}
+
+export default function CreateCourseStep2Page() {
+  return (
+    <Suspense fallback={<div className="flex h-[200px] w-full items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>}>
+      <CreateCourseStep2Content />
+    </Suspense>
   )
 }
