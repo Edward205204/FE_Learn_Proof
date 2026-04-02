@@ -14,6 +14,9 @@ export interface WishlistItem {
     creator: {
       fullName: string
     }
+    overallAnalytics?: {
+      totalStudents: number
+    }
   }
 }
 

@@ -13,10 +13,10 @@ import { useState, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { PATH } from '@/constants/path'
-import { useAddToCartMutation } from '@/app/(learner)/cart/_hooks/use-cart'
-import { useCourseDetailQuery } from '../_hooks/use-course'
-import { useWishlistQuery, useAddToWishlistMutation, useRemoveFromWishlistMutation } from '@/app/(learner)/wishlist/_hooks/use-wishlist'
-import type { WishlistItem } from '@/app/(learner)/wishlist/_api/wishlist.api'
+import { useAddToCartMutation } from '@/app/(learner)/_hooks/use-cart'
+import { useCourseDetailQuery } from '../../_hooks/use-course'
+import { useWishlistQuery, useAddToWishlistMutation, useRemoveFromWishlistMutation } from '@/app/(learner)/_hooks/use-wishlist'
+import type { WishlistItem } from '@/app/(learner)/_api/wishlist.api'
 
 export default function CourseDetailPage() {
   const params = useParams()

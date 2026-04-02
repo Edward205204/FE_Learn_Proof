@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Star, Trash2, Tag, ArrowRight, ShieldCheck, ChevronRight } from 'lucide-react'
-import { useCartQuery, useRemoveFromCartMutation } from './_hooks/use-cart'
+import { useCartQuery, useRemoveFromCartMutation } from '../_hooks/use-cart'
 import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { PATH } from '@/constants/path'
@@ -15,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
+import { toast } from 'sonner'
 
 export default function CartPage() {
   const { data: cartData, isLoading } = useCartQuery()
@@ -40,10 +41,12 @@ export default function CartPage() {
       removeMutation.mutate(deletingId, {
         onSuccess: () => {
           setDeletingId(null)
+          toast.success('Đã xóa sản phẩm khỏi giỏ hàng')
         }
       })
     }
   }
+
 
   if (isLoading) {
     return (
@@ -161,53 +164,61 @@ export default function CartPage() {
 
             {/* Checkout Summary */}
             <div className='lg:w-1/3'>
-              <div className='p-6 rounded-2xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] bg-white dark:bg-[oklch(0.141_0.005_285.823)] shadow-sm'>
-                <h2 className='text-xl font-bold mb-6 text-gray-900 dark:text-white'>Tổng cộng</h2>
+              <div className='p-8 rounded-3xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] bg-white dark:bg-[oklch(0.141_0.005_285.823)] shadow-xl shadow-slate-100 dark:shadow-none'>
+                <h2 className='text-xl font-black mb-8 text-gray-900 dark:text-white uppercase tracking-wider'>Tổng cộng</h2>
 
-                <div className='space-y-4 mb-6 text-sm text-gray-600 dark:text-[oklch(0.552_0.016_285.938)]'>
+                <div className='space-y-4 mb-8 text-sm font-medium text-gray-600 dark:text-[oklch(0.552_0.016_285.938)]'>
                   <div className='flex items-center justify-between'>
                     <span>Tạm tính:</span>
-                    <span className='font-medium text-gray-900 dark:text-white'>
+                    <span className='font-bold text-gray-900 dark:text-white'>
                       {totalOriginalPrice.toLocaleString('vi-VN')} đ
                     </span>
                   </div>
                   <div className='flex items-center justify-between text-green-600 dark:text-green-500'>
                     <span>Giảm giá:</span>
-                    <span>-{discount.toLocaleString('vi-VN')} đ</span>
+                    <span className='font-bold'>-{discount.toLocaleString('vi-VN')} đ</span>
                   </div>
-                  <div className='flex items-center gap-2 pt-4 border-t border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)]'>
-                    <Tag size={18} className='text-[oklch(0.552_0.016_285.938)]' />
-                    <input
-                      type='text'
-                      placeholder='Nhập mã giảm giá...'
-                      className='bg-transparent border-none outline-none text-sm w-full focus:ring-0 dark:text-white placeholder:text-[oklch(0.552_0.016_285.938)]'
-                    />
-                    <button className='text-blue-600 dark:text-blue-500 font-medium whitespace-nowrap'>Áp dụng</button>
+                  <div className='flex items-center gap-2 pt-6 border-t border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)]'>
+                    <div className='flex-1 flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 px-4 py-3 rounded-xl border border-transparent focus-within:border-[oklch(0.577_0.245_27.325)]/30 transition-all'>
+                      <Tag size={16} className='text-[oklch(0.552_0.016_285.938)]' />
+                      <input
+                        type='text'
+                        placeholder='Nhập mã ưu đãi...'
+                        className='bg-transparent border-none outline-none text-xs w-full focus:ring-0 dark:text-white placeholder:text-[oklch(0.552_0.016_285.938)] font-bold'
+                      />
+                    </div>
+                    <button className='text-[oklch(0.577_0.245_27.325)] dark:text-rose-400 font-black text-xs hover:scale-105 transition-transform uppercase tracking-tighter'>
+                      Áp dụng
+                    </button>
                   </div>
                 </div>
 
-                <div className='pt-4 border-t border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] mb-6'>
+                <div className='pt-6 border-t border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] mb-8'>
                   <div className='flex items-end justify-between mb-2'>
-                    <span className='font-semibold text-gray-900 dark:text-white'>Thành tiền:</span>
-                    <span className='text-3xl font-bold text-[oklch(0.577_0.245_27.325)]'>
+                    <span className='font-black text-gray-900 dark:text-white uppercase text-xs tracking-widest'>
+                      Thành tiền:
+                    </span>
+                    <span className='text-4xl font-black text-[oklch(0.577_0.245_27.325)]'>
                       {totalPrice.toLocaleString('vi-VN')} đ
                     </span>
                   </div>
-                  <p className='text-xs text-[oklch(0.552_0.016_285.938)] text-right'>Đã bao gồm thuế (nếu có)</p>
+                  <p className='text-[10px] uppercase font-black text-[oklch(0.552_0.016_285.938)] text-right tracking-widest opacity-80'>
+                    Đã bao gồm phí & thuế
+                  </p>
                 </div>
 
                 <Button
                   asChild
-                  className='w-full py-7 bg-[oklch(0.577_0.245_27.325)] hover:opacity-90 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-opacity mb-4 shadow-lg shadow-[oklch(0.577_0.245_27.325)]/20'
+                  className='w-full h-16 bg-[oklch(0.577_0.245_27.325)] hover:opacity-90 text-white rounded-2xl font-black text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] mb-4 shadow-xl shadow-[oklch(0.577_0.245_27.325)]/20'
                 >
                   <Link href={PATH.CHECKOUT}>
-                    Tiến hành thanh toán <ArrowRight size={20} />
+                    Tiến hành thanh toán <ArrowRight size={22} />
                   </Link>
                 </Button>
 
-                <div className='flex items-center justify-center gap-2 text-xs text-gray-500 mt-6'>
-                  <ShieldCheck size={16} className='text-green-500' />
-                  <span>Đảm bảo hoàn tiền trong 30 ngày</span>
+                <div className='flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-[oklch(0.552_0.016_285.938)] mt-8'>
+                  <ShieldCheck size={14} className='text-green-500' />
+                  <span>Cam kết bảo mật & An toàn</span>
                 </div>
               </div>
             </div>
@@ -217,21 +228,26 @@ export default function CartPage() {
 
       {/* Confirmation Dialog */}
       <Dialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
-        <DialogContent className='sm:max-w-md'>
-          <DialogHeader>
-            <DialogTitle>Xác nhận xóa</DialogTitle>
-            <DialogDescription>
+        <DialogContent className='sm:max-w-md bg-white dark:bg-[oklch(0.141_0.005_285.823)] rounded-[32px] border-none shadow-2xl'>
+          <DialogHeader className='pt-4'>
+            <DialogTitle className='text-2xl font-black text-gray-900 dark:text-white'>Xác nhận xóa</DialogTitle>
+            <DialogDescription className='text-base font-medium text-[oklch(0.552_0.016_285.938)] pt-2 leading-relaxed'>
               Bạn có chắc chắn muốn xóa khóa học{' '}
-              <span className='font-semibold text-foreground'>&quot;{deletingCourse?.title}&quot;</span> khỏi giỏ hàng
-              không?
+              <span className='font-black text-gray-900 dark:text-white'>&quot;{deletingCourse?.title}&quot;</span> khỏi
+              giỏ hàng không?
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className='flex sm:justify-end gap-2'>
-            <Button variant='outline' onClick={() => setDeletingId(null)}>
+          <DialogFooter className='flex sm:justify-end gap-3 pb-4 pt-6'>
+            <Button variant='outline' onClick={() => setDeletingId(null)} className='h-12 rounded-xl font-bold border-2 px-6'>
               Hủy
             </Button>
-            <Button variant='destructive' onClick={handleDeleteCart}>
-              Xác nhận xóa
+            <Button
+              variant='destructive'
+              onClick={handleDeleteCart}
+              disabled={removeMutation.isPending}
+              className='h-12 rounded-xl font-bold px-8 bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/20'
+            >
+              {removeMutation.isPending ? 'Đang xóa...' : 'Xác nhận xóa'}
             </Button>
           </DialogFooter>
         </DialogContent>

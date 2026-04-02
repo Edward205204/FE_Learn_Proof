@@ -13,8 +13,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useAddToCartMutation } from '@/app/(learner)/cart/_hooks/use-cart'
-import { useWishlistQuery, useRemoveFromWishlistMutation } from './_hooks/use-wishlist'
+import { useAddToCartMutation } from '@/app/(learner)/_hooks/use-cart'
+import { useWishlistQuery, useRemoveFromWishlistMutation } from '../_hooks/use-wishlist'
+import { toast } from 'sonner'
 
 export default function WishlistPage() {
   const { data: wishlistData, isLoading } = useWishlistQuery()
@@ -34,10 +35,12 @@ export default function WishlistPage() {
       removeMutation.mutate(deletingId, {
         onSuccess: () => {
           setDeletingId(null)
+          toast.success('Đã xóa khóa học khỏi danh sách yêu thích')
         }
       })
     }
   }
+
 
   if (isLoading) {
     return (
@@ -127,8 +130,8 @@ export default function WishlistPage() {
                     disabled={addCartMutation.isPending}
                     className='flex justify-center items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50'
                   >
-                    <ShoppingCart size={16} />
-                    {addCartMutation.isPending ? 'Đang thêm...' : 'Thêm vào giỏ'}
+                    <ShoppingCart size={18} />
+                    {addCartMutation.isPending ? '...' : 'Thêm giỏ'}
                   </button>
                 </div>
               </div>

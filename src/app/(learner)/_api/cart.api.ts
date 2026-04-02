@@ -12,6 +12,9 @@ export interface CartItem {
     creator: {
       fullName: string
     }
+    overallAnalytics?: {
+      totalStudents: number
+    }
   }
 }
 
