@@ -2,11 +2,7 @@ interface Step {
   label: string
 }
 
-const STEPS: Step[] = [
-  { label: 'Thông tin cơ bản' },
-  { label: 'Chương học' },
-  { label: 'Giá & Xuất bản' }
-]
+const STEPS: Step[] = [{ label: 'Thông tin cơ bản' }, { label: 'Chương học' }, { label: 'Hoàn thành' }]
 
 interface CourseStepperProps {
   currentStep: 1 | 2 | 3
@@ -49,7 +45,7 @@ export function CourseStepper({ currentStep }: CourseStepperProps) {
               >
                 {stepNumber}
               </span>
-              <span className="truncate">{step.label}</span>
+              <span className='truncate'>{step.label}</span>
             </div>
           )
         })}

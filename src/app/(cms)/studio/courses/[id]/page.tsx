@@ -9,7 +9,12 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { toast } from 'sonner'
-import { useGetManagerCourseDetailQuery, useRenameChapterMutation, useUpdateCourseChaptersFrameMutation } from '@/app/(cms)/_hooks/use-course-mutation'
+import {
+  useGetManagerCourseDetailQuery,
+  useRenameChapterMutation,
+  useUpdateCourseChaptersFrameMutation
+} from '@/app/(cms)/_hooks/use-course-mutation'
+import { useDeleteLessonMutation } from '@/app/(cms)/_hooks/use-lesson'
 import { useReorderQueue } from '@/app/(cms)/_hooks/use-reorder'
 import Link from 'next/link'
 import { PATH } from '@/constants/path'
@@ -74,11 +79,17 @@ export default function ChaptersPage() {
   })
 
   const renameChapterMutation = useRenameChapterMutation(courseId)
+  const deleteLessonMutation = useDeleteLessonMutation(courseId)
 
   useEffect(() => {
     if (!mappedChaptersFromServer.length) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setChapters((prev) => (prev.length === 0 ? mappedChaptersFromServer : prev))
+    setChapters((prev) => {
+      const hasUnsavedChanges = prev.some(
+        (ch) => ch.id.startsWith('ch-') || ch.lessons.some((ls) => ls.id.startsWith('ls-'))
+      )
+      return hasUnsavedChanges ? prev : mappedChaptersFromServer
+    })
     setExpandedChapters((prev) => {
       const next: Record<string, boolean> = { ...prev }
       mappedChaptersFromServer.forEach((ch) => {
@@ -390,13 +401,19 @@ export default function ChaptersPage() {
                                           size='icon'
                                           className='h-7 w-7 text-destructive'
                                           onClick={() => {
-                                            setChapters(
-                                              chapters.map((ch) =>
-                                                ch.id === chapter.id
-                                                  ? { ...ch, lessons: ch.lessons.filter((ls) => ls.id !== lesson.id) }
-                                                  : ch
+                                            if (lesson.id.startsWith('ls-')) {
+                                              setChapters(
+                                                chapters.map((ch) =>
+                                                  ch.id === chapter.id
+                                                    ? { ...ch, lessons: ch.lessons.filter((ls) => ls.id !== lesson.id) }
+                                                    : ch
+                                                )
                                               )
-                                            )
+                                            } else {
+                                              if (window.confirm('Bạn có chắc muốn xóa bài học này không?')) {
+                                                deleteLessonMutation.mutate(lesson.id)
+                                              }
+                                            }
                                           }}
                                         >
                                           <Trash2 className='w-3.5 h-3.5' />
