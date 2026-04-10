@@ -8,7 +8,7 @@ import { BookOpen, Pencil, Star, TrendingUp, Trash2, Users } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { useDeleteCourseMutation } from '../_hooks/use-course-mutation'
+import { toast } from 'sonner'
 import type { ManagerCourseItem } from '../_utils/zod'
 import {
   formatDate,
@@ -27,7 +27,7 @@ interface CourseCardProps {
 
 export function CourseCard({ course, onPrefetch }: CourseCardProps) {
   const router = useRouter()
-  const deleteMutation = useDeleteCourseMutation()
+
   const analytics = course.overallAnalytics
 
   return (
@@ -44,12 +44,12 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
             {/* Image Section */}
             <div className='relative aspect-video w-full sm:w-44 shrink-0 rounded-xl bg-muted/50 overflow-hidden border border-border/50'>
               {course.thumbnail ? (
-                <Image 
-                  fill 
-                  src={course.thumbnail} 
-                  alt={course.title} 
-                  className='object-cover transition-transform duration-500 group-hover:scale-105' 
-                  sizes='(max-width: 640px) 100vw, 176px' 
+                <Image
+                  fill
+                  src={course.thumbnail}
+                  alt={course.title}
+                  className='object-cover transition-transform duration-500 group-hover:scale-105'
+                  sizes='(max-width: 640px) 100vw, 176px'
                 />
               ) : (
                 <div className='flex items-center justify-center h-full text-muted-foreground/30'>
@@ -70,7 +70,10 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                   </p>
                 </div>
 
-                <div className='flex items-center gap-1.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity' onClick={(e) => e.preventDefault()}>
+                <div
+                  className='flex items-center gap-1.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity'
+                  onClick={(e) => e.preventDefault()}
+                >
                   {course.status === 'DRAFT' && (
                     <Button
                       variant='outline'
@@ -91,9 +94,10 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                     className='bg-background text-muted-foreground border-border/50 h-8 w-8 rounded-full shadow-sm hover:text-destructive hover:bg-destructive/10 hover:border-destructive/20'
                     onClick={(e) => {
                       e.preventDefault()
-                      deleteMutation.mutate(course.id)
+                      toast.info('Tính năng xóa khóa học hiện chưa được hỗ trợ trên hệ thống.')
+                      // deleteMutation.mutate(course.id)
                     }}
-                    disabled={deleteMutation.isPending}
+                    // disabled={deleteMutation.isPending}
                   >
                     <Trash2 className='size-3.5' />
                   </Button>
@@ -101,13 +105,19 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
               </div>
 
               <div className='flex items-center gap-2 mt-3.5 flex-wrap'>
-                <Badge variant={STATUS_VARIANT[course.status]} className="text-[10px] px-2 h-5 shadow-none tracking-wide uppercase">
+                <Badge
+                  variant={STATUS_VARIANT[course.status]}
+                  className='text-[10px] px-2 h-5 shadow-none tracking-wide uppercase'
+                >
                   {STATUS_LABEL[course.status]}
                 </Badge>
-                <Badge variant='outline' className={`text-[10px] px-2 h-5 uppercase tracking-wide shadow-none ${LEVEL_CLASS[course.level]}`}>
+                <Badge
+                  variant='outline'
+                  className={`text-[10px] px-2 h-5 uppercase tracking-wide shadow-none ${LEVEL_CLASS[course.level]}`}
+                >
                   {LEVEL_LABEL[course.level]}
                 </Badge>
-                
+
                 <div className='ml-2 flex items-center gap-1.5'>
                   <span className='text-[13px] font-bold text-foreground'>
                     {formatPrice(course.price, course.isFree)}
@@ -125,7 +135,7 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                   <>
                     <span className='inline-flex items-center gap-1.5 bg-muted/30 px-2 py-0.5 rounded-sm'>
                       <Star className='size-3 fill-amber-400 text-amber-400' />
-                      <span className="text-foreground/80">{analytics.avgRating.toFixed(1)}</span>
+                      <span className='text-foreground/80'>{analytics.avgRating.toFixed(1)}</span>
                     </span>
                     <span className='inline-flex items-center gap-1.5'>
                       <Users className='size-3 opacity-70' />
@@ -138,7 +148,7 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                   </>
                 )}
                 <div className='flex-1' />
-                <span className="opacity-70">{formatDate(course.createdAt)}</span>
+                <span className='opacity-70'>{formatDate(course.createdAt)}</span>
                 {!course.isCompleted && (
                   <Badge
                     variant='outline'
