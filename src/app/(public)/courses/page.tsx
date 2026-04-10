@@ -4,10 +4,23 @@ import CtaSection from '../_components/cta-section'
 import homeApi from '../_api/home.api'
 import { HomeSectionsResponse } from '@/schemas/course.schema'
 
+const EMPTY_DATA: HomeSectionsResponse = {
+  trending: [],
+  topSelling: [],
+  newest: [],
+  topRated: []
+}
+
 export default async function HomePage() {
-  const res = await homeApi.getHomeSections()
-  const data = (await res.json()) as HomeSectionsResponse
-  console.log(data)
+  let data: HomeSectionsResponse = EMPTY_DATA
+  try {
+    const res = await homeApi.getHomeSections()
+    if (res.ok) {
+      data = (await res.json()) as HomeSectionsResponse
+    }
+  } catch {
+    // BE chưa chạy hoặc lỗi mạng — giữ data rỗng
+  }
   return (
     <main>
       <HeroBanner />

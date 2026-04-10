@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { toast } from 'sonner'
-import { useGetManagerCourseDetailQuery } from '@/app/(cms)/_hooks/use-course-mutation'
+import { useGetManagerCourseDetailQuery, useRenameChapterMutation } from '@/app/(cms)/_hooks/use-course-mutation'
 import { useReorderQueue } from '@/app/(cms)/_hooks/use-reorder'
 import Link from 'next/link'
 import { PATH } from '@/constants/path'
@@ -51,6 +51,8 @@ export default function ChaptersPage() {
   const [activeChapterId, setActiveChapterId] = useState<string | null>(null)
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null)
 
+  const renameChapterMutation = useRenameChapterMutation(courseId)
+
   useEffect(() => {
     if (!mappedChaptersFromServer.length) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -79,14 +81,24 @@ export default function ChaptersPage() {
     if (!inputText.trim()) return
 
     if (activeChapterId) {
-      setChapters(chapters.map((ch) => (ch.id === activeChapterId ? { ...ch, title: inputText } : ch)))
-      toast.success('Đã cập nhật tên chương')
+      // Gọi API đổi tên chapter thật sự
+      renameChapterMutation.mutate(
+        { chapterId: activeChapterId, title: inputText.trim() },
+        {
+          onSuccess: () => {
+            // Cập nhật local state ngay để UI phản hồi nhanh (optimistic)
+            setChapters(chapters.map((ch) => (ch.id === activeChapterId ? { ...ch, title: inputText.trim() } : ch)))
+            setIsChapterDialogOpen(false)
+            setInputText('')
+          }
+        }
+      )
     } else {
       setChapters([...chapters, { id: `ch-${Date.now()}`, title: inputText, lessons: [] }])
       toast.success('Đã thêm chương mới')
+      setIsChapterDialogOpen(false)
+      setInputText('')
     }
-    setIsChapterDialogOpen(false)
-    setInputText('')
   }
 
   const handleOpenLessonDialog = (chapterId: string, lesson?: LessonItem) => {
@@ -378,7 +390,9 @@ export default function ChaptersPage() {
             <Button variant='outline' onClick={() => setIsChapterDialogOpen(false)}>
               Hủy
             </Button>
-            <Button onClick={handleSaveChapter}>Lưu</Button>
+            <Button onClick={handleSaveChapter} disabled={renameChapterMutation.isPending}>
+              {renameChapterMutation.isPending ? 'Đang lưu...' : 'Lưu'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
