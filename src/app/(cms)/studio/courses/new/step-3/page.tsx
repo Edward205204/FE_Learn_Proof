@@ -30,7 +30,7 @@ export default function CreateCourseStep3Page() {
     resolver: zodResolver(publishCourseSchema),
     defaultValues: {
       isFree: false,
-      price: 299000,
+      price: 0,
       originalPrice: null
     }
   })
@@ -78,10 +78,18 @@ export default function CreateCourseStep3Page() {
           </Button>
 
           <div className='flex items-center gap-3 w-full sm:w-auto'>
-            <Button variant='outline' type='button' className='font-bold h-11 px-6 rounded-xl w-full sm:w-auto bg-background'>
+            <Button
+              variant='outline'
+              type='button'
+              className='font-bold h-11 px-6 rounded-xl w-full sm:w-auto bg-background'
+            >
               Lưu bản nháp
             </Button>
-            <Button type='submit' className='font-bold h-11 px-8 rounded-xl shadow-md w-full sm:w-auto' disabled={publishMutation.isPending || !courseId}>
+            <Button
+              type='submit'
+              className='font-bold h-11 px-8 rounded-xl shadow-md w-full sm:w-auto'
+              disabled={publishMutation.isPending || !courseId}
+            >
               <Check className='w-5 h-5 mr-2' />
               Hoàn tất xuất bản
             </Button>

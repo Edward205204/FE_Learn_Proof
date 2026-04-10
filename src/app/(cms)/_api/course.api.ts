@@ -15,7 +15,6 @@ import type {
 } from '../_utils/zod'
 
 const courseApi = {
-  getCourses: () => http.get<Course[]>('/courses/my'),
   getCategories: () => http.get<Categories[]>('/courses/categories'),
 
   getMyCoursesManager: (params: GetMyCoursesManagerQuery) =>
@@ -48,7 +47,7 @@ const courseApi = {
 
   reorderChapter: (body: ReorderChapterPayload) => http.patch('/courses/reorder/chapters', body),
 
-  reorderLesson: (body: ReorderLessonPayload) => http.patch('/courses/reorder/lessons', body)
+  reorderLesson: (body: ReorderLessonPayload) => http.patch('/lesson/reorder', body)
 }
 
 export default courseApi

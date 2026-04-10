@@ -20,13 +20,6 @@ export const COURSE_QUERY_KEYS = {
   categories: ['categories'] as const
 }
 
-export function useGetCoursesQuery() {
-  return useQuery({
-    queryKey: COURSE_QUERY_KEYS.all,
-    queryFn: () => courseApi.getCourses().then((res) => res.data)
-  })
-}
-
 export function useGetManagerCourseDetailQuery(courseId: string) {
   return useQuery<ManagerCourseDetail | null>({
     queryKey: COURSE_QUERY_KEYS.detailManager(courseId),

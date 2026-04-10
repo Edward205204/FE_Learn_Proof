@@ -9,14 +9,27 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { toast } from 'sonner'
-import { useGetManagerCourseDetailQuery } from '@/app/(cms)/_hooks/use-course-mutation'
+import { useGetManagerCourseDetailQuery, useUpdateCourseChaptersFrameMutation } from '@/app/(cms)/_hooks/use-course-mutation'
 import { useReorderQueue } from '@/app/(cms)/_hooks/use-reorder'
 import Link from 'next/link'
 import { PATH } from '@/constants/path'
+import { useQuery } from '@tanstack/react-query'
+import lessonApi from '@/app/(cms)/_api/lesson.api'
+import dynamic from 'next/dynamic'
+import { PlayCircle } from 'lucide-react'
+
+const ReactPlayer = dynamic(() => import('react-player'), { ssr: false }) as React.ComponentType<{
+  url: string
+  width?: string | number
+  height?: string | number
+  controls?: boolean
+  playing?: boolean
+}>
 
 interface LessonItem {
   id: string
   title: string
+  type?: string
 }
 
 interface ChapterItem {
@@ -30,6 +43,7 @@ export default function ChaptersPage() {
   const courseId = params.id
 
   const { data: courseDetail } = useGetManagerCourseDetailQuery(courseId)
+  const { mutate: updateChaptersFrame, isPending: isUpdating } = useUpdateCourseChaptersFrameMutation(courseId)
 
   const mappedChaptersFromServer: ChapterItem[] = useMemo(() => {
     if (!courseDetail) return []
@@ -38,7 +52,8 @@ export default function ChaptersPage() {
       title: ch.title,
       lessons: ch.lessons.map((ls) => ({
         id: ls.id,
-        title: ls.title
+        title: ls.title,
+        type: ls.type
       }))
     }))
   }, [courseDetail])
@@ -50,6 +65,13 @@ export default function ChaptersPage() {
   const [inputText, setInputText] = useState('')
   const [activeChapterId, setActiveChapterId] = useState<string | null>(null)
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null)
+  const [previewLessonId, setPreviewLessonId] = useState<string | null>(null)
+
+  const { data: previewLesson, isFetching: isFetchingPreview } = useQuery({
+    queryKey: ['lesson-preview', previewLessonId],
+    queryFn: () => lessonApi.getLessonDetail(previewLessonId!).then(res => res.data),
+    enabled: !!previewLessonId
+  })
 
   useEffect(() => {
     if (!mappedChaptersFromServer.length) return
@@ -136,6 +158,21 @@ export default function ChaptersPage() {
   const handleRollback = useCallback(() => {
     setChapters(lastConfirmedRef.current)
   }, [])
+
+  const handleSaveFrame = () => {
+    const payload = {
+      chapterList: chapters.map((ch, cIndex) => ({
+        title: ch.title,
+        order: cIndex + 1,
+        lessons: ch.lessons.map((ls, lIndex) => ({
+          title: ls.title,
+          order: lIndex + 1,
+          type: 'VIDEO' as const // Mặc định type là VIDEO nếu tạo nhanh qua UI frame
+        }))
+      }))
+    }
+    updateChaptersFrame(payload)
+  }
 
   const { enqueue } = useReorderQueue(handleRollback)
 
@@ -227,9 +264,14 @@ export default function ChaptersPage() {
             {chapters.length} chương · {totalLessons} bài học
           </p>
         </div>
-        <Button onClick={() => handleOpenChapterDialog()} className='shadow-lg'>
-          <Plus className='w-4 h-4 mr-2' /> Thêm chương
-        </Button>
+        <div className='flex gap-3'>
+          <Button variant='outline' onClick={() => handleOpenChapterDialog()} className='shadow-sm'>
+            <Plus className='w-4 h-4 mr-2' /> Thêm chương
+          </Button>
+          <Button onClick={handleSaveFrame} disabled={isUpdating} className='shadow-lg px-6'>
+            {isUpdating ? 'Đang lưu...' : 'Lưu cấu trúc khóa học'}
+          </Button>
+        </div>
       </div>
 
       <DragDropContext onDragEnd={onDragEnd}>
@@ -268,12 +310,14 @@ export default function ChaptersPage() {
 
                         <div className='flex items-center gap-2' onClick={(e) => e.stopPropagation()}>
                           <Button
+                            asChild
                             variant='outline'
                             size='sm'
-                            className='h-8 bg-background'
-                            onClick={() => handleOpenLessonDialog(chapter.id)}
+                            className='h-8 bg-background cursor-pointer'
                           >
-                            <Plus className='w-3.5 h-3.5 mr-1' /> Bài học
+                            <Link href={`${PATH.CREATE_LESSON.replace(':id', courseId)}?chapterId=${chapter.id}`}>
+                              <Plus className='w-3.5 h-3.5 mr-1' /> Soạn bài học
+                            </Link>
                           </Button>
                           <Button
                             variant='ghost'
@@ -317,12 +361,20 @@ export default function ChaptersPage() {
                                         Bài {lIndex + 1}: {lesson.title}
                                       </span>
                                       <div className='flex opacity-0 group-hover/lesson:opacity-100 transition-opacity'>
+                                        {lesson.type === 'VIDEO' && (
+                                          <Button
+                                            variant='ghost'
+                                            size='icon'
+                                            className='h-7 w-7 text-primary hover:bg-primary/10'
+                                            onClick={() => setPreviewLessonId(lesson.id)}
+                                            title="Xem trước Video"
+                                          >
+                                            <PlayCircle className='w-4 h-4' />
+                                          </Button>
+                                        )}
                                         <Link
-                                          href={PATH.CREATE_LESSON.replace(':id', courseId).replace(
-                                            ':lessonId',
-                                            lesson.id
-                                          )}
-                                          className='h-7 w-7 flex items-center justify-center'
+                                          href={`${PATH.CREATE_LESSON.replace(':id', courseId)}?chapterId=${chapter.id}&lessonId=${lesson.id}`}
+                                          className='h-7 w-7 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors'
                                         >
                                           <Pencil className='size-4' />
                                         </Link>
@@ -401,6 +453,27 @@ export default function ChaptersPage() {
             </Button>
             <Button onClick={handleSaveLesson}>Lưu</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Video Preview Dialog */}
+      <Dialog open={!!previewLessonId} onOpenChange={(open) => !open && setPreviewLessonId(null)}>
+        <DialogContent className="max-w-4xl bg-black border-border shadow-2xl overflow-hidden p-0 gap-0 sm:rounded-2xl">
+          <DialogHeader className="opacity-0 absolute p-0 m-0 h-0 w-0">
+            <DialogTitle>Video Preview</DialogTitle>
+          </DialogHeader>
+          <div className="relative aspect-video w-full bg-black/90 flex items-center justify-center">
+            {isFetchingPreview ? (
+              <div className="text-white flex items-center gap-2">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <span className="font-medium">Đang tải video...</span>
+              </div>
+            ) : previewLesson?.type === 'VIDEO' && previewLesson.videoUrl ? (
+              <ReactPlayer url={previewLesson.videoUrl} width="100%" height="100%" controls playing />
+            ) : (
+              <div className="text-muted-foreground font-medium">Không tìm thấy video hợp lệ.</div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>

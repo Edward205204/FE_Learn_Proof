@@ -18,12 +18,6 @@ interface Chapter {
   title: string
 }
 
-const DEFAULT_CHAPTERS: Chapter[] = [
-  { id: 1, title: 'Giới thiệu khóa học' },
-  { id: 2, title: 'Kiến thức nền tảng' },
-  { id: 3, title: 'Thực hành & Bài tập' }
-]
-
 function CreateCourseStep2Content() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -34,7 +28,7 @@ function CreateCourseStep2Content() {
   }, [courseId, router])
 
   const [chapterName, setChapterName] = useState('')
-  const [chapters, setChapters] = useState<Chapter[]>(DEFAULT_CHAPTERS)
+  const [chapters, setChapters] = useState<Chapter[]>([])
   const updateChaptersMutation = useUpdateCourseChaptersFrameMutation(courseId ?? '')
 
   const addChapter = () => {
@@ -64,12 +58,12 @@ function CreateCourseStep2Content() {
       toast.error('Dữ liệu không hợp lệ', { description: 'Vui lòng kiểm tra lại danh sách chương.' })
       return
     }
-    
+
     try {
       await updateChaptersMutation.mutateAsync(parsed.data)
       persistDraftCourseId(courseId)
       router.push(`${PATH.COURSE_NEW_STEP3}?courseId=${courseId}`)
-    } catch (error) {
+    } catch {
       toast.error('Lưu thất bại', { description: 'Đã có lỗi xảy ra khi lưu chương học. Vui lòng thử lại.' })
     }
   }
@@ -104,7 +98,10 @@ function CreateCourseStep2Content() {
                 onKeyDown={handleKeyDown}
                 className='h-12 text-base font-medium rounded-xl border-border/50 focus-visible:ring-primary/20 bg-muted/10 flex-1'
               />
-              <Button onClick={() => addChapter()} className='h-12 px-8 rounded-xl font-bold shadow-md shrink-0 bg-primary hover:bg-primary/90'>
+              <Button
+                onClick={() => addChapter()}
+                className='h-12 px-8 rounded-xl font-bold shadow-md shrink-0 bg-primary hover:bg-primary/90'
+              >
                 <Plus className='w-5 h-5 mr-2' />
                 Thêm Chương
               </Button>
@@ -116,8 +113,10 @@ function CreateCourseStep2Content() {
           <div className='p-6 sm:p-10 space-y-6'>
             <div className='flex items-center justify-between'>
               <h3 className='font-extrabold text-xl tracking-tight text-foreground flex items-center gap-3'>
-                Danh sách chương 
-                <span className='bg-primary/10 text-primary text-xs font-bold px-2.5 py-0.5 rounded-full ring-1 ring-primary/20'>{chapters.length}</span>
+                Danh sách chương
+                <span className='bg-primary/10 text-primary text-xs font-bold px-2.5 py-0.5 rounded-full ring-1 ring-primary/20'>
+                  {chapters.length}
+                </span>
               </h3>
             </div>
 
@@ -127,18 +126,25 @@ function CreateCourseStep2Content() {
                   <GripVertical className='w-6 h-6 text-muted-foreground/50' />
                 </div>
                 <p className='font-bold text-foreground'>Chưa có chương nào</p>
-                <p className='text-sm text-muted-foreground mt-1'>Hãy tạo chương đầu tiên để bắt đầu xây dựng khóa học.</p>
+                <p className='text-sm text-muted-foreground mt-1'>
+                  Hãy tạo chương đầu tiên để bắt đầu xây dựng khóa học.
+                </p>
               </div>
             ) : (
               <div className='space-y-3'>
                 {chapters.map((chapter, index) => (
-                  <div key={chapter.id} className='flex items-center justify-between border border-border/50 rounded-2xl p-4 bg-muted/5 hover:bg-muted/20 transition-all group'>
+                  <div
+                    key={chapter.id}
+                    className='flex items-center justify-between border border-border/50 rounded-2xl p-4 bg-muted/5 hover:bg-muted/20 transition-all group'
+                  >
                     <div className='flex items-center gap-4'>
                       <div className='cursor-grab active:cursor-grabbing p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors'>
                         <GripVertical className='w-5 h-5' />
                       </div>
                       <div>
-                        <p className='text-[10px] font-extrabold text-primary uppercase tracking-wider mb-0.5'>Chương {index + 1}</p>
+                        <p className='text-[10px] font-extrabold text-primary uppercase tracking-wider mb-0.5'>
+                          Chương {index + 1}
+                        </p>
                         <p className='font-bold text-foreground text-sm sm:text-base'>{chapter.title}</p>
                       </div>
                     </div>
@@ -173,7 +179,11 @@ function CreateCourseStep2Content() {
             <ChevronLeft className='w-4 h-4 mr-2' />
             Quay lại
           </Button>
-          <Button onClick={onNext} className='font-bold h-11 px-8 rounded-xl shadow-md w-full sm:w-auto' disabled={updateChaptersMutation.isPending || !courseId}>
+          <Button
+            onClick={onNext}
+            className='font-bold h-11 px-8 rounded-xl shadow-md w-full sm:w-auto'
+            disabled={updateChaptersMutation.isPending || !courseId}
+          >
             Tiếp theo: Giá & Xuất bản
             <ArrowRight className='w-5 h-5 ml-2' />
           </Button>
@@ -185,7 +195,13 @@ function CreateCourseStep2Content() {
 
 export default function CreateCourseStep2Page() {
   return (
-    <Suspense fallback={<div className="flex h-[200px] w-full items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>}>
+    <Suspense
+      fallback={
+        <div className='flex h-[200px] w-full items-center justify-center'>
+          <div className='h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent' />
+        </div>
+      }
+    >
       <CreateCourseStep2Content />
     </Suspense>
   )

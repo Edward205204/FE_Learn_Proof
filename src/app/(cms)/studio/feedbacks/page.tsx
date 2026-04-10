@@ -69,9 +69,13 @@ export default function FeedbackListPage() {
         </div>
 
         <div className='flex items-center gap-3 bg-muted/40 p-1.5 rounded-xl border border-border/50 shadow-sm'>
-          <Button variant='ghost' size='sm' className='h-9 px-4 text-xs font-bold hover:bg-background'>Xuất báo cáo</Button>
+          <Button variant='ghost' size='sm' className='h-9 px-4 text-xs font-bold hover:bg-background'>
+            Xuất báo cáo
+          </Button>
           <div className='w-[1px] h-5 bg-border/50' />
-          <Button variant='default' size='sm' className='h-9 px-4 text-xs font-bold shadow-md'>Cài đặt tự động</Button>
+          <Button variant='default' size='sm' className='h-9 px-4 text-xs font-bold shadow-md'>
+            Cài đặt tự động
+          </Button>
         </div>
       </header>
 
@@ -87,10 +91,24 @@ export default function FeedbackListPage() {
           />
         </div>
 
-        <Tabs defaultValue='all' className='w-full md:w-auto shrink-0' onValueChange={(v) => setFilter(v as 'all' | 'discussion')}>
+        <Tabs
+          defaultValue='all'
+          className='w-full md:w-auto shrink-0'
+          onValueChange={(v) => setFilter(v as 'all' | 'discussion')}
+        >
           <TabsList className='h-12 bg-background p-1 border border-border/40 rounded-xl w-full sm:w-auto shadow-sm'>
-            <TabsTrigger value='all' className='px-6 text-xs font-bold data-[state=active]:bg-muted data-[state=active]:text-foreground rounded-lg h-10 w-1/2 sm:w-auto transition-all'>Tất cả</TabsTrigger>
-            <TabsTrigger value='discussion' className='px-6 text-xs font-bold data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg h-10 w-1/2 sm:w-auto transition-all'>Thảo luận (Q&A)</TabsTrigger>
+            <TabsTrigger
+              value='all'
+              className='px-6 text-xs font-bold data-[state=active]:bg-muted data-[state=active]:text-foreground rounded-lg h-10 w-1/2 sm:w-auto transition-all'
+            >
+              Tất cả
+            </TabsTrigger>
+            <TabsTrigger
+              value='discussion'
+              className='px-6 text-xs font-bold data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg h-10 w-1/2 sm:w-auto transition-all'
+            >
+              Thảo luận (Q&A)
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -121,13 +139,25 @@ export default function FeedbackListPage() {
       {/* Pagination */}
       {!isLoading && filteredItems.length > 0 && (
         <div className='mt-8 pt-8 border-t flex items-center justify-center gap-4'>
-          <Button variant='outline' size='sm' className='rounded-xl px-6 font-bold text-xs h-10 hover:bg-muted transition-colors' disabled={page === 1} onClick={() => setPage(p => p - 1)}>
+          <Button
+            variant='outline'
+            size='sm'
+            className='rounded-xl px-6 font-bold text-xs h-10 hover:bg-muted transition-colors'
+            disabled={page === 1}
+            onClick={() => setPage((p) => p - 1)}
+          >
             Trang trước
           </Button>
           <span className='text-xs font-black text-foreground bg-muted/50 px-4 py-2 rounded-xl ring-1 ring-border/50'>
             {page} / {data?.totalPages || 1}
           </span>
-          <Button variant='outline' size='sm' className='rounded-xl px-6 font-bold text-xs h-10 hover:bg-muted transition-colors' disabled={page >= (data?.totalPages || 1)} onClick={() => setPage(p => p + 1)}>
+          <Button
+            variant='outline'
+            size='sm'
+            className='rounded-xl px-6 font-bold text-xs h-10 hover:bg-muted transition-colors'
+            disabled={page >= (data?.totalPages || 1)}
+            onClick={() => setPage((p) => p + 1)}
+          >
             Trang sau
           </Button>
         </div>
