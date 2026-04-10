@@ -61,13 +61,13 @@ export function ContentManagementContent() {
       </div>
 
       <div className='flex items-center justify-between bg-muted/30 p-2 sm:p-3 rounded-xl border border-border/50'>
-        <div className="flex-1">
+        <div className='flex-1'>
           <CourseManagerFilter status={queryParams.status} onStatusChange={handleStatusChange} />
         </div>
         {meta && (
           <div className='pl-4 pr-2 border-l border-border/50'>
             <p className='text-xs font-bold text-muted-foreground uppercase tracking-wider'>
-              {meta.total} <span className="hidden sm:inline">khóa học</span>
+              {meta.total} <span className='hidden sm:inline'>khóa học</span>
             </p>
           </div>
         )}

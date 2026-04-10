@@ -40,12 +40,14 @@ export function CourseStep3PricingFields({ control, setValue, isFree, priceLabel
               </div>
               <div>
                 <p className='font-bold text-lg text-foreground'>Khóa học có phí</p>
-                <p className='text-sm text-muted-foreground font-medium mt-0.5'>Yêu cầu học viên thanh toán để tham gia.</p>
+                <p className='text-sm text-muted-foreground font-medium mt-0.5'>
+                  Yêu cầu học viên thanh toán để tham gia.
+                </p>
               </div>
             </div>
-            <Switch 
-              checked={!isFree} 
-              onCheckedChange={(checked) => setValue('isFree', !checked)} 
+            <Switch
+              checked={!isFree}
+              onCheckedChange={(checked) => setValue('isFree', !checked)}
               className='data-[state=checked]:bg-primary scale-125 mr-2'
             />
           </div>
@@ -68,14 +70,19 @@ export function CourseStep3PricingFields({ control, setValue, isFree, priceLabel
                         onValueChange={(v) => field.onChange(v ?? 0)}
                         className='h-12 text-lg font-bold rounded-xl pr-12 focus-visible:ring-primary/20'
                       />
-                      <span className='absolute right-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground select-none'>₫</span>
+                      <span className='absolute right-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground select-none'>
+                        ₫
+                      </span>
                     </div>
                   )}
                 />
               </div>
 
               <div className='flex gap-2 flex-col'>
-                <Label htmlFor='discount' className='text-[11px] font-bold uppercase tracking-wider text-muted-foreground'>
+                <Label
+                  htmlFor='discount'
+                  className='text-[11px] font-bold uppercase tracking-wider text-muted-foreground'
+                >
                   Giá khuyến mãi (Tùy chọn)
                 </Label>
                 <Controller
@@ -90,7 +97,9 @@ export function CourseStep3PricingFields({ control, setValue, isFree, priceLabel
                         onValueChange={(v) => field.onChange(v)}
                         className='h-12 text-lg font-bold rounded-xl pr-12 focus-visible:ring-primary/20'
                       />
-                      <span className='absolute right-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground select-none'>₫</span>
+                      <span className='absolute right-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground select-none'>
+                        ₫
+                      </span>
                     </div>
                   )}
                 />
@@ -106,4 +115,3 @@ export function CourseStep3PricingFields({ control, setValue, isFree, priceLabel
     </Card>
   )
 }
-

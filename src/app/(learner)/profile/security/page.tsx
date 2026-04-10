@@ -16,10 +16,7 @@ export default function SecurityPage() {
   function handleForgotPassword() {
     if (!user?.email || forgotPasswordMutation.isPending || countdown > 0) return
 
-    forgotPasswordMutation.mutate(
-      { email: user.email },
-      { onSuccess: () => startCountdown() }
-    )
+    forgotPasswordMutation.mutate({ email: user.email }, { onSuccess: () => startCountdown() })
   }
 
   return (
@@ -34,17 +31,13 @@ export default function SecurityPage() {
 
       {/* Main Form section */}
       <div className='flex flex-col w-full space-y-10'>
-
         {/* Change Password Section */}
         <div className='max-w-xl'>
           <div className='space-y-6'>
-
             {/* Current Password */}
             <div className='space-y-2'>
               <div className='flex items-center justify-between mb-2'>
-                <Label className='text-[15px] font-semibold text-foreground'>
-                  Mật khẩu hiện tại
-                </Label>
+                <Label className='text-[15px] font-semibold text-foreground'>Mật khẩu hiện tại</Label>
                 <button
                   type='button'
                   onClick={handleForgotPassword}
@@ -67,9 +60,7 @@ export default function SecurityPage() {
 
             {/* New Password */}
             <div className='space-y-2'>
-              <Label className='text-[15px] font-semibold text-foreground block mb-2'>
-                Mật khẩu mới
-              </Label>
+              <Label className='text-[15px] font-semibold text-foreground block mb-2'>Mật khẩu mới</Label>
               <Input
                 type='password'
                 placeholder='Nhập mật khẩu mới'
@@ -79,9 +70,7 @@ export default function SecurityPage() {
 
             {/* Confirm New Password */}
             <div className='space-y-2'>
-              <Label className='text-[15px] font-semibold text-foreground block mb-2'>
-                Xác nhận mật khẩu mới
-              </Label>
+              <Label className='text-[15px] font-semibold text-foreground block mb-2'>Xác nhận mật khẩu mới</Label>
               <Input
                 type='password'
                 placeholder='Nhập lại mật khẩu mới'
@@ -100,4 +89,3 @@ export default function SecurityPage() {
     </div>
   )
 }
-

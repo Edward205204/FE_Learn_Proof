@@ -31,8 +31,7 @@ const interactionApi = {
    * GET /comments
    * Content Manager: Lấy tất cả bình luận trên toàn hệ thống
    */
-  getAllComments: (params: PaginationParams = {}) =>
-    http.get<GetDiscussionsResponse>('/comments', { params }),
+  getAllComments: (params: PaginationParams = {}) => http.get<GetDiscussionsResponse>('/comments', { params }),
 
   /**
    * POST /courses/:courseId/lessons/:lessonId/comments
@@ -45,23 +44,19 @@ const interactionApi = {
    * PATCH /comments/:id
    * Sửa nội dung bình luận
    */
-  updateComment: (commentId: string, payload: ContentPayload) =>
-    http.patch(`/comments/${commentId}`, payload),
+  updateComment: (commentId: string, payload: ContentPayload) => http.patch(`/comments/${commentId}`, payload),
 
   /**
    * DELETE /comments/:id
    * Xóa bình luận
    */
-  deleteComment: (commentId: string) =>
-    http.delete(`/comments/${commentId}`),
+  deleteComment: (commentId: string) => http.delete(`/comments/${commentId}`),
 
   /**
    * PATCH /comments/:id/pin
    * Ghim/Bỏ ghim bình luận (Dành cho Instructor/Manager)
    */
-  pinComment: (commentId: string, isPinned: boolean) =>
-    http.patch(`/comments/${commentId}/pin`, { isPinned }),
-
+  pinComment: (commentId: string, isPinned: boolean) => http.patch(`/comments/${commentId}/pin`, { isPinned }),
 
   // ==========================================
   // QUẢN LÝ TRẢ LỜI (REPLIES)
@@ -71,23 +66,19 @@ const interactionApi = {
    * POST /comments/:id/replies
    * Trả lời một bình luận cha
    */
-  replyToComment: (commentId: string, payload: ContentPayload) =>
-    http.post(`/comments/${commentId}/replies`, payload),
+  replyToComment: (commentId: string, payload: ContentPayload) => http.post(`/comments/${commentId}/replies`, payload),
 
   /**
    * PATCH /replies/:id
    * Sửa nội dung trả lời
    */
-  updateReply: (replyId: string, payload: ContentPayload) =>
-    http.patch(`/replies/${replyId}`, payload),
+  updateReply: (replyId: string, payload: ContentPayload) => http.patch(`/replies/${replyId}`, payload),
 
   /**
    * DELETE /replies/:id
    * Xóa nội dung trả lời
    */
-  deleteReply: (replyId: string) =>
-    http.delete(`/replies/${replyId}`),
-
+  deleteReply: (replyId: string) => http.delete(`/replies/${replyId}`),
 
   // ==========================================
   // QUẢN LÝ ĐÁNH GIÁ KHOÁ HỌC (REVIEWS)
@@ -104,8 +95,7 @@ const interactionApi = {
    * POST /courses/:courseId/reviews
    * Học viên gửi đánh giá khoá học
    */
-  createReview: (courseId: string, payload: CreateReviewPayload) =>
-    http.post(`/courses/${courseId}/reviews`, payload),
+  createReview: (courseId: string, payload: CreateReviewPayload) => http.post(`/courses/${courseId}/reviews`, payload)
 }
 
 export default interactionApi

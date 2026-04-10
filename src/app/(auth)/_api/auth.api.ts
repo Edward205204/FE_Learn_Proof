@@ -23,8 +23,12 @@ const authApi = {
 
   getMe: () => http.get<User>('/auth/me'),
 
-  updateProfile: (body: { fullName?: string; bio?: string | null; headline?: string | null; website?: string | null }) =>
-    http.patch<User>('/auth/me', body)
+  updateProfile: (body: {
+    fullName?: string
+    bio?: string | null
+    headline?: string | null
+    website?: string | null
+  }) => http.patch<User>('/auth/me', body)
 }
 
 export default authApi

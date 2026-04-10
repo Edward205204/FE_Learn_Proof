@@ -66,10 +66,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         <ChevronLeft className='size-4' />
       </Button>
 
-      <div
-        className='flex items-center gap-1'
-        style={{ minWidth: `${showSlots * 2.25}rem` }}
-      >
+      <div className='flex items-center gap-1' style={{ minWidth: `${showSlots * 2.25}rem` }}>
         <div className='flex items-center gap-1 mx-auto'>
           {pages.map((page, index) =>
             page === 'dots' ? (

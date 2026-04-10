@@ -24,6 +24,24 @@ export function proxy(request: NextRequest) {
   const role = request.cookies.get('role')?.value
   const isLoggedIn = Boolean(role)
 
+  // ── ADMIN LOCK: Admin chỉ được ở khu vực /admin ──
+  // Nếu là Admin đã đăng nhập và đang truy cập trang KHÔNG phải /admin → redirect về /admin
+  if (isLoggedIn && role === Role.ADMIN) {
+    // Cho phép admin ở trang login/register (để logout/re-login)
+    if (matchesPath(pathname, AUTH_ONLY_PATHS)) {
+      // Admin đã login mà vào trang auth → redirect về /admin
+      return NextResponse.redirect(new URL(PATH.ADMIN, request.url))
+    }
+    // Admin ở khu vực /admin → cho phép
+    if (matchesPath(pathname, ADMIN_PATHS)) {
+      return NextResponse.next()
+    }
+    // Admin ở bất kỳ trang nào khác → redirect về /admin
+    return NextResponse.redirect(new URL(PATH.ADMIN, request.url))
+  }
+
+  // ── Các role khác (LEARNER, CONTENT_MANAGER) ──
+
   // Auth-only: đã login thì về trang chủ
   if (matchesPath(pathname, AUTH_ONLY_PATHS)) {
     if (isLoggedIn) {
@@ -32,26 +50,24 @@ export function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Content management: chỉ CONTENT_MANAGER và ADMIN
+  // Content management: chỉ CONTENT_MANAGER
   if (matchesPath(pathname, CONTENT_MANAGER_PATHS)) {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL(PATH.LOGIN, request.url))
     }
-    if (role !== Role.CONTENT_MANAGER && role !== Role.ADMIN) {
+    if (role !== Role.CONTENT_MANAGER) {
       return NextResponse.redirect(new URL(PATH.HOME, request.url))
     }
     return NextResponse.next()
   }
 
-  // Admin: chỉ ADMIN
+  // Admin area: không phải ADMIN thì không vào được
   if (matchesPath(pathname, ADMIN_PATHS)) {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL(PATH.LOGIN, request.url))
     }
-    if (role !== Role.ADMIN) {
-      return NextResponse.redirect(new URL(PATH.HOME, request.url))
-    }
-    return NextResponse.next()
+    // Non-admin users → redirect home
+    return NextResponse.redirect(new URL(PATH.HOME, request.url))
   }
 
   // Protected: cần đăng nhập, mọi role

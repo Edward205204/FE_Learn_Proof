@@ -85,8 +85,8 @@ export function ContentManagementHeader() {
           </div>
         </div>
 
-        <div 
-          className='flex items-center gap-3 relative' 
+        <div
+          className='flex items-center gap-3 relative'
           ref={menuRef}
           onMouseEnter={openMenu}
           onMouseLeave={handleMouseLeave}
@@ -105,7 +105,9 @@ export function ContentManagementHeader() {
             <>
               <button
                 onClick={toggleMenu}
-                onFocus={() => { if (!isMenuOpen) toggleMenu(); }}
+                onFocus={() => {
+                  if (!isMenuOpen) toggleMenu()
+                }}
                 className='flex items-center gap-2 focus:outline-none transition-transform active:scale-95'
                 aria-expanded={isMenuOpen}
                 aria-haspopup='true'
@@ -120,44 +122,44 @@ export function ContentManagementHeader() {
               </button>
 
               {isMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50">
+                <div className='absolute right-0 top-full mt-2 w-56 animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50'>
                   {/* Bridge element to fill the gap - ensures no mouseLeave when moving to menu */}
-                  <div className="absolute -top-2 left-0 right-0 h-4 bg-transparent" />
-                  
+                  <div className='absolute -top-2 left-0 right-0 h-4 bg-transparent' />
+
                   <div className='overflow-hidden rounded-xl border bg-background shadow-xl'>
                     <div className='px-4 py-3 border-b'>
                       <p className='text-sm font-semibold text-foreground truncate'>{user.fullName}</p>
-                    <p className='text-xs text-muted-foreground truncate'>{user.email}</p>
-                  </div>
+                      <p className='text-xs text-muted-foreground truncate'>{user.email}</p>
+                    </div>
 
-                  <div className='p-1'>
-                    <Link
-                      href={PATH.PROFILE}
-                      className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors'
-                      onClick={closeMenu}
-                    >
-                      <UserIcon size={16} />
-                      Profile
-                    </Link>
-                    <Link
-                      href='/settings'
-                      className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors'
-                      onClick={closeMenu}
-                    >
-                      <Settings size={16} />
-                      Settings
-                    </Link>
-                  </div>
+                    <div className='p-1'>
+                      <Link
+                        href={PATH.PROFILE}
+                        className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors'
+                        onClick={closeMenu}
+                      >
+                        <UserIcon size={16} />
+                        Profile
+                      </Link>
+                      <Link
+                        href='/settings'
+                        className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors'
+                        onClick={closeMenu}
+                      >
+                        <Settings size={16} />
+                        Settings
+                      </Link>
+                    </div>
 
-                  <div className='border-t p-1'>
-                    <button
-                      onClick={handleLogout}
-                      className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 transition-colors'
-                      type='button'
-                    >
-                      <LogOut size={16} />
-                      Log out
-                    </button>
+                    <div className='border-t p-1'>
+                      <button
+                        onClick={handleLogout}
+                        className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 transition-colors'
+                        type='button'
+                      >
+                        <LogOut size={16} />
+                        Log out
+                      </button>
                     </div>
                   </div>
                 </div>

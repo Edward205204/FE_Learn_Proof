@@ -61,7 +61,7 @@ export function Sidebar() {
     setIsDragging(false)
 
     const file = e.dataTransfer.files?.[0]
-    if (file && (file.type === "image/jpeg" || file.type === "image/png" || file.type === "image/jpg")) {
+    if (file && (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')) {
       const url = URL.createObjectURL(file)
       setAvatarPreview(url)
     }
@@ -82,15 +82,15 @@ export function Sidebar() {
   return (
     <div className='flex flex-col'>
       {/* Avatar Section */}
-      <div className="flex flex-col items-center mb-10">
-        <Dialog 
-          open={isAvatarModalOpen} 
+      <div className='flex flex-col items-center mb-10'>
+        <Dialog
+          open={isAvatarModalOpen}
           onOpenChange={(open) => {
             setIsAvatarModalOpen(open)
             if (!open) {
               setTimeout(() => {
                 setAvatarPreview(null)
-                setInputKey(k => k + 1)
+                setInputKey((k) => k + 1)
               }, 300)
             }
           }}
@@ -109,42 +109,54 @@ export function Sidebar() {
             </div>
           </DialogTrigger>
 
-          <DialogContent 
-            className='sm:max-w-md p-0 overflow-hidden rounded-[24px] border border-border shadow-lg bg-background' 
+          <DialogContent
+            className='sm:max-w-md p-0 overflow-hidden rounded-[24px] border border-border shadow-lg bg-background'
             aria-describedby={undefined}
             onDragOver={handleDragOver}
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
             onDrop={(e) => {
               handleDrop(e)
-              setInputKey(k => k + 1) // attempt to destroy input to close OS File Dialog
+              setInputKey((k) => k + 1) // attempt to destroy input to close OS File Dialog
             }}
           >
             <DialogHeader className='p-6 pb-2 border-none'>
-              <DialogTitle className="text-2xl font-bold text-center text-foreground tracking-tight">Cập nhật ảnh đại diện</DialogTitle>
+              <DialogTitle className='text-2xl font-bold text-center text-foreground tracking-tight'>
+                Cập nhật ảnh đại diện
+              </DialogTitle>
             </DialogHeader>
             <div className='flex flex-col items-center justify-center p-6 pt-0 gap-6'>
               {/* Upload area */}
               {!avatarPreview ? (
-                <div 
+                <div
                   className={`w-full border-2 border-dashed border-border ${isDragging ? 'border-primary bg-primary/10 scale-[1.02]' : 'hover:border-primary/50 bg-muted/20 hover:bg-muted/50'} transition-all duration-300 rounded-3xl p-12 flex flex-col items-center justify-center gap-5 cursor-pointer text-center group/upload relative min-h-[260px]`}
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <div className='w-20 h-20 rounded-full bg-background border border-border flex items-center justify-center shadow-sm group-hover/upload:scale-110 transition-transform duration-500'>
                     <CloudUpload size={36} className='text-primary' strokeWidth={2} />
                   </div>
-                  <div className="space-y-1.5 px-4">
-                    <p className='font-bold text-[16px] text-foreground leading-snug'>Nhấn hoặc kéo thả để tải ảnh lên</p>
-                    <p className='text-[14px] text-muted-foreground font-medium'>Định dạng JPG, JPEG hoặc PNG. Tối đa 5MB.</p>
+                  <div className='space-y-1.5 px-4'>
+                    <p className='font-bold text-[16px] text-foreground leading-snug'>
+                      Nhấn hoặc kéo thả để tải ảnh lên
+                    </p>
+                    <p className='text-[14px] text-muted-foreground font-medium'>
+                      Định dạng JPG, JPEG hoặc PNG. Tối đa 5MB.
+                    </p>
                   </div>
                 </div>
               ) : (
-                <div className={`flex flex-col items-center gap-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-300 min-h-[260px] justify-center p-4 rounded-3xl border-2 border-dashed border-transparent transition-all ${isDragging ? 'border-primary bg-primary/5 scale-[1.02]' : ''}`}>
+                <div
+                  className={`flex flex-col items-center gap-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-300 min-h-[260px] justify-center p-4 rounded-3xl border-2 border-dashed border-transparent transition-all ${isDragging ? 'border-primary bg-primary/5 scale-[1.02]' : ''}`}
+                >
                   <div className='relative w-44 h-44 rounded-full overflow-hidden border-4 border-background shadow-md ring-4 ring-primary/10 pointer-events-none'>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={avatarPreview} alt='Preview' className='w-full h-full object-cover' />
                   </div>
-                  <Button variant='outline' onClick={() => fileInputRef.current?.click()} className='rounded-xl font-bold h-11 px-6 border-border shadow-sm text-foreground hover:bg-muted transition-all w-fit'>
+                  <Button
+                    variant='outline'
+                    onClick={() => fileInputRef.current?.click()}
+                    className='rounded-xl font-bold h-11 px-6 border-border shadow-sm text-foreground hover:bg-muted transition-all w-fit'
+                  >
                     Chọn ảnh khác
                   </Button>
                 </div>
@@ -160,15 +172,15 @@ export function Sidebar() {
               />
 
               {avatarPreview && (
-                <Button 
+                <Button
                   className='w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-14 rounded-xl text-[16px] shadow-sm transition-all active:scale-[0.98]'
                   onClick={() => {
-                     if (avatarPreview) {
-                       setOptimisticAvatar(avatarPreview)
-                       updateUser({ avatar: avatarPreview })
-                     }
-                     // Thực tế sẽ gọi API upload lên S3 hay backend ở đây
-                     setIsAvatarModalOpen(false)
+                    if (avatarPreview) {
+                      setOptimisticAvatar(avatarPreview)
+                      updateUser({ avatar: avatarPreview })
+                    }
+                    // Thực tế sẽ gọi API upload lên S3 hay backend ở đây
+                    setIsAvatarModalOpen(false)
                   }}
                 >
                   Lưu ảnh
@@ -178,9 +190,7 @@ export function Sidebar() {
           </DialogContent>
         </Dialog>
 
-        <h2 className='text-lg font-bold text-foreground text-center'>
-          {displayUser?.fullName ?? '...'}
-        </h2>
+        <h2 className='text-lg font-bold text-foreground text-center'>{displayUser?.fullName ?? '...'}</h2>
       </div>
 
       {/* Navigation Links */}
@@ -205,4 +215,3 @@ export function Sidebar() {
     </div>
   )
 }
-

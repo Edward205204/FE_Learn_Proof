@@ -47,7 +47,6 @@ export default function CartPage() {
     }
   }
 
-
   if (isLoading) {
     return (
       <div className='container mx-auto py-10 px-6 max-w-[1200px]'>
@@ -165,7 +164,9 @@ export default function CartPage() {
             {/* Checkout Summary */}
             <div className='lg:w-1/3'>
               <div className='p-8 rounded-3xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] bg-white dark:bg-[oklch(0.141_0.005_285.823)] shadow-xl shadow-slate-100 dark:shadow-none'>
-                <h2 className='text-xl font-black mb-8 text-gray-900 dark:text-white uppercase tracking-wider'>Tổng cộng</h2>
+                <h2 className='text-xl font-black mb-8 text-gray-900 dark:text-white uppercase tracking-wider'>
+                  Tổng cộng
+                </h2>
 
                 <div className='space-y-4 mb-8 text-sm font-medium text-gray-600 dark:text-[oklch(0.552_0.016_285.938)]'>
                   <div className='flex items-center justify-between'>
@@ -238,7 +239,11 @@ export default function CartPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className='flex sm:justify-end gap-3 pb-4 pt-6'>
-            <Button variant='outline' onClick={() => setDeletingId(null)} className='h-12 rounded-xl font-bold border-2 px-6'>
+            <Button
+              variant='outline'
+              onClick={() => setDeletingId(null)}
+              className='h-12 rounded-xl font-bold border-2 px-6'
+            >
               Hủy
             </Button>
             <Button
