@@ -47,7 +47,12 @@ const courseApi = {
 
   reorderChapter: (body: ReorderChapterPayload) => http.patch('/courses/reorder/chapters', body),
 
-  reorderLesson: (body: ReorderLessonPayload) => http.patch('/lesson/reorder', body)
+  reorderLesson: (body: ReorderLessonPayload) => http.patch('/courses/reorder/lessons', body),
+
+  renameChapter: (chapterId: string, title: string) =>
+    http.patch<{ id: string; title: string; order: number; courseId: string }>(`/courses/chapters/${chapterId}`, {
+      title
+    })
 }
 
 export default courseApi

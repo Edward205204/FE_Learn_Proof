@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { toast } from 'sonner'
-import { useGetManagerCourseDetailQuery, useUpdateCourseChaptersFrameMutation } from '@/app/(cms)/_hooks/use-course-mutation'
+import { useGetManagerCourseDetailQuery, useRenameChapterMutation, useUpdateCourseChaptersFrameMutation } from '@/app/(cms)/_hooks/use-course-mutation'
 import { useReorderQueue } from '@/app/(cms)/_hooks/use-reorder'
 import Link from 'next/link'
 import { PATH } from '@/constants/path'
@@ -69,9 +69,11 @@ export default function ChaptersPage() {
 
   const { data: previewLesson, isFetching: isFetchingPreview } = useQuery({
     queryKey: ['lesson-preview', previewLessonId],
-    queryFn: () => lessonApi.getLessonDetail(previewLessonId!).then(res => res.data),
+    queryFn: () => lessonApi.getLessonDetail(previewLessonId!).then((res) => res.data),
     enabled: !!previewLessonId
   })
+
+  const renameChapterMutation = useRenameChapterMutation(courseId)
 
   useEffect(() => {
     if (!mappedChaptersFromServer.length) return
@@ -101,14 +103,24 @@ export default function ChaptersPage() {
     if (!inputText.trim()) return
 
     if (activeChapterId) {
-      setChapters(chapters.map((ch) => (ch.id === activeChapterId ? { ...ch, title: inputText } : ch)))
-      toast.success('Đã cập nhật tên chương')
+      // Gọi API đổi tên chapter thật sự
+      renameChapterMutation.mutate(
+        { chapterId: activeChapterId, title: inputText.trim() },
+        {
+          onSuccess: () => {
+            // Cập nhật local state ngay để UI phản hồi nhanh (optimistic)
+            setChapters(chapters.map((ch) => (ch.id === activeChapterId ? { ...ch, title: inputText.trim() } : ch)))
+            setIsChapterDialogOpen(false)
+            setInputText('')
+          }
+        }
+      )
     } else {
       setChapters([...chapters, { id: `ch-${Date.now()}`, title: inputText, lessons: [] }])
       toast.success('Đã thêm chương mới')
+      setIsChapterDialogOpen(false)
+      setInputText('')
     }
-    setIsChapterDialogOpen(false)
-    setInputText('')
   }
 
   const handleOpenLessonDialog = (chapterId: string, lesson?: LessonItem) => {
@@ -309,12 +321,7 @@ export default function ChaptersPage() {
                         </div>
 
                         <div className='flex items-center gap-2' onClick={(e) => e.stopPropagation()}>
-                          <Button
-                            asChild
-                            variant='outline'
-                            size='sm'
-                            className='h-8 bg-background cursor-pointer'
-                          >
+                          <Button asChild variant='outline' size='sm' className='h-8 bg-background cursor-pointer'>
                             <Link href={`${PATH.CREATE_LESSON.replace(':id', courseId)}?chapterId=${chapter.id}`}>
                               <Plus className='w-3.5 h-3.5 mr-1' /> Soạn bài học
                             </Link>
@@ -367,7 +374,7 @@ export default function ChaptersPage() {
                                             size='icon'
                                             className='h-7 w-7 text-primary hover:bg-primary/10'
                                             onClick={() => setPreviewLessonId(lesson.id)}
-                                            title="Xem trước Video"
+                                            title='Xem trước Video'
                                           >
                                             <PlayCircle className='w-4 h-4' />
                                           </Button>
@@ -430,7 +437,9 @@ export default function ChaptersPage() {
             <Button variant='outline' onClick={() => setIsChapterDialogOpen(false)}>
               Hủy
             </Button>
-            <Button onClick={handleSaveChapter}>Lưu</Button>
+            <Button onClick={handleSaveChapter} disabled={renameChapterMutation.isPending}>
+              {renameChapterMutation.isPending ? 'Đang lưu...' : 'Lưu'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -458,20 +467,20 @@ export default function ChaptersPage() {
 
       {/* Video Preview Dialog */}
       <Dialog open={!!previewLessonId} onOpenChange={(open) => !open && setPreviewLessonId(null)}>
-        <DialogContent className="max-w-4xl bg-black border-border shadow-2xl overflow-hidden p-0 gap-0 sm:rounded-2xl">
-          <DialogHeader className="opacity-0 absolute p-0 m-0 h-0 w-0">
+        <DialogContent className='max-w-4xl bg-black border-border shadow-2xl overflow-hidden p-0 gap-0 sm:rounded-2xl'>
+          <DialogHeader className='opacity-0 absolute p-0 m-0 h-0 w-0'>
             <DialogTitle>Video Preview</DialogTitle>
           </DialogHeader>
-          <div className="relative aspect-video w-full bg-black/90 flex items-center justify-center">
+          <div className='relative aspect-video w-full bg-black/90 flex items-center justify-center'>
             {isFetchingPreview ? (
-              <div className="text-white flex items-center gap-2">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                <span className="font-medium">Đang tải video...</span>
+              <div className='text-white flex items-center gap-2'>
+                <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div>
+                <span className='font-medium'>Đang tải video...</span>
               </div>
             ) : previewLesson?.type === 'VIDEO' && previewLesson.videoUrl ? (
-              <ReactPlayer url={previewLesson.videoUrl} width="100%" height="100%" controls playing />
+              <ReactPlayer url={previewLesson.videoUrl} width='100%' height='100%' controls playing />
             ) : (
-              <div className="text-muted-foreground font-medium">Không tìm thấy video hợp lệ.</div>
+              <div className='text-muted-foreground font-medium'>Không tìm thấy video hợp lệ.</div>
             )}
           </div>
         </DialogContent>
