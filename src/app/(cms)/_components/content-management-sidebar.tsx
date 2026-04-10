@@ -25,13 +25,13 @@ const NAV_ITEMS: NavItem[] = [
     href: PATH.COURSE_NEW_STEP1,
     label: 'Tạo khóa học',
     icon: PlusCircle,
-    match: (p) => p.startsWith(PATH.COURSE_NEW_STEP1)
+    match: (p) => p.startsWith('/studio/courses/new')
   },
   {
     href: PATH.STUDIO_COURSES,
     label: 'Khóa học',
     icon: BookOpen,
-    match: (p) => p === PATH.STUDIO_COURSES || p.startsWith(PATH.STUDIO_COURSES + '/courses/')
+    match: (p) => p.startsWith(PATH.STUDIO_COURSES) && !p.startsWith('/studio/courses/new')
   },
   {
     href: PATH.FEEDBACK_LIST,
