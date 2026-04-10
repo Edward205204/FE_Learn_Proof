@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Users, LayoutDashboard, Settings } from 'lucide-react'
+import { Users, LayoutDashboard, Settings, BookOpen, History } from 'lucide-react'
 
 import { PATH } from '@/constants/path'
 import { cn } from '@/lib/utils'
@@ -26,6 +26,18 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Quản lý người dùng',
     icon: Users,
     match: (p) => p.startsWith(`${PATH.ADMIN}/users`)
+  },
+  {
+    href: `${PATH.ADMIN}/courses`,
+    label: 'Quản lý khóa học',
+    icon: BookOpen,
+    match: (p) => p.startsWith(`${PATH.ADMIN}/courses`)
+  },
+  {
+    href: `${PATH.ADMIN}/audit-logs`,
+    label: 'Nhật ký hoạt động',
+    icon: History,
+    match: (p) => p.startsWith(`${PATH.ADMIN}/audit-logs`)
   },
   {
     href: `${PATH.ADMIN}/settings`,
