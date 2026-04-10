@@ -142,7 +142,7 @@ export default function EditCourseStep2Page() {
           Quay lại
         </Button>
         <Button onClick={onNext} disabled={updateChaptersMutation.isPending}>
-          Tiếp theo: Giá & Xuất bản
+          Tiếp theo: Hoàn thành
           <ArrowRight className='w-4 h-4 ml-2' />
         </Button>
       </div>

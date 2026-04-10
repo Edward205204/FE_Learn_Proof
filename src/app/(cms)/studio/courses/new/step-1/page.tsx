@@ -68,9 +68,9 @@ export default function CreateCourseStep1Page() {
               Hủy
             </Button>
             <div className='flex items-center gap-3'>
-              <Button variant='outline' type='button' className='font-semibold'>
+              {/* <Button variant='outline' type='button' className='font-semibold'>
                 Lưu bản nháp
-              </Button>
+              </Button> */}
               <Button type='submit' className='px-6 font-semibold' disabled={createCourseMutation.isPending}>
                 Tiếp theo: Chương học
                 <ArrowRight className='w-4 h-4 ml-2' />

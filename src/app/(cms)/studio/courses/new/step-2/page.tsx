@@ -184,7 +184,7 @@ function CreateCourseStep2Content() {
             className='font-bold h-11 px-8 rounded-xl shadow-md w-full sm:w-auto'
             disabled={updateChaptersMutation.isPending || !courseId}
           >
-            Tiếp theo: Giá & Xuất bản
+            Tiếp theo: Hoàn thành
             <ArrowRight className='w-5 h-5 ml-2' />
           </Button>
         </div>

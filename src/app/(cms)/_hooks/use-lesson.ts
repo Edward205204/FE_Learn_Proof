@@ -30,7 +30,7 @@ export function useCreateLessonMutation(courseId?: string) {
     onSuccess: () => {
       // Invalidate course detail để danh sách bài giảng trong Studio refresh
       if (courseId) {
-        queryClient.invalidateQueries({ queryKey: ['courses', 'manager', courseId] })
+        queryClient.invalidateQueries({ queryKey: ['courses', courseId, 'manager-detail'] })
       }
       toast.success('Tạo bài giảng thành công!')
     },
@@ -38,9 +38,7 @@ export function useCreateLessonMutation(courseId?: string) {
       const data = error.response?.data
       let message = 'Có lỗi xảy ra khi tạo bài giảng.'
       if (data?.message) {
-        message = Array.isArray(data.message)
-          ? data.message.map((e) => e.message).join(', ')
-          : data.message
+        message = Array.isArray(data.message) ? data.message.map((e) => e.message).join(', ') : data.message
       }
       toast.error(message)
     }
@@ -61,9 +59,7 @@ export function useUpdateLessonMutation(lessonId: string) {
       const data = error.response?.data
       let message = 'Có lỗi xảy ra khi cập nhật bài giảng.'
       if (data?.message) {
-        message = Array.isArray(data.message)
-          ? data.message.map((e) => e.message).join(', ')
-          : data.message
+        message = Array.isArray(data.message) ? data.message.map((e) => e.message).join(', ') : data.message
       }
       toast.error(message)
     }
@@ -78,7 +74,7 @@ export function useDeleteLessonMutation(courseId?: string) {
     mutationFn: (lessonId: string) => lessonApi.deleteLesson(lessonId),
     onSuccess: () => {
       if (courseId) {
-        queryClient.invalidateQueries({ queryKey: ['courses', 'manager', courseId] })
+        queryClient.invalidateQueries({ queryKey: ['courses', courseId, 'manager-detail'] })
       }
       toast.success('Đã xóa bài giảng!')
     },
@@ -86,9 +82,7 @@ export function useDeleteLessonMutation(courseId?: string) {
       const data = error.response?.data
       let message = 'Có lỗi xảy ra khi xóa bài giảng.'
       if (data?.message) {
-        message = Array.isArray(data.message)
-          ? data.message.map((e) => e.message).join(', ')
-          : data.message
+        message = Array.isArray(data.message) ? data.message.map((e) => e.message).join(', ') : data.message
       }
       toast.error(message)
     }
