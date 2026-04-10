@@ -35,14 +35,23 @@ function GoogleCallbackContent() {
       setTimeout(() => router.replace(PATH.LOGIN), 2000)
       return
     }
-
     authApi
       .getProfile(accessToken)
       .then((response) => {
-        useAuthStore.getState().setAuth({ accessToken, refreshToken, user: response.data })
+        const user = response.data
+        useAuthStore.getState().setAuth({ accessToken, refreshToken, user })
         setStatus('success')
         toast.success('Đăng nhập với Google thành công!')
-        setTimeout(() => router.replace(PATH.HOME), 1000)
+
+        setTimeout(() => {
+          if (user.role === 'CONTENT_MANAGER') {
+            router.replace(PATH.STUDIO_COURSES)
+          } else if (user.role === 'ADMIN') {
+            router.replace(PATH.ADMIN)
+          } else {
+            router.replace(`${PATH.ONBOARDING}/survey/step-1`)
+          }
+        }, 1000)
       })
       .catch(() => {
         setStatus('error')
