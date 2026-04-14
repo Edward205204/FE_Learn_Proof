@@ -562,11 +562,6 @@
           "type": "address"
         },
         {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
           "internalType": "string",
           "name": "uri",
           "type": "string"
@@ -793,5 +788,6 @@
       "stateMutability": "nonpayable",
       "type": "function"
     }
-  ]
+  ],
+  "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
 }
