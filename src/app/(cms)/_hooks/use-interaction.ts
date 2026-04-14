@@ -9,7 +9,7 @@ import type { BaseErrorResponse } from '@/app/(learner)/_hooks/use-enrollment'
 export const INTERACTION_KEYS = {
   allComments: ['cms-discussions'] as const,
   lessonComments: (courseId: string, lessonId: string) => ['lesson-comments', courseId, lessonId] as const,
-  courseReviews: (courseId: string) => ['course-reviews', courseId] as const,
+  courseReviews: (courseId: string) => ['course-reviews', courseId] as const
 }
 
 // ==========================================

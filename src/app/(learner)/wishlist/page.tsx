@@ -11,7 +11,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { useAddToCartMutation } from '@/app/(learner)/_hooks/use-cart'
 import { useWishlistQuery, useRemoveFromWishlistMutation } from '../_hooks/use-wishlist'
@@ -40,7 +40,6 @@ export default function WishlistPage() {
       })
     }
   }
-
 
   if (isLoading) {
     return (
@@ -140,9 +139,7 @@ export default function WishlistPage() {
         </div>
       ) : (
         <div className='text-center py-20 bg-gray-50 dark:bg-[oklch(0.21_0.006_285.885)] rounded-2xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)]'>
-          <p className='text-[oklch(0.552_0.016_285.938)] mb-4'>
-            Bạn chưa có khóa học nào trong danh sách yêu thích.
-          </p>
+          <p className='text-[oklch(0.552_0.016_285.938)] mb-4'>Bạn chưa có khóa học nào trong danh sách yêu thích.</p>
           <Link
             href='/courses'
             className='inline-flex px-6 py-3 bg-[oklch(0.577_0.245_27.325)] text-white font-medium rounded-lg hover:opacity-90 transition-opacity'

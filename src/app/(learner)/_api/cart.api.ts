@@ -27,7 +27,8 @@ export interface CartResponse {
 export const cartApi = {
   getCart: () => http.get<CartResponse>('/cart'),
   addToCart: (courseId: string) => http.post<CartResponse>('/cart/items', { courseId }),
-  removeFromCart: (courseId: string) => http.delete<CartResponse>(`/cart/items/${courseId}`)
+  removeFromCart: (courseId: string) => http.delete<CartResponse>(`/cart/items/${courseId}`),
+  checkout: () => http.post<{ courseIds: string[] }>('/cart/checkout')
 }
 
 export default cartApi

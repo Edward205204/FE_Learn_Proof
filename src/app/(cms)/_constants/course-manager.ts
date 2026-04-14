@@ -36,4 +36,3 @@ export function formatDate(dateString: string) {
     year: 'numeric'
   })
 }
-

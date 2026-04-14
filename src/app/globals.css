@@ -3,7 +3,6 @@
 @import 'shadcn/tailwind.css';
 /* @import 'highlight.js/styles/atom-one-dark.css'; */
 
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

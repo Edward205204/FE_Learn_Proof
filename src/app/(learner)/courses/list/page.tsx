@@ -1,6 +1,18 @@
 'use client'
 
-import { Search, Bell, PlayCircle, PlusCircle, ArrowRight, ChevronRight, Loader2, BookOpen, CheckCircle2, Trophy, Clock } from 'lucide-react'
+import {
+  Search,
+  Bell,
+  PlayCircle,
+  PlusCircle,
+  ArrowRight,
+  ChevronRight,
+  Loader2,
+  BookOpen,
+  CheckCircle2,
+  Trophy,
+  Clock
+} from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -28,10 +40,12 @@ export default function MyCoursesPage() {
         <div className='absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent' />
         <div className='absolute -right-20 -top-20 w-80 h-80 bg-primary/10 rounded-full blur-3xl' />
         <div className='absolute right-40 -bottom-20 w-60 h-60 bg-primary/5 rounded-full blur-2xl' />
-        
+
         <div className='max-w-[1240px] mx-auto px-6 pt-10 pb-16 relative z-10'>
           <nav className='flex items-center gap-2 text-[11px] font-bold tracking-widest uppercase text-muted-foreground mb-8'>
-            <Link href='/' className='hover:text-primary transition-colors'>Trang chủ</Link>
+            <Link href='/' className='hover:text-primary transition-colors'>
+              Trang chủ
+            </Link>
             <ChevronRight size={12} className='text-muted-foreground/50' />
             <span className='text-primary'>Học tập</span>
           </nav>
@@ -42,11 +56,10 @@ export default function MyCoursesPage() {
                 <Trophy size={14} />
                 <span>Hành trình kiến thức</span>
               </div>
-              <h1 className='text-4xl lg:text-5xl font-black tracking-tight text-foreground'>
-                Khóa học của tôi
-              </h1>
+              <h1 className='text-4xl lg:text-5xl font-black tracking-tight text-foreground'>Khóa học của tôi</h1>
               <p className='text-muted-foreground text-lg lg:text-xl font-medium max-w-2xl leading-relaxed'>
-                Chào {displayFirstName}, hôm nay là một ngày tuyệt vời để tiếp tục hành trình học tập và phát triển bản thân!
+                Chào {displayFirstName}, hôm nay là một ngày tuyệt vời để tiếp tục hành trình học tập và phát triển bản
+                thân!
               </p>
             </div>
 
@@ -58,8 +71,8 @@ export default function MyCoursesPage() {
                   placeholder='Tìm khóa học của bạn...'
                 />
               </div>
-              <Button size="icon" variant="outline" className="h-14 w-14 rounded-2xl shrink-0 group">
-                <Bell size={22} className="group-hover:rotate-12 transition-transform" />
+              <Button size='icon' variant='outline' className='h-14 w-14 rounded-2xl shrink-0 group'>
+                <Bell size={22} className='group-hover:rotate-12 transition-transform' />
               </Button>
             </div>
           </div>
@@ -69,23 +82,23 @@ export default function MyCoursesPage() {
       <div className='max-w-[1240px] mx-auto px-6 -mt-10 relative z-20'>
         {/* Stats Section */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-12'>
-          <StatCard 
+          <StatCard
             icon={<BookOpen className='text-blue-500' size={24} />}
-            label="Đang tham gia"
+            label='Đang tham gia'
             value={learningCourses.length}
-            description="Khóa học đang học"
+            description='Khóa học đang học'
           />
-          <StatCard 
+          <StatCard
             icon={<CheckCircle2 className='text-green-500' size={24} />}
-            label="Đã hoàn thành"
+            label='Đã hoàn thành'
             value={completedCourses.length}
-            description="Chinh phục thành công"
+            description='Chinh phục thành công'
           />
-          <StatCard 
+          <StatCard
             icon={<Clock className='text-orange-500' size={24} />}
-            label="Tổng tích lũy"
+            label='Tổng tích lũy'
             value={enrollments?.length || 0}
-            description="Toàn bộ khoá học"
+            description='Toàn bộ khoá học'
           />
         </div>
 
@@ -95,19 +108,19 @@ export default function MyCoursesPage() {
             <TabsList className='bg-transparent h-auto p-0 gap-8'>
               <TabsTrigger
                 value='learning'
-                className="text-[15px] font-bold px-0 py-4 data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground bg-transparent border-none shadow-none relative rounded-none transition-all data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:w-full data-[state=active]:after:h-0.5 data-[state=active]:after:bg-primary"
+                className='text-[15px] font-bold px-0 py-4 data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground bg-transparent border-none shadow-none relative rounded-none transition-all data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:w-full data-[state=active]:after:h-0.5 data-[state=active]:after:bg-primary'
               >
                 Đang học ({learningCourses.length})
               </TabsTrigger>
               <TabsTrigger
                 value='completed'
-                className="text-[15px] font-bold px-0 py-4 data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground bg-transparent border-none shadow-none relative rounded-none transition-all data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:w-full data-[state=active]:after:h-0.5 data-[state=active]:after:bg-primary"
+                className='text-[15px] font-bold px-0 py-4 data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground bg-transparent border-none shadow-none relative rounded-none transition-all data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:w-full data-[state=active]:after:h-0.5 data-[state=active]:after:bg-primary'
               >
                 Đã hoàn thành ({completedCourses.length})
               </TabsTrigger>
               <TabsTrigger
                 value='all'
-                className="text-[15px] font-bold px-0 py-4 data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground bg-transparent border-none shadow-none relative rounded-none transition-all data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:w-full data-[state=active]:after:h-0.5 data-[state=active]:after:bg-primary"
+                className='text-[15px] font-bold px-0 py-4 data-[state=active]:text-primary data-[state=inactive]:text-muted-foreground bg-transparent border-none shadow-none relative rounded-none transition-all data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:w-full data-[state=active]:after:h-0.5 data-[state=active]:after:bg-primary'
               >
                 Tất cả ({enrollments?.length || 0})
               </TabsTrigger>
@@ -129,9 +142,9 @@ export default function MyCoursesPage() {
                     ))}
                   </div>
                 ) : (
-                  <EmptyState 
-                    title="Chưa có khóa học đang học" 
-                    description="Bắt đầu ngay hôm nay để không bỏ lỡ những kiến thức giá trị nhất!"
+                  <EmptyState
+                    title='Chưa có khóa học đang học'
+                    description='Bắt đầu ngay hôm nay để không bỏ lỡ những kiến thức giá trị nhất!'
                   />
                 )}
               </TabsContent>
@@ -144,9 +157,9 @@ export default function MyCoursesPage() {
                     ))}
                   </div>
                 ) : (
-                  <EmptyState 
-                    title="Bạn chưa hoàn thành khoá học nào" 
-                    description="Kiên trì học tập mỗi ngày để sớm đạt được mục tiêu của mình nhé!"
+                  <EmptyState
+                    title='Bạn chưa hoàn thành khoá học nào'
+                    description='Kiên trì học tập mỗi ngày để sớm đạt được mục tiêu của mình nhé!'
                   />
                 )}
               </TabsContent>
@@ -159,9 +172,9 @@ export default function MyCoursesPage() {
                     ))}
                   </div>
                 ) : (
-                  <EmptyState 
-                    title="Bạn chưa tham gia khoá học nào" 
-                    description="Đến trang khám phá để tìm kiếm những khóa học phù hợp nhất với bạn."
+                  <EmptyState
+                    title='Bạn chưa tham gia khoá học nào'
+                    description='Đến trang khám phá để tìm kiếm những khóa học phù hợp nhất với bạn.'
                   />
                 )}
               </TabsContent>
@@ -192,12 +205,20 @@ export default function MyCoursesPage() {
   )
 }
 
-function StatCard({ icon, label, value, description }: { icon: React.ReactNode; label: string; value: number; description: string }) {
+function StatCard({
+  icon,
+  label,
+  value,
+  description
+}: {
+  icon: React.ReactNode
+  label: string
+  value: number
+  description: string
+}) {
   return (
     <div className='bg-white dark:bg-card p-6 rounded-2xl border border-border shadow-sm flex items-start gap-4 hover:shadow-md transition-all group'>
-      <div className='p-3 bg-muted dark:bg-muted/30 rounded-xl group-hover:scale-110 transition-transform'>
-        {icon}
-      </div>
+      <div className='p-3 bg-muted dark:bg-muted/30 rounded-xl group-hover:scale-110 transition-transform'>{icon}</div>
       <div className='space-y-1'>
         <p className='text-[13px] font-bold text-muted-foreground uppercase tracking-wider'>{label}</p>
         <div className='flex items-baseline gap-2'>
@@ -217,7 +238,10 @@ function EmptyState({ title, description }: { title: string; description: string
       </div>
       <h3 className='text-2xl font-bold text-foreground mb-4'>{title}</h3>
       <p className='text-muted-foreground font-medium leading-relaxed mb-10'>{description}</p>
-      <Button asChild className='rounded-xl px-8 h-12 h-14 text-base font-bold transition-all hover:scale-105 active:scale-95'>
+      <Button
+        asChild
+        className='rounded-xl px-8 h-12 h-14 text-base font-bold transition-all hover:scale-105 active:scale-95'
+      >
         <Link href={PATH.COURSES}>Bắt đầu khám phá</Link>
       </Button>
     </div>
@@ -264,8 +288,8 @@ function CourseCard({ enroll }: { enroll: EnrollmentCourse }) {
           </h3>
           <div className='flex items-center gap-2 text-xs text-muted-foreground font-medium'>
             <div className='flex flex-row items-center gap-1.5'>
-               <div className='w-1.5 h-1.5 rounded-full bg-primary/40' />
-               <span>Giảng viên: {course.creator.fullName}</span>
+              <div className='w-1.5 h-1.5 rounded-full bg-primary/40' />
+              <span>Giảng viên: {course.creator.fullName}</span>
             </div>
           </div>
         </div>

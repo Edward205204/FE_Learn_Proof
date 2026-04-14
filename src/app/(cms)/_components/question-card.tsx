@@ -35,7 +35,9 @@ export function QuestionCard({ index, form, onRemove, showAnswers = true }: Ques
 
         <div className='space-y-6'>
           <div>
-            <label className='text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2 block'>Nội dung câu hỏi</label>
+            <label className='text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2 block'>
+              Nội dung câu hỏi
+            </label>
             <Input
               {...form.register(`questions.${index}.questionText`)}
               placeholder='VD: Tính chất OOP nào dưới đây cho phép...'
@@ -45,7 +47,9 @@ export function QuestionCard({ index, form, onRemove, showAnswers = true }: Ques
 
           {showAnswers && (
             <div className='space-y-3 pt-2 border-t border-border/30'>
-              <label className='text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-2 mt-4'>Các đáp án</label>
+              <label className='text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-2 mt-4'>
+                Các đáp án
+              </label>
               <AnswerList questionIndex={index} form={form as UseFormReturn<QuizFormValues>} />
             </div>
           )}

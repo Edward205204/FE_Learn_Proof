@@ -1,4 +1,4 @@
-import { Bell, MessageSquare, Tag, CheckCircle, Clock } from 'lucide-react';
+import { Bell, MessageSquare, Tag, CheckCircle, Clock } from 'lucide-react'
 
 const MOCK_NOTIFICATIONS = [
   {
@@ -41,55 +41,57 @@ const MOCK_NOTIFICATIONS = [
     icon: CheckCircle,
     color: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
   }
-];
+]
 
 export default function NotificationsPage() {
   return (
-    <div className="container mx-auto py-10 px-6 max-w-4xl">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-[oklch(0.141_0.005_285.823)] dark:text-white">
-          Thông báo
-        </h1>
-        <button className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 transition-colors">
+    <div className='container mx-auto py-10 px-6 max-w-4xl'>
+      <div className='flex items-center justify-between mb-8'>
+        <h1 className='text-3xl font-bold text-[oklch(0.141_0.005_285.823)] dark:text-white'>Thông báo</h1>
+        <button className='text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 transition-colors'>
           Đánh dấu tất cả đã đọc
         </button>
       </div>
-      
-      <div className="bg-white dark:bg-[oklch(0.141_0.005_285.823)] rounded-2xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] shadow-sm overflow-hidden">
+
+      <div className='bg-white dark:bg-[oklch(0.141_0.005_285.823)] rounded-2xl border border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] shadow-sm overflow-hidden'>
         {MOCK_NOTIFICATIONS.map((noti) => {
-          const Icon = noti.icon;
+          const Icon = noti.icon
           return (
-            <div 
-              key={noti.id} 
+            <div
+              key={noti.id}
               className={`p-5 flex gap-5 border-b border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)] last:border-0 hover:bg-gray-50 dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors ${noti.unread ? 'bg-blue-50/30 dark:bg-blue-900/10' : ''}`}
             >
               <div className={`w-12 h-12 rounded-full shrink-0 flex items-center justify-center ${noti.color}`}>
                 <Icon size={24} />
               </div>
-              
-              <div className="flex-1">
-                <div className="flex items-start justify-between gap-4 mb-1">
-                  <h3 className={`text-base font-semibold ${noti.unread ? 'text-gray-900 dark:text-white' : 'text-[oklch(0.552_0.016_285.938)]'}`}>
+
+              <div className='flex-1'>
+                <div className='flex items-start justify-between gap-4 mb-1'>
+                  <h3
+                    className={`text-base font-semibold ${noti.unread ? 'text-gray-900 dark:text-white' : 'text-[oklch(0.552_0.016_285.938)]'}`}
+                  >
                     {noti.title}
                   </h3>
                   {noti.unread && (
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0 mt-1.5 shadow-sm"></span>
+                    <span className='w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0 mt-1.5 shadow-sm'></span>
                   )}
                 </div>
-                
-                <p className={`text-sm mb-3 ${noti.unread ? 'text-gray-700 dark:text-gray-300 font-medium' : 'text-[oklch(0.552_0.016_285.938)]'}`}>
+
+                <p
+                  className={`text-sm mb-3 ${noti.unread ? 'text-gray-700 dark:text-gray-300 font-medium' : 'text-[oklch(0.552_0.016_285.938)]'}`}
+                >
                   {noti.message}
                 </p>
-                
-                <div className="flex items-center gap-1.5 text-xs text-[oklch(0.552_0.016_285.938)]">
+
+                <div className='flex items-center gap-1.5 text-xs text-[oklch(0.552_0.016_285.938)]'>
                   <Clock size={14} />
                   <span>{noti.time}</span>
                 </div>
               </div>
             </div>
-          );
+          )
         })}
       </div>
     </div>
-  );
+  )
 }

@@ -41,3 +41,13 @@ export function useRemoveFromCartMutation() {
     }
   })
 }
+
+export function useCheckoutMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: cartApi.checkout,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY })
+    }
+  })
+}

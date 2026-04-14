@@ -19,7 +19,10 @@ export function AnswerList({ questionIndex, form }: AnswerListProps) {
   return (
     <div className='space-y-4'>
       {fields.map((field, index) => (
-        <div key={field.id} className='flex items-center gap-3 group bg-muted/20 p-2 rounded-xl border border-transparent focus-within:border-border/50 focus-within:bg-card transition-all'>
+        <div
+          key={field.id}
+          className='flex items-center gap-3 group bg-muted/20 p-2 rounded-xl border border-transparent focus-within:border-border/50 focus-within:bg-card transition-all'
+        >
           <div className='pl-2'>
             <Checkbox
               checked={form.watch(`questions.${questionIndex}.answers.${index}.isCorrect`)}
