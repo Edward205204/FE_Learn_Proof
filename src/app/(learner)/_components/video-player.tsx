@@ -70,6 +70,7 @@ function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastP
   const playerRef = useRef<YouTubePlayerInstance | null>(null)
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const metadataRetryRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const controlsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hasSeekedInitialRef = useRef(false)
   const isSeekingRef = useRef(false)
   const [isReady, setIsReady] = useState(false)
@@ -80,12 +81,24 @@ function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastP
   const [quality, setQuality] = useState('auto')
   const [availableSpeeds, setAvailableSpeeds] = useState<number[]>([0.5, 1, 1.25, 1.5, 2])
   const [availableQualities, setAvailableQualities] = useState<string[]>(['auto'])
+  const [isControlsVisible, setIsControlsVisible] = useState(true)
 
   const stopTimers = useCallback(() => {
     if (progressTimerRef.current) clearInterval(progressTimerRef.current)
     if (metadataRetryRef.current) clearInterval(metadataRetryRef.current)
+    if (controlsTimerRef.current) clearTimeout(controlsTimerRef.current)
     progressTimerRef.current = null
     metadataRetryRef.current = null
+    controlsTimerRef.current = null
+  }, [])
+
+  const resetControlsAutoHide = useCallback(() => {
+    if (controlsTimerRef.current) clearTimeout(controlsTimerRef.current)
+    setIsControlsVisible(true)
+    controlsTimerRef.current = setTimeout(() => {
+      if (isSeekingRef.current) return
+      setIsControlsVisible(false)
+    }, 5000)
   }, [])
 
   const syncProgress = useCallback(() => {
@@ -149,6 +162,7 @@ function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastP
         onReady: (event) => {
           playerRef.current = event.target
           setIsReady(true)
+          resetControlsAutoHide()
           if (!hasSeekedInitialRef.current && lastPosition > 0) {
             playerRef.current?.seekTo(lastPosition, true)
             hasSeekedInitialRef.current = true
@@ -178,7 +192,7 @@ function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastP
         }
       }
     })
-  }, [containerId, lastPosition, startProgressTimer, stopTimers, syncProgress, videoId])
+  }, [containerId, lastPosition, resetControlsAutoHide, startProgressTimer, stopTimers, syncProgress, videoId])
 
   useEffect(() => {
     if (window.YT?.Player) {
@@ -209,6 +223,7 @@ function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastP
     if (!player) return
     if (isPlaying) player.pauseVideo()
     else player.playVideo()
+    resetControlsAutoHide()
     syncProgress()
   }
 
@@ -217,6 +232,7 @@ function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastP
     if (!player) return
     player.seekTo(value, true)
     setCurrentTime(value)
+    resetControlsAutoHide()
   }
 
   const onChangeSpeed = (next: number) => {
@@ -224,6 +240,7 @@ function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastP
     if (!player) return
     player.setPlaybackRate(next)
     setSpeed(next)
+    resetControlsAutoHide()
   }
 
   const onChangeQuality = (next: string) => {
@@ -231,6 +248,7 @@ function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastP
     if (!player) return
     if (next !== 'auto') player.setPlaybackQuality(next)
     setQuality(next)
+    resetControlsAutoHide()
   }
 
   const toggleFullscreen = async () => {
@@ -241,12 +259,22 @@ function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastP
       return
     }
     await el.requestFullscreen()
+    resetControlsAutoHide()
   }
 
   return (
-    <div ref={wrapperRef} className='absolute inset-0 flex flex-col bg-black'>
+    <div
+      ref={wrapperRef}
+      className={`absolute inset-0 flex flex-col bg-black ${isControlsVisible ? 'cursor-default' : 'cursor-none'}`}
+      onMouseMove={resetControlsAutoHide}
+      onTouchStart={resetControlsAutoHide}
+    >
       <div id={containerId} className='w-full h-full' />
-      <div className='absolute inset-x-0 bottom-0 bg-black/70 p-3 flex items-center gap-3'>
+      <div
+        className={`absolute inset-x-0 bottom-0 bg-black/70 p-3 flex items-center gap-3 transition-opacity duration-300 ${
+          isControlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+      >
         <button
           type='button'
           onClick={togglePlay}
@@ -266,16 +294,22 @@ function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastP
           onInput={(e) => onSeek(Number((e.target as HTMLInputElement).value))}
           onMouseDown={() => {
             isSeekingRef.current = true
+            setIsControlsVisible(true)
+            if (controlsTimerRef.current) clearTimeout(controlsTimerRef.current)
           }}
           onMouseUp={() => {
             isSeekingRef.current = false
+            resetControlsAutoHide()
             syncProgress()
           }}
           onTouchStart={() => {
             isSeekingRef.current = true
+            setIsControlsVisible(true)
+            if (controlsTimerRef.current) clearTimeout(controlsTimerRef.current)
           }}
           onTouchEnd={() => {
             isSeekingRef.current = false
+            resetControlsAutoHide()
             syncProgress()
           }}
           className='w-full'
