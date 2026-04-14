@@ -81,13 +81,46 @@ export const publishCourseSchema = z
   .object({
     isFree: z.boolean(),
     price: z.number().min(0, 'Giá không hợp lệ'),
-    originalPrice: z.number().min(0, 'Giá giảm không hợp lệ').nullable()
+    originalPrice: z.number().min(0, 'Giá gốc không hợp lệ').nullable()
   })
   .superRefine((data, ctx) => {
+    if (!data.isFree) {
+      if (data.price <= 0) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Khóa học có phí phải có giá lớn hơn 0',
+          path: ['price']
+        })
+      }
+      if (data.price > 100000000) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Giá bán tối đa là 100.000.000 VNĐ',
+          path: ['price']
+        })
+      }
+      if (data.originalPrice !== null) {
+        if (data.originalPrice <= 0) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Giá gốc phải lớn hơn 0',
+            path: ['originalPrice']
+          })
+        }
+        if (data.originalPrice > 100000000) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Giá gốc tối đa là 100.000.000 VNĐ',
+            path: ['originalPrice']
+          })
+        }
+      }
+    }
+
     if (data.originalPrice !== null && data.price > data.originalPrice) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Giá sau khi giảm không được cao hơn giá gốc',
+        message: 'Giá sau khi giảm (giá bán) không được cao hơn giá gốc',
         path: ['price']
       })
     }

@@ -55,7 +55,10 @@ const courseApi = {
   renameChapter: (chapterId: string, title: string) =>
     http.patch<{ id: string; title: string; order: number; courseId: string }>(`/courses/chapters/${chapterId}`, {
       title
-    })
+    }),
+
+  deleteChapter: (courseId: string, chapterId: string) =>
+    http.delete(`/courses/${courseId}/delete/chapter/${chapterId}`)
 }
 
 export default courseApi

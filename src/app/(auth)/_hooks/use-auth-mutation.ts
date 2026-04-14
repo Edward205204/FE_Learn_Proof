@@ -39,7 +39,7 @@ export function useLoginMutation() {
     onSuccess: (response) => {
       toast.success('Đăng nhập thành công!')
       router.refresh()
-      
+
       const { user } = response.data
       if (user.role === 'CONTENT_MANAGER') {
         router.replace(PATH.STUDIO_COURSES)

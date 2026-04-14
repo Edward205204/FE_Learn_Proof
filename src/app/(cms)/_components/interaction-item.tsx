@@ -77,9 +77,9 @@ export function InteractionItem({ data }: InteractionItemProps) {
             </div>
           </div>
 
-          <Button 
-            variant='ghost' 
-            size='icon' 
+          <Button
+            variant='ghost'
+            size='icon'
             className={cn(
               'h-8 w-8 transition-colors',
               data.isPinned ? 'text-primary bg-primary/5' : 'text-muted-foreground/40 hover:text-primary'
@@ -94,12 +94,12 @@ export function InteractionItem({ data }: InteractionItemProps) {
           {data.type === 'review' && data.rating && (
             <div className='flex gap-0.5 mb-2.5'>
               {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i} 
+                <Star
+                  key={i}
                   className={cn(
                     'h-3.5 w-3.5 transition-colors',
                     i < data.rating! ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/20'
-                  )} 
+                  )}
                 />
               ))}
             </div>
@@ -112,7 +112,7 @@ export function InteractionItem({ data }: InteractionItemProps) {
               href={data.lessonUrl}
               className='inline-flex items-center gap-1.5 mt-3.5 text-[11px] font-bold text-primary hover:text-primary/80 transition-all group/link'
             >
-              Đến bài học 
+              Đến bài học
               <ExternalLink className='h-3 w-3 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform' />
             </a>
           )}
@@ -128,9 +128,9 @@ export function InteractionItem({ data }: InteractionItemProps) {
             defaultValue={data.reply || ''}
           />
           <div className='absolute right-2 bottom-2 flex items-center gap-2'>
-             <Button size='sm' className='h-7 py-0 px-3 text-[11px] font-bold shadow-sm bg-primary hover:bg-primary/90 transition-all'>
-               Gửi phản hồi
-             </Button>
+            <Button size='sm' className='h-7 py-0 px-3 text-[11px] font-bold shadow-sm bg-primary hover:bg-primary/90 transition-all'>
+              Gửi phản hồi
+            </Button>
           </div>
         </div>
 

@@ -10,7 +10,11 @@ import { Input } from '@/components/ui/input'
 import { PATH } from '@/constants/path'
 import { CourseStepper } from '@/app/(cms)/_components/course-stepper'
 import { updateCourseChaptersFrameSchema, type UpdateCourseChaptersFrameBody } from '@/app/(cms)/_utils/zod'
-import { useGetCourseBaseInfoQuery, useUpdateCourseChaptersFrameMutation } from '@/app/(cms)/_hooks/use-course-mutation'
+import {
+  useGetCourseBaseInfoQuery,
+  useUpdateCourseChaptersFrameMutation,
+  useDeleteChapterMutation
+} from '@/app/(cms)/_hooks/use-course-mutation'
 
 interface ChapterUi {
   id: string
@@ -25,6 +29,7 @@ export default function EditCourseStep2Page() {
 
   const { data: baseInfo } = useGetCourseBaseInfoQuery(courseId)
   const updateChaptersMutation = useUpdateCourseChaptersFrameMutation(courseId)
+  const deleteChapterMutation = useDeleteChapterMutation(courseId)
 
   const initialChapters = useMemo<ChapterUi[]>(
     () =>
@@ -44,7 +49,16 @@ export default function EditCourseStep2Page() {
     setChapterName('')
   }
 
-  const deleteChapter = (id: string) => {
+  const deleteChapter = async (id: string) => {
+    const isTemp = id.startsWith('temp-')
+    if (!isTemp) {
+      if (!window.confirm('Bạn có chắc chắn muốn xóa chương này?')) return
+      try {
+        await deleteChapterMutation.mutateAsync(id)
+      } catch {
+        return
+      }
+    }
     const newChapters = chapters.filter((c) => c.id !== id).map((c, idx) => ({ ...c, order: idx + 1 }))
     setChapters(newChapters)
   }
@@ -57,6 +71,17 @@ export default function EditCourseStep2Page() {
   }
 
   const onNext = async () => {
+    if (chapters.length === 0) {
+      router.push(`${PATH.STUDIO_COURSES}/courses/${courseId}/edit/step3`)
+      return
+    }
+
+    const hasNewChapters = chapters.some((c) => c.id.startsWith('temp-'))
+    if (!hasNewChapters) {
+      router.push(`${PATH.STUDIO_COURSES}/courses/${courseId}/edit/step3`)
+      return
+    }
+
     const body: UpdateCourseChaptersFrameBody = {
       chapterList: chapters.map((c, idx) => ({ title: c.title, order: idx + 1 }))
     }
