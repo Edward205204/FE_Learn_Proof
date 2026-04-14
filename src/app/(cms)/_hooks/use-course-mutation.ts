@@ -163,3 +163,18 @@ export function useRenameChapterMutation(courseId: string) {
     }
   })
 }
+
+export function useDeleteChapterMutation(courseId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (chapterId: string) => courseApi.deleteChapter(courseId, chapterId),
+    onSuccess: () => {
+      toast.success('Đã xóa chương.')
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.detailManager(courseId) })
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.detail(courseId) })
+    },
+    onError: () => {
+      toast.error('Có lỗi xảy ra khi xóa chương.')
+    }
+  })
+}

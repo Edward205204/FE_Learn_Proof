@@ -50,6 +50,13 @@ function CreateCourseStep2Content() {
 
   const onNext = async () => {
     if (!courseId) return
+
+    if (chapters.length === 0) {
+      persistDraftCourseId(courseId)
+      router.push(`${PATH.COURSE_NEW_STEP3}?courseId=${courseId}`)
+      return
+    }
+
     const body: UpdateCourseChaptersFrameBody = {
       chapterList: chapters.map((ch, index) => ({ title: ch.title, order: index + 1 }))
     }
