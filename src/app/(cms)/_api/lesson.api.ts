@@ -59,7 +59,6 @@ export type LessonDetail = VideoLessonDetail | TextLessonDetail | QuizLessonDeta
 
 // ─── Request Body Types (ánh xạ từ BE lesson.model.ts) ───────────────────────
 
-type VideoProvider = 'YOUTUBE' | 'BUNNY' | 'SELF_HOSTED'
 
 /** Body tạo bài giảng Video */
 export type CreateVideoLessonBody = {
