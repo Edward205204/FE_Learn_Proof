@@ -1,5 +1,7 @@
 export const PATH = {
   STUDIO_COURSES: '/studio/courses',
+  STUDIO_COURSES_DRAFT: '/studio/courses/draft',
+  STUDIO_COURSES_ARCHIVE: '/studio/courses/archive',
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',

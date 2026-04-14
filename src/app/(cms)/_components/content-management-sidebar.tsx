@@ -2,16 +2,21 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BookOpen, MessageSquareText, PlusCircle, LayoutDashboard } from 'lucide-react'
+import { Archive, BookOpen, FilePenLine, LayoutDashboard, MessageSquareText, PlusCircle } from 'lucide-react'
 
+import { SidebarCountBadge } from '@/components/common/sidebar-count-badge'
 import { PATH } from '@/constants/path'
 import { cn } from '@/lib/utils'
+import { useGetMyCoursesManagerQuery } from '../_hooks/use-course-mutation'
+import type { CourseStatus } from '../_utils/zod'
 
 type NavItem = {
   href: string
   label: string
   icon: React.ComponentType<{ className?: string }>
   match?: (pathname: string) => boolean
+  countStatus?: Extract<CourseStatus, 'DRAFT' | 'ARCHIVED'>
+  countClassName?: string
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -25,7 +30,11 @@ const NAV_ITEMS: NavItem[] = [
     href: PATH.STUDIO_COURSES,
     label: 'Khóa học',
     icon: BookOpen,
-    match: (p) => p.startsWith(PATH.STUDIO_COURSES) && !p.startsWith('/studio/courses/new')
+    match: (p) =>
+      p.startsWith(PATH.STUDIO_COURSES) &&
+      !p.startsWith('/studio/courses/new') &&
+      !p.startsWith(PATH.STUDIO_COURSES_DRAFT) &&
+      !p.startsWith(PATH.STUDIO_COURSES_ARCHIVE)
   },
   {
     href: PATH.COURSE_NEW_STEP1,
@@ -38,6 +47,22 @@ const NAV_ITEMS: NavItem[] = [
     href: PATH.FEEDBACK_LIST,
     label: 'Feedback',
     icon: MessageSquareText
+  },
+  {
+    href: PATH.STUDIO_COURSES_DRAFT,
+    label: 'Bản nháp',
+    icon: FilePenLine,
+    match: (p) => p.startsWith(PATH.STUDIO_COURSES_DRAFT),
+    countStatus: 'DRAFT',
+    countClassName: 'bg-sky-100 text-sky-700 border-sky-200'
+  },
+  {
+    href: PATH.STUDIO_COURSES_ARCHIVE,
+    label: 'Lưu trữ',
+    icon: Archive,
+    match: (p) => p.startsWith(PATH.STUDIO_COURSES_ARCHIVE),
+    countStatus: 'ARCHIVED',
+    countClassName: 'bg-amber-100 text-amber-800 border-amber-200'
   }
   // {
   //   href: PATH.QUIZ_LESSON,
@@ -58,6 +83,13 @@ function isActive(item: NavItem, pathname: string) {
 
 export function ContentManagementSidebar({ variant = 'desktop' }: Props) {
   const pathname = usePathname()
+  const { data: draftCourses } = useGetMyCoursesManagerQuery({ status: 'DRAFT', page: 1, limit: 1 })
+  const { data: archivedCourses } = useGetMyCoursesManagerQuery({ status: 'ARCHIVED', page: 1, limit: 1 })
+
+  const courseCounts: Partial<Record<Extract<CourseStatus, 'DRAFT' | 'ARCHIVED'>, number | null>> = {
+    DRAFT: draftCourses?.meta.total ?? null,
+    ARCHIVED: archivedCourses?.meta.total ?? null
+  }
 
   if (variant === 'mobile') {
     return (
@@ -78,11 +110,17 @@ export function ContentManagementSidebar({ variant = 'desktop' }: Props) {
                 key={item.href + item.label}
                 href={item.href}
                 className={cn(
-                  'text-sm px-3 py-1.5 rounded-md whitespace-nowrap transition-colors',
+                  'inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-md whitespace-nowrap transition-colors',
                   active ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 {item.label}
+                {item.countStatus && (
+                  <SidebarCountBadge
+                    count={courseCounts[item.countStatus]}
+                    className={cn('ml-0 h-5 min-w-5 px-1.5 text-[10px]', item.countClassName)}
+                  />
+                )}
               </Link>
             )
           })}
@@ -121,6 +159,9 @@ export function ContentManagementSidebar({ variant = 'desktop' }: Props) {
             >
               <Icon className='h-4 w-4' />
               <span className='truncate'>{item.label}</span>
+              {item.countStatus && (
+                <SidebarCountBadge count={courseCounts[item.countStatus]} className={item.countClassName} />
+              )}
             </Link>
           )
         })}

@@ -26,8 +26,8 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import {
   useGetManagerCourseDetailQuery,
-  useRenameChapterMutation,
-  useUpdateCourseChaptersFrameMutation
+  useCompleteCourseMutation,
+  useRenameChapterMutation
 } from '@/app/(cms)/_hooks/use-course-mutation'
 import { useDeleteLessonMutation } from '@/app/(cms)/_hooks/use-lesson'
 import { useReorderQueue } from '@/app/(cms)/_hooks/use-reorder'
@@ -36,6 +36,7 @@ import { PATH } from '@/constants/path'
 import { EditLessonMetadataDialog } from '@/app/(cms)/_components/edit-lesson-metadata-dialog'
 import { EditCourseMetadataDialog } from '@/app/(cms)/_components/edit-course-metadata-dialog'
 import { EditCourseStatusDialog } from '@/app/(cms)/_components/edit-course-status-dialog'
+import { EditCourseThumbnailDialog } from '@/app/(cms)/_components/edit-course-thumbnail-dialog'
 import { useQuery } from '@tanstack/react-query'
 import lessonApi from '@/app/(cms)/_api/lesson.api'
 import { PlayCircle } from 'lucide-react'
@@ -53,13 +54,15 @@ interface ChapterItem {
   lessons: LessonItem[]
 }
 
+const MIN_LESSONS_TO_COMPLETE = 10
+
 export default function ChaptersPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
   const courseId = params.id
 
   const { data: courseDetail } = useGetManagerCourseDetailQuery(courseId)
-  const { mutate: updateChaptersFrame, isPending: isUpdating } = useUpdateCourseChaptersFrameMutation(courseId)
+  const completeCourseMutation = useCompleteCourseMutation(courseId)
 
   const mappedChaptersFromServer: ChapterItem[] = useMemo(() => {
     if (!courseDetail) return []
@@ -88,6 +91,7 @@ export default function ChaptersPage() {
 
   const [isEditBaseInfoOpen, setIsEditBaseInfoOpen] = useState(false)
   const [isEditStatusOpen, setIsEditStatusOpen] = useState(false)
+  const [isCompleteCourseOpen, setIsCompleteCourseOpen] = useState(false)
 
   const deleteLessonMutation = useDeleteLessonMutation(courseId)
 
@@ -200,21 +204,6 @@ export default function ChaptersPage() {
     setChapters(lastConfirmedRef.current)
   }, [])
 
-  const handleSaveFrame = () => {
-    const payload = {
-      chapterList: chapters.map((ch, cIndex) => ({
-        title: ch.title,
-        order: cIndex + 1,
-        lessons: ch.lessons.map((ls, lIndex) => ({
-          title: ls.title,
-          order: lIndex + 1,
-          type: 'VIDEO' as const // Mặc định type là VIDEO nếu tạo nhanh qua UI frame
-        }))
-      }))
-    }
-    updateChaptersFrame(payload)
-  }
-
   const { enqueue } = useReorderQueue(handleRollback)
 
   const toggleChapter = (chapterId: string) => {
@@ -295,6 +284,8 @@ export default function ChaptersPage() {
   }
 
   const totalLessons = chapters.reduce((acc, ch) => acc + ch.lessons.length, 0)
+  const isCourseCompleted = Boolean((courseDetail as { isCompleted?: boolean } | null)?.isCompleted)
+  const canCompleteCourse = totalLessons >= MIN_LESSONS_TO_COMPLETE
 
   return (
     <div className='p-8 max-w-5xl mx-auto space-y-8 text-foreground'>
@@ -370,6 +361,12 @@ export default function ChaptersPage() {
           </div>
 
           <div className='flex flex-wrap items-center gap-3'>
+            <EditCourseThumbnailDialog
+              courseId={courseId}
+              courseTitle={courseDetail?.title}
+              thumbnail={courseDetail?.thumbnail}
+              compact
+            />
             <Button
               variant='outline'
               className='shadow-sm bg-background hover:bg-muted/50 transition-colors'
@@ -398,14 +395,26 @@ export default function ChaptersPage() {
               <Plus className='w-4 h-4 mr-2' /> Thêm chương
             </Button>
             <Button
-              onClick={handleSaveFrame}
-              disabled={isUpdating}
+              onClick={() => setIsCompleteCourseOpen(true)}
+              disabled={completeCourseMutation.isPending || isCourseCompleted || !canCompleteCourse}
               className='shadow-sm px-6 font-medium bg-primary text-primary-foreground hover:bg-primary/90'
             >
-              {isUpdating ? 'Đang lưu...' : 'Lưu cấu trúc'}
+              {isCourseCompleted
+                ? 'Khóa học đã hoàn thiện'
+                : !canCompleteCourse
+                  ? `Cần tối thiểu ${MIN_LESSONS_TO_COMPLETE} bài học`
+                  : completeCourseMutation.isPending
+                    ? 'Đang xác nhận...'
+                    : 'Xác nhận hoàn thiện khóa học'}
             </Button>
           </div>
         </div>
+        {!isCourseCompleted && !canCompleteCourse && (
+          <p className='text-xs text-muted-foreground'>
+            Bạn hiện có <strong>{totalLessons}</strong> bài học. Cần tối thiểu{' '}
+            <strong>{MIN_LESSONS_TO_COMPLETE}</strong> bài học để hoàn thiện khóa học.
+          </p>
+        )}
       </div>
 
       <DragDropContext onDragEnd={onDragEnd}>
@@ -644,7 +653,7 @@ export default function ChaptersPage() {
             className='absolute top-3 right-3 z-50 bg-black/40 hover:bg-red-600 hover:text-white text-white/80 rounded-full w-12 h-12 flex items-center justify-center transition-all duration-300 backdrop-blur-sm shadow-xl border border-white/10 group'
             title='Đóng video'
           >
-            <X className='!w-7 !h-7 transition-transform group-hover:scale-110 group-hover:rotate-90' />
+            <X className='w-7! h-7! transition-transform group-hover:scale-110 group-hover:rotate-90' />
           </Button>
 
           <div className='relative aspect-video w-full bg-[#0a0a0a] flex items-center justify-center'>
@@ -717,6 +726,37 @@ export default function ChaptersPage() {
               disabled={deleteLessonMutation.isPending}
             >
               {deleteLessonMutation.isPending ? 'Đang xóa...' : 'Xóa'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isCompleteCourseOpen} onOpenChange={setIsCompleteCourseOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Xác nhận hoàn thiện khóa học</DialogTitle>
+          </DialogHeader>
+          <div className='py-2 text-sm text-muted-foreground leading-relaxed'>
+            Bạn xác nhận khóa học này đã hoàn thiện nội dung? Hệ thống yêu cầu tối thiểu{' '}
+            <strong>{MIN_LESSONS_TO_COMPLETE}</strong> bài học trước khi đánh dấu hoàn thiện.
+          </div>
+          <DialogFooter>
+            <Button
+              variant='outline'
+              onClick={() => setIsCompleteCourseOpen(false)}
+              disabled={completeCourseMutation.isPending}
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={() =>
+                completeCourseMutation.mutate(undefined, {
+                  onSuccess: () => setIsCompleteCourseOpen(false)
+                })
+              }
+              disabled={completeCourseMutation.isPending}
+            >
+              {completeCourseMutation.isPending ? 'Đang xử lý...' : 'Xác nhận hoàn thiện'}
             </Button>
           </DialogFooter>
         </DialogContent>

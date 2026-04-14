@@ -190,6 +190,7 @@ export const ManagerCourseDetailSchema = z.object({
   isFree: z.boolean(),
   price: z.number(),
   originalPrice: z.number().nullable(),
+  isCompleted: z.boolean(),
   publishedLessonsCount: z.number().int(),
   totalPlannedLessons: z.number().int().nullable(),
   expectedDays: z.number().int().nullable(),

@@ -61,19 +61,24 @@ export function CourseStep3PricingFields({ control, setValue, isFree, priceLabel
                 <Controller
                   control={control}
                   name='price'
-                  render={({ field }) => (
-                    <div className='relative'>
-                      <MoneyInput
-                        id='price'
-                        placeholder='299.000'
-                        value={typeof field.value === 'number' ? field.value : 0}
-                        onValueChange={(v) => field.onChange(v ?? 0)}
-                        className='h-12 text-lg font-bold rounded-xl pr-12 focus-visible:ring-primary/20'
-                      />
-                      <span className='absolute right-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground select-none'>
-                        ₫
-                      </span>
-                    </div>
+                  render={({ field, fieldState }) => (
+                    <>
+                      <div className='relative'>
+                        <MoneyInput
+                          id='price'
+                          placeholder='299.000'
+                          value={typeof field.value === 'number' ? field.value : 0}
+                          onValueChange={(v) => field.onChange(v ?? 0)}
+                          className='h-12 text-lg font-bold rounded-xl pr-12 focus-visible:ring-primary/20'
+                        />
+                        <span className='absolute right-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground select-none'>
+                          ₫
+                        </span>
+                      </div>
+                      {fieldState.error && (
+                        <p className='text-[13px] text-destructive font-medium mt-1'>{fieldState.error.message}</p>
+                      )}
+                    </>
                   )}
                 />
               </div>
@@ -88,19 +93,24 @@ export function CourseStep3PricingFields({ control, setValue, isFree, priceLabel
                 <Controller
                   control={control}
                   name='originalPrice'
-                  render={({ field }) => (
-                    <div className='relative'>
-                      <MoneyInput
-                        id='discount'
-                        placeholder='Để trống nếu không có'
-                        value={field.value ?? null}
-                        onValueChange={(v) => field.onChange(v)}
-                        className='h-12 text-lg font-bold rounded-xl pr-12 focus-visible:ring-primary/20'
-                      />
-                      <span className='absolute right-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground select-none'>
-                        ₫
-                      </span>
-                    </div>
+                  render={({ field, fieldState }) => (
+                    <>
+                      <div className='relative'>
+                        <MoneyInput
+                          id='discount'
+                          placeholder='Để trống nếu không có'
+                          value={field.value ?? null}
+                          onValueChange={(v) => field.onChange(v)}
+                          className='h-12 text-lg font-bold rounded-xl pr-12 focus-visible:ring-primary/20'
+                        />
+                        <span className='absolute right-4 top-1/2 -translate-y-1/2 font-bold text-muted-foreground select-none'>
+                          ₫
+                        </span>
+                      </div>
+                      {fieldState.error && (
+                        <p className='text-[13px] text-destructive font-medium mt-1'>{fieldState.error.message}</p>
+                      )}
+                    </>
                   )}
                 />
                 <p className='text-[13px] text-muted-foreground font-medium flex items-center gap-1.5 mt-1'>

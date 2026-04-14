@@ -43,6 +43,8 @@ const courseApi = {
 
   publishCourse: (courseId: string, body: PublishCourseBody) => http.patch(`/courses/${courseId}/publish`, body),
 
+  completeCourse: (courseId: string) => http.patch(`/courses/${courseId}/complete`),
+
   updateCourseStatus: (courseId: string, status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED') =>
     http.patch(`/courses/${courseId}/status`, { status }),
 

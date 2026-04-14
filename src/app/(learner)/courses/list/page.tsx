@@ -251,7 +251,11 @@ function EmptyState({ title, description }: { title: string; description: string
 function CourseCard({ enroll }: { enroll: EnrollmentCourse }) {
   const { course } = enroll
   const imageUrl = course.thumbnail
-    ? `${config.BE_URL}/media/${course.thumbnail}`
+    ? course.thumbnail.startsWith('http')
+      ? course.thumbnail
+      : course.thumbnail.startsWith('/media/')
+        ? `${config.BE_URL}${course.thumbnail}`
+        : `${config.BE_URL}/media/${course.thumbnail}`
     : 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80'
 
   return (
