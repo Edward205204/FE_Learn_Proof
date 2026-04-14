@@ -16,7 +16,7 @@ export default function CourseSection({
   subtitle,
   courses,
   viewAllHref = '/courses',
-  viewAllLabel = 'Xem tất cả',
+  viewAllLabel = 'Xem tất cả'
 }: CourseSectionProps) {
   if (!courses || courses.length === 0) return null
 
@@ -26,9 +26,7 @@ export default function CourseSection({
       <div className='flex items-end justify-between mb-6 gap-4'>
         <div>
           <h2 className='text-2xl font-extrabold tracking-tight text-foreground'>{title}</h2>
-          {subtitle && (
-            <p className='text-sm text-muted-foreground mt-1'>{subtitle}</p>
-          )}
+          {subtitle && <p className='text-sm text-muted-foreground mt-1'>{subtitle}</p>}
         </div>
         <Link
           href={viewAllHref}

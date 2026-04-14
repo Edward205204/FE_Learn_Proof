@@ -45,13 +45,21 @@ export function InteractionItem({ data }: InteractionItemProps) {
             <Avatar className='h-10 w-10 ring-2 ring-background shadow-sm'>
               <AvatarImage src={data.user.avatar} />
               <AvatarFallback className='bg-muted text-xs font-bold'>
-                {data.user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                {data.user.name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .toUpperCase()
+                  .slice(0, 2)}
               </AvatarFallback>
             </Avatar>
             <div className='flex flex-col gap-0.5'>
               <div className='flex items-center gap-2 flex-wrap'>
                 <h4 className='font-bold text-[15px] text-foreground/90'>{data.user.name}</h4>
-                <Badge variant='outline' className='text-[10px] h-5 font-bold uppercase tracking-wider text-muted-foreground bg-muted/20'>
+                <Badge
+                  variant='outline'
+                  className='text-[10px] h-5 font-bold uppercase tracking-wider text-muted-foreground bg-muted/20'
+                >
                   {TYPE_LABEL[data.type]}
                 </Badge>
                 {data.type === 'discussion' && (
@@ -59,7 +67,9 @@ export function InteractionItem({ data }: InteractionItemProps) {
                     variant={isResolved ? 'default' : 'secondary'}
                     className={cn(
                       'text-[9px] h-4 uppercase font-bold px-1.5',
-                      isResolved ? 'bg-emerald-500/10 text-emerald-600 border-none' : 'bg-muted text-muted-foreground border-none'
+                      isResolved
+                        ? 'bg-emerald-500/10 text-emerald-600 border-none'
+                        : 'bg-muted text-muted-foreground border-none'
                     )}
                   >
                     {isResolved ? 'Đã giải quyết' : 'Chưa giải quyết'}
@@ -104,9 +114,7 @@ export function InteractionItem({ data }: InteractionItemProps) {
               ))}
             </div>
           )}
-          <p className='text-[14px] text-foreground/85 leading-relaxed tracking-tight font-medium'>
-            {data.content}
-          </p>
+          <p className='text-[14px] text-foreground/85 leading-relaxed tracking-tight font-medium'>{data.content}</p>
           {data.lessonUrl && (
             <a
               href={data.lessonUrl}
@@ -128,7 +136,10 @@ export function InteractionItem({ data }: InteractionItemProps) {
             defaultValue={data.reply || ''}
           />
           <div className='absolute right-2 bottom-2 flex items-center gap-2'>
-            <Button size='sm' className='h-7 py-0 px-3 text-[11px] font-bold shadow-sm bg-primary hover:bg-primary/90 transition-all'>
+            <Button
+              size='sm'
+              className='h-7 py-0 px-3 text-[11px] font-bold shadow-sm bg-primary hover:bg-primary/90 transition-all'
+            >
               Gửi phản hồi
             </Button>
           </div>
@@ -143,4 +154,3 @@ export function InteractionItem({ data }: InteractionItemProps) {
     </Card>
   )
 }
-

@@ -12,4 +12,3 @@ export function persistDraftCourseId(courseId: string) {
 export function clearDraftCourseId() {
   sessionStorage.removeItem(COURSE_DRAFT_ID_KEY)
 }
-

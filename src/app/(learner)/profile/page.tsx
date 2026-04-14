@@ -25,16 +25,21 @@ export default function ProfilePage() {
   // Tách fullName thành firstName / lastName
   const nameParts = user?.fullName?.trim().split(' ') ?? []
   const defaultLastName = nameParts.length > 1 ? nameParts[0] : ''
-  const defaultFirstName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : nameParts[0] ?? ''
+  const defaultFirstName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : (nameParts[0] ?? '')
 
-  const { register, handleSubmit, reset, formState: { isDirty } } = useForm<ProfileForm>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isDirty }
+  } = useForm<ProfileForm>({
     defaultValues: {
       firstName: '',
       lastName: '',
       headline: '',
       bio: '',
-      website: '',
-    },
+      website: ''
+    }
   })
 
   // Populate form khi data từ API về
@@ -45,7 +50,7 @@ export default function ProfilePage() {
         lastName: defaultLastName,
         headline: user.headline ?? '',
         bio: user.bio ?? '',
-        website: user.website ?? '',
+        website: user.website ?? ''
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,7 +63,7 @@ export default function ProfilePage() {
         fullName: fullName || undefined,
         headline: data.headline || null,
         bio: data.bio || null,
-        website: data.website || null,
+        website: data.website || null
       })
       toast.success('Hồ sơ đã được cập nhật!')
       reset(data) // clear dirty state
@@ -112,7 +117,8 @@ export default function ProfilePage() {
                 />
               </div>
               <p className='text-[13px] text-muted-foreground'>
-                Hãy thêm tiêu đề chuyên nghiệp như &quot;Giảng viên tại Udemy&quot; hoặc &quot;Kiến trúc sư phần mềm&quot;.
+                Hãy thêm tiêu đề chuyên nghiệp như &quot;Giảng viên tại Udemy&quot; hoặc &quot;Kiến trúc sư phần
+                mềm&quot;.
               </p>
             </div>
           </div>
@@ -125,7 +131,9 @@ export default function ProfilePage() {
               readOnly
               className='h-11 rounded-md border-input bg-muted/50 text-muted-foreground cursor-not-allowed'
             />
-            <p className='text-[13px] text-muted-foreground'>Bạn không thể thay đổi địa chỉ email liên kết với tài khoản này.</p>
+            <p className='text-[13px] text-muted-foreground'>
+              Bạn không thể thay đổi địa chỉ email liên kết với tài khoản này.
+            </p>
           </div>
 
           {/* Bio */}
@@ -133,10 +141,16 @@ export default function ProfilePage() {
             <Label className='text-[15px] font-bold text-foreground'>Tiểu sử</Label>
             <div className='border border-input rounded-md overflow-hidden bg-background focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-shadow'>
               <div className='flex items-center gap-1 p-2 border-b border-input bg-muted/30'>
-                <button type='button' className='p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded transition-colors'>
+                <button
+                  type='button'
+                  className='p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded transition-colors'
+                >
                   <Bold size={16} />
                 </button>
-                <button type='button' className='p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded transition-colors'>
+                <button
+                  type='button'
+                  className='p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded transition-colors'
+                >
                   <Italic size={16} />
                 </button>
               </div>

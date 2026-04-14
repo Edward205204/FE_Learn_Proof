@@ -12,10 +12,16 @@ export function QuizSidebar({ title, infoLines }: QuizSidebarProps) {
     <aside className='w-64 md:w-72 bg-muted/20 border-r border-border/50 p-6 flex flex-col shrink-0'>
       <h2 className='text-lg font-extrabold text-foreground mb-6'>{title}</h2>
       <nav className='space-y-2'>
-        <Button variant='ghost' className='w-full justify-start text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl h-10'>
+        <Button
+          variant='ghost'
+          className='w-full justify-start text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-xl h-10'
+        >
           <Lock className='mr-2 h-4 w-4' /> Nội dung khóa học
         </Button>
-        <Button variant='secondary' className='w-full justify-start bg-primary/10 text-primary hover:bg-primary/20 font-bold rounded-xl h-10'>
+        <Button
+          variant='secondary'
+          className='w-full justify-start bg-primary/10 text-primary hover:bg-primary/20 font-bold rounded-xl h-10'
+        >
           <Play className='mr-2 h-4 w-4' /> Trình soạn Quiz
         </Button>
       </nav>

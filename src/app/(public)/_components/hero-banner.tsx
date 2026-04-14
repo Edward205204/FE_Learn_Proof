@@ -3,7 +3,6 @@ import Link from 'next/link'
 export default function HeroBanner() {
   return (
     <section className='relative overflow-hidden bg-[oklch(0.141_0.005_285.823)] rounded-b-3xl'>
-
       {/* Banner image */}
       <div
         className='absolute inset-0 bg-cover bg-center opacity-40'
@@ -20,7 +19,6 @@ export default function HeroBanner() {
       <div className='relative max-w-[1200px] mx-auto px-6 py-16 md:py-24 grid grid-cols-1 md:grid-cols-2 gap-12 items-center'>
         {/* Content */}
         <div className='flex flex-col gap-6'>
-
           <h1 className='text-4xl md:text-5xl font-black leading-[1.1] tracking-tight text-white'>
             Chứng chỉ
             <br />
@@ -28,7 +26,8 @@ export default function HeroBanner() {
           </h1>
 
           <p className='text-[oklch(0.75_0.01_285)] text-base leading-relaxed max-w-[40ch]'>
-            Học từ các chuyên gia hàng đầu. Nhận chứng chỉ được xác thực trên Blockchain — không thể làm giả, không thể mất, mãi mãi thuộc về bạn.
+            Học từ các chuyên gia hàng đầu. Nhận chứng chỉ được xác thực trên Blockchain — không thể làm giả, không thể
+            mất, mãi mãi thuộc về bạn.
           </p>
 
           <div className='flex gap-3 flex-wrap'>
@@ -49,7 +48,10 @@ export default function HeroBanner() {
 
         {/* Decorative nodes */}
         <div className='hidden md:block relative h-72'>
-          {[{ top: '15%', left: '25%' }, { top: '35%', left: '60%' }].map((n, i) => (
+          {[
+            { top: '15%', left: '25%' },
+            { top: '35%', left: '60%' }
+          ].map((n, i) => (
             <span
               key={i}
               className='absolute w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_12px_currentColor] text-primary animate-pulse'

@@ -32,9 +32,7 @@ function useUploadMutation(
       const data = error.response?.data
       let message = 'Tải ảnh lên thất bại.'
       if (data?.message) {
-        message = Array.isArray(data.message)
-          ? data.message.map((e) => e.message).join(', ')
-          : data.message
+        message = Array.isArray(data.message) ? data.message.map((e) => e.message).join(', ') : data.message
       }
       toast.error(message)
     }

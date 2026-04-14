@@ -25,4 +25,3 @@ export function CourseStepHeader({ backLabel, title, description, onBack }: Prop
     </div>
   )
 }
-

@@ -9,4 +9,3 @@ export const metadata: Metadata = {
 export default function ContentManagementLayout({ children }: { children: React.ReactNode }) {
   return <ContentManagementShell>{children}</ContentManagementShell>
 }
-
