@@ -14,10 +14,10 @@ import {
   useRenameChapterMutation,
   useUpdateCourseChaptersFrameMutation
 } from '@/app/(cms)/_hooks/use-course-mutation'
-import { useDeleteLessonMutation } from '@/app/(cms)/_hooks/use-lesson'
 import { useReorderQueue } from '@/app/(cms)/_hooks/use-reorder'
 import Link from 'next/link'
 import { PATH } from '@/constants/path'
+import { EditLessonMetadataDialog } from '@/app/(cms)/_components/edit-lesson-metadata-dialog'
 import { useQuery } from '@tanstack/react-query'
 import lessonApi from '@/app/(cms)/_api/lesson.api'
 import dynamic from 'next/dynamic'
@@ -70,6 +70,7 @@ export default function ChaptersPage() {
   const [inputText, setInputText] = useState('')
   const [activeChapterId, setActiveChapterId] = useState<string | null>(null)
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null)
+  const [editingLessonId, setEditingLessonId] = useState<string | null>(null)
   const [previewLessonId, setPreviewLessonId] = useState<string | null>(null)
 
   const { data: previewLesson, isFetching: isFetchingPreview } = useQuery({
@@ -79,7 +80,6 @@ export default function ChaptersPage() {
   })
 
   const renameChapterMutation = useRenameChapterMutation(courseId)
-  const deleteLessonMutation = useDeleteLessonMutation(courseId)
 
   useEffect(() => {
     if (!mappedChaptersFromServer.length) return
@@ -390,18 +390,27 @@ export default function ChaptersPage() {
                                             <PlayCircle className='w-4 h-4' />
                                           </Button>
                                         )}
-                                        <Link
-                                          href={`${PATH.CREATE_LESSON.replace(':id', courseId)}?chapterId=${chapter.id}&lessonId=${lesson.id}`}
-                                          className='h-7 w-7 flex items-center justify-center text-muted-foreground hover:text-primary transition-colors'
-                                        >
-                                          <Pencil className='size-4' />
-                                        </Link>
                                         <Button
                                           variant='ghost'
                                           size='icon'
-                                          className='h-7 w-7 text-destructive'
+                                          className='h-7 w-7 text-muted-foreground hover:text-primary transition-colors'
                                           onClick={() => {
                                             if (lesson.id.startsWith('ls-')) {
+                                              handleOpenLessonDialog(chapter.id, lesson)
+                                            } else {
+                                              setEditingLessonId(lesson.id)
+                                            }
+                                          }}
+                                          title='Chỉnh sửa thông tin bài học'
+                                        >
+                                          <Pencil className='size-4' />
+                                        </Button>
+                                        {lesson.id.startsWith('ls-') && (
+                                          <Button
+                                            variant='ghost'
+                                            size='icon'
+                                            className='h-7 w-7 text-destructive'
+                                            onClick={() => {
                                               setChapters(
                                                 chapters.map((ch) =>
                                                   ch.id === chapter.id
@@ -409,15 +418,12 @@ export default function ChaptersPage() {
                                                     : ch
                                                 )
                                               )
-                                            } else {
-                                              if (window.confirm('Bạn có chắc muốn xóa bài học này không?')) {
-                                                deleteLessonMutation.mutate(lesson.id)
-                                              }
-                                            }
-                                          }}
-                                        >
-                                          <Trash2 className='w-3.5 h-3.5' />
-                                        </Button>
+                                            }}
+                                            title='Xóa bài học chưa lưu'
+                                          >
+                                            <Trash2 className='w-3.5 h-3.5' />
+                                          </Button>
+                                        )}
                                       </div>
                                     </div>
                                   )}
@@ -502,6 +508,12 @@ export default function ChaptersPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <EditLessonMetadataDialog
+        lessonId={editingLessonId}
+        open={!!editingLessonId}
+        onOpenChange={(open) => !open && setEditingLessonId(null)}
+      />
     </div>
   )
 }
