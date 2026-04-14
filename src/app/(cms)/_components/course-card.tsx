@@ -144,7 +144,7 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                 </div>
 
                 <div className='flex flex-wrap items-center gap-x-4 gap-y-2 mt-3.5 text-[11px] font-medium text-muted-foreground'>
-                  {analytics && (
+                  {/* {analytics && (
                     <>
                       <span className='inline-flex items-center gap-1.5 bg-muted/30 px-2 py-0.5 rounded-sm'>
                         <Star className='size-3 fill-amber-400 text-amber-400' />
@@ -159,7 +159,7 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                         {analytics.avgInterestScore.toFixed(1)} điểm
                       </span>
                     </>
-                  )}
+                  )} */}
                   <div className='flex-1' />
                   <span className='opacity-70'>{formatDate(course.createdAt)}</span>
                   {!course.isCompleted && (
