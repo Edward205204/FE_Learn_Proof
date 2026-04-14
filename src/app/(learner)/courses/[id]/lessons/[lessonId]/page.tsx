@@ -1,9 +1,9 @@
 'use client'
-
+import { LessonTabs } from '@/app/(learner)/_components/lesson-tabs'
 import { useEffect, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { VideoPlayer } from '../../../../_components/video-player'
-import { LessonTabs } from '../../../../_components/lesson-tabs'
+
 import { CurriculumSidebar } from '../../../../_components/curriculum-sidebar'
 import { ReadingContent } from '../../../../_components/reading-content'
 import { QuizContainer } from '../../../../_components/quiz-container'
@@ -175,17 +175,17 @@ export default function LessonPage() {
   }
 
   return (
-    <main className='max-w-[1200px] mx-auto py-10 px-4 md:px-8 grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-10'>
+    <main className='mx-auto flex w-full max-w-[1200px] flex-col gap-10 px-4 py-10 md:px-8 lg:flex-row'>
       {/* Lõi Render theo loại bài học */}
-      <div className='min-w-0 space-y-6'>
+      <div className='min-w-0 flex-1 basis-0 space-y-6 lg:flex-2'>
         {activeLesson.type === 'video' && (
-          <div className='animate-in fade-in slide-in-from-bottom-4 duration-500'>
+          <div className='w-full min-w-0'>
             <VideoPlayer
               url={activeLesson.videoUrl}
               lastPosition={activeLesson.lastPosition}
               lessonId={activeLesson.id}
             />
-            <h1 className='text-3xl font-bold text-foreground mt-6'>{activeLesson.title}</h1>
+            <h1 className='mt-6 w-full wrap-break-word text-3xl font-bold text-foreground'>{activeLesson.title}</h1>
             <LessonTabs
               courseId={courseId}
               lessonId={activeLesson.id}
@@ -196,21 +196,21 @@ export default function LessonPage() {
         )}
 
         {activeLesson.type === 'reading' && (
-          <div className='animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6'>
+          <div className='space-y-6 w-full min-w-0'>
             <ReadingContent lesson={activeLesson} onComplete={() => markCompleteMutation.mutate(activeLesson.id)} />
             <LessonDiscussion courseId={courseId} lessonId={activeLesson.id} />
           </div>
         )}
 
         {activeLesson.type === 'quiz' && (
-          <div className='animate-in fade-in slide-in-from-bottom-4 duration-500'>
+          <div className='w-full min-w-0'>
             <QuizContainer courseId={courseId} lesson={activeLesson} onSubmit={handleQuizSubmit} />
           </div>
         )}
       </div>
 
       {/* Cột Sidebar */}
-      <div className='min-w-0 lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)]'>
+      <div className='min-w-0 lg:flex-1 lg:basis-0 lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)]'>
         <CurriculumSidebar
           chapters={chapters}
           currentLessonId={activeLesson.id}
