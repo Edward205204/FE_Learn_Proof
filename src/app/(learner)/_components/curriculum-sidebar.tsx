@@ -65,7 +65,7 @@ export function CurriculumSidebar({
         {chapters.map((chapter, index) => (
           <div key={chapter.id} className='space-y-3'>
             {/* Tiêu đề chương */}
-            <h4 className='text-[11px] font-bold text-muted-foreground uppercase tracking-widest px-1'>
+            <h4 className='text-[11px] font-bold text-muted-foreground uppercase tracking-widest px-1 wrap-break-word'>
               Chương {index + 1}: {chapter.title}
             </h4>
 
@@ -107,7 +107,7 @@ export function CurriculumSidebar({
 
                       <span
                         className={cn(
-                          'text-[13px] leading-snug break-words',
+                          'text-[13px] leading-snug wrap-break-word',
                           isActive
                             ? 'font-bold text-primary'
                             : lesson.isCompleted
@@ -120,7 +120,7 @@ export function CurriculumSidebar({
                     </div>
 
                     {/* Thời lượng / loại */}
-                    <span className='text-[10px] font-mono text-muted-foreground shrink-0 ml-3 pt-0.5'>
+                    <span className='text-[10px] font-mono text-muted-foreground shrink-0 ml-3 pt-0.5 max-w-[72px] text-right break-all'>
                       {lesson.type === 'quiz' ? 'Quiz' : lesson.duration}
                     </span>
                   </button>

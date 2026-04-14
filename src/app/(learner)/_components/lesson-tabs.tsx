@@ -2,31 +2,24 @@
 
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Send, FileText, Download, Bot } from 'lucide-react'
+import { LessonDiscussion } from './lesson-discussion'
 
 interface LessonTabsProps {
+  courseId: string
   lessonId: string
   description: string
   materials: { title: string; size: string; url: string }[]
 }
 
-export function LessonTabs({ lessonId, description, materials }: LessonTabsProps) {
+export function LessonTabs({ courseId, lessonId, description, materials }: LessonTabsProps) {
   const [aiInput, setAiInput] = useState('')
-  const [discussionInput, setDiscussionInput] = useState('')
 
   const handleSendAi = () => {
     if (!aiInput.trim()) return
     console.log('Sending to AI:', { lessonId, content: aiInput })
     setAiInput('')
-  }
-
-  const handleSendDiscussion = () => {
-    if (!discussionInput.trim()) return
-    console.log('Sending discussion:', { lessonId, content: discussionInput })
-    setDiscussionInput('')
   }
 
   return (
@@ -63,12 +56,14 @@ export function LessonTabs({ lessonId, description, materials }: LessonTabsProps
       </TabsList>
 
       {/* --- PHẦN MÔ TẢ --- */}
-      <TabsContent value='description' className='mt-6'>
-        <div className='text-foreground/90 leading-relaxed text-[15px] whitespace-pre-line'>{description}</div>
+      <TabsContent value='description' className='mt-6 w-full min-w-0'>
+        <div className='w-full min-w-0 text-foreground/90 leading-relaxed text-[15px] whitespace-pre-line break-all'>
+          {description}
+        </div>
       </TabsContent>
 
       {/* --- PHẦN HỎI ĐÁP AI --- */}
-      <TabsContent value='ai' className='mt-6'>
+      <TabsContent value='ai' className='mt-6 w-full min-w-0'>
         <div className='bg-muted/30 rounded-2xl p-6 min-h-[400px] flex flex-col justify-between border border-border'>
           {/* Luồng tin nhắn */}
           <div className='space-y-6'>
@@ -105,35 +100,12 @@ export function LessonTabs({ lessonId, description, materials }: LessonTabsProps
       </TabsContent>
 
       {/* --- PHẦN THẢO LUẬN --- */}
-      <TabsContent value='discussion' className='mt-6 space-y-8'>
-        <div className='flex gap-4 items-start'>
-          <Avatar className='h-10 w-10 shrink-0'>
-            <AvatarImage src='/user-avatar.jpg' />
-            <AvatarFallback className='bg-muted text-muted-foreground font-bold text-sm'>U</AvatarFallback>
-          </Avatar>
-          <div className='flex-1 space-y-3'>
-            <Textarea
-              value={discussionInput}
-              onChange={(e) => setDiscussionInput(e.target.value)}
-              placeholder='Chia sẻ suy nghĩ của bạn về bài học này...'
-              className='min-h-[120px] rounded-xl border-input bg-background focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary p-4 text-[15px] resize-none shadow-sm'
-            />
-            <div className='flex justify-end'>
-              <Button
-                onClick={handleSendDiscussion}
-                className='bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-8 font-medium h-11 shadow-sm'
-              >
-                Gửi thảo luận
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Danh sách các thảo luận cũ có thể render tại đây */}
+      <TabsContent value='discussion' className='mt-6 w-full min-w-0'>
+        <LessonDiscussion courseId={courseId} lessonId={lessonId} />
       </TabsContent>
 
       {/* --- PHẦN TÀI LIỆU --- */}
-      <TabsContent value='materials' className='mt-6 space-y-3'>
+      <TabsContent value='materials' className='mt-6 w-full min-w-0 space-y-3'>
         {materials.length > 0 ? (
           materials.map((file, idx) => (
             <a

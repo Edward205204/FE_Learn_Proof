@@ -18,11 +18,11 @@ export function useGetMyEnrollmentsQuery() {
   })
 }
 
-export function useGetEnrollmentStatusQuery(courseId: string) {
+export function useGetEnrollmentStatusQuery(courseId: string, enabled = true) {
   return useQuery({
     queryKey: ENROLLMENT_QUERY_KEYS.status(courseId),
     queryFn: () => enrollmentApi.getEnrollmentStatus(courseId).then((res) => res.data),
-    enabled: Boolean(courseId)
+    enabled: Boolean(courseId) && enabled
   })
 }
 

@@ -26,12 +26,17 @@ export interface EnrollmentCourse {
   }
 }
 
+export interface EnrollmentStatusResponse {
+  enrolled: boolean
+  progressPercent?: number
+}
+
 const enrollmentApi = {
   createEnrollment: (courseId: string) => http.post('/enrollment', { courseId }),
 
   getMyEnrollments: () => http.get<EnrollmentCourse[]>('/enrollment/me'),
 
-  getEnrollmentStatus: (courseId: string) => http.get<boolean>(`/enrollment/${courseId}/status`),
+  getEnrollmentStatus: (courseId: string) => http.get<EnrollmentStatusResponse>(`/enrollment/${courseId}/status`),
 
   markCourseCompleted: (courseId: string) => http.post(`/enrollment/${courseId}/complete`)
 }
