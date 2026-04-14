@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BookOpen, MessageSquareText, PlusCircle, LayoutDashboard, HelpCircle } from 'lucide-react'
+import { BookOpen, MessageSquareText, PlusCircle, LayoutDashboard } from 'lucide-react'
 
 import { PATH } from '@/constants/path'
 import { cn } from '@/lib/utils'
@@ -22,28 +22,29 @@ const NAV_ITEMS: NavItem[] = [
     match: () => false
   },
   {
-    href: PATH.COURSE_NEW_STEP1,
-    label: 'Tạo khóa học',
-    icon: PlusCircle,
-    match: (p) => p.startsWith('/studio/courses/new')
-  },
-  {
     href: PATH.STUDIO_COURSES,
     label: 'Khóa học',
     icon: BookOpen,
     match: (p) => p.startsWith(PATH.STUDIO_COURSES) && !p.startsWith('/studio/courses/new')
   },
   {
+    href: PATH.COURSE_NEW_STEP1,
+    label: 'Tạo khóa học',
+    icon: PlusCircle,
+    match: (p) => p.startsWith('/studio/courses/new')
+  },
+
+  {
     href: PATH.FEEDBACK_LIST,
     label: 'Feedback',
     icon: MessageSquareText
-  },
-  {
-    href: PATH.QUIZ_LESSON,
-    label: 'Quiz',
-    icon: HelpCircle,
-    match: (p) => p.startsWith(PATH.STUDIO_COURSES + '/quiz/')
   }
+  // {
+  //   href: PATH.QUIZ_LESSON,
+  //   label: 'Quiz',
+  //   icon: HelpCircle,
+  //   match: (p) => p.startsWith(PATH.STUDIO_COURSES + '/quiz/')
+  // }
 ]
 
 type Props = {

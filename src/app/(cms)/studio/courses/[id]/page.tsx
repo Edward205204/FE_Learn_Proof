@@ -1,40 +1,50 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
-import { Plus, GripVertical, Pencil, Trash2, FileText, LayoutGrid, ChevronDown, ChevronRight } from 'lucide-react'
+import {
+  Plus,
+  GripVertical,
+  Pencil,
+  Trash2,
+  FileText,
+  LayoutGrid,
+  ChevronDown,
+  ChevronRight,
+  Video,
+  HelpCircle,
+  Clock,
+  X,
+  Settings
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import {
   useGetManagerCourseDetailQuery,
   useRenameChapterMutation,
   useUpdateCourseChaptersFrameMutation
 } from '@/app/(cms)/_hooks/use-course-mutation'
+import { useDeleteLessonMutation } from '@/app/(cms)/_hooks/use-lesson'
 import { useReorderQueue } from '@/app/(cms)/_hooks/use-reorder'
 import Link from 'next/link'
 import { PATH } from '@/constants/path'
 import { EditLessonMetadataDialog } from '@/app/(cms)/_components/edit-lesson-metadata-dialog'
+import { EditCourseMetadataDialog } from '@/app/(cms)/_components/edit-course-metadata-dialog'
+import { EditCourseStatusDialog } from '@/app/(cms)/_components/edit-course-status-dialog'
 import { useQuery } from '@tanstack/react-query'
 import lessonApi from '@/app/(cms)/_api/lesson.api'
-import dynamic from 'next/dynamic'
 import { PlayCircle } from 'lucide-react'
-
-const ReactPlayer = dynamic(() => import('react-player'), { ssr: false }) as React.ComponentType<{
-  url: string
-  width?: string | number
-  height?: string | number
-  controls?: boolean
-  playing?: boolean
-}>
 
 interface LessonItem {
   id: string
   title: string
   type?: string
+  duration?: number | null
 }
 
 interface ChapterItem {
@@ -44,6 +54,7 @@ interface ChapterItem {
 }
 
 export default function ChaptersPage() {
+  const router = useRouter()
   const params = useParams<{ id: string }>()
   const courseId = params.id
 
@@ -58,7 +69,8 @@ export default function ChaptersPage() {
       lessons: ch.lessons.map((ls) => ({
         id: ls.id,
         title: ls.title,
-        type: ls.type
+        type: ls.type,
+        duration: ls.duration
       }))
     }))
   }, [courseDetail])
@@ -72,6 +84,12 @@ export default function ChaptersPage() {
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null)
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null)
   const [previewLessonId, setPreviewLessonId] = useState<string | null>(null)
+  const [lessonToDelete, setLessonToDelete] = useState<LessonItem | null>(null)
+
+  const [isEditBaseInfoOpen, setIsEditBaseInfoOpen] = useState(false)
+  const [isEditStatusOpen, setIsEditStatusOpen] = useState(false)
+
+  const deleteLessonMutation = useDeleteLessonMutation(courseId)
 
   const { data: previewLesson, isFetching: isFetchingPreview } = useQuery({
     queryKey: ['lesson-preview', previewLessonId],
@@ -280,20 +298,113 @@ export default function ChaptersPage() {
 
   return (
     <div className='p-8 max-w-5xl mx-auto space-y-8 text-foreground'>
-      <div className='flex justify-between items-center border-b pb-6'>
-        <div>
-          <h1 className='text-3xl font-extrabold tracking-tight'>{courseDetail?.title}</h1>
-          <p className='text-muted-foreground mt-1'>
-            {chapters.length} chương · {totalLessons} bài học
-          </p>
+      <div className='mb-8 space-y-8'>
+        {/* Course Header & Metadata */}
+        <div className='flex flex-col xl:flex-row xl:items-start justify-between gap-6'>
+          <div className='flex-1 max-w-3xl'>
+            <div className='mb-3'>
+              {courseDetail?.status && (
+                <Badge
+                  variant={courseDetail.status === 'PUBLISHED' ? 'default' : 'secondary'}
+                  className={`px-3 py-1 text-xs uppercase tracking-wider font-bold rounded-md shadow-sm ${
+                    courseDetail.status === 'PUBLISHED'
+                      ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border-emerald-300 gap-2'
+                      : 'bg-amber-100 text-amber-800 hover:bg-amber-200 border-amber-300 gap-2'
+                  }`}
+                >
+                  <span className='relative flex h-2 w-2'>
+                    {courseDetail.status === 'PUBLISHED' ? (
+                      <>
+                        <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
+                        <span className='relative inline-flex rounded-full h-2 w-2 bg-emerald-500'></span>
+                      </>
+                    ) : (
+                      <>
+                        <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75'></span>
+                        <span className='relative inline-flex rounded-full h-2 w-2 bg-amber-500'></span>
+                      </>
+                    )}
+                  </span>
+                  {courseDetail.status === 'PUBLISHED' ? 'Đã xuất bản' : 'Bản nháp'}
+                </Badge>
+              )}
+            </div>
+
+            <h1 className='text-3xl font-extrabold tracking-tight text-foreground mb-4'>
+              {courseDetail?.title || 'Đang tải...'}
+            </h1>
+
+            <div className='flex flex-wrap items-center gap-2.5 text-[13px]'>
+              <div className='flex items-center gap-1.5 bg-muted/50 px-2.5 py-1 rounded-md border shadow-sm'>
+                <span className='font-semibold text-foreground'>{chapters.length}</span>
+                <span className='text-muted-foreground'>chương</span>
+                <span className='text-muted-foreground/50'>•</span>
+                <span className='font-semibold text-foreground'>{totalLessons}</span>
+                <span className='text-muted-foreground'>bài học</span>
+              </div>
+
+              {courseDetail?.level && (
+                <div className='flex items-center gap-1.5 bg-blue-50/50 dark:bg-blue-950/30 px-2.5 py-1 rounded-md border border-blue-100 dark:border-blue-900 shadow-sm'>
+                  <span className='font-medium text-blue-700 dark:text-blue-400'>{courseDetail.level}</span>
+                </div>
+              )}
+
+              {courseDetail?.category?.name && (
+                <div className='flex items-center gap-1.5 bg-purple-50/50 dark:bg-purple-950/30 px-2.5 py-1 rounded-md border border-purple-100 dark:border-purple-900 shadow-sm'>
+                  <span className='font-medium text-purple-700 dark:text-purple-400'>{courseDetail.category.name}</span>
+                </div>
+              )}
+
+              {courseDetail?.isFree ? (
+                <div className='flex items-center gap-1.5 bg-emerald-50/50 dark:bg-emerald-950/30 px-2.5 py-1 rounded-md border border-emerald-100 dark:border-emerald-900 shadow-sm'>
+                  <span className='font-medium text-emerald-700 dark:text-emerald-400'>Miễn phí</span>
+                </div>
+              ) : courseDetail?.price !== undefined ? (
+                <div className='flex items-center gap-1.5 bg-rose-50/50 dark:bg-rose-950/30 px-2.5 py-1 rounded-md border border-rose-100 dark:border-rose-900 shadow-sm'>
+                  <span className='font-medium text-rose-700 dark:text-rose-400'>
+                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(courseDetail.price)}
+                  </span>
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <div className='flex flex-wrap items-center gap-3'>
+            <Button
+              variant='outline'
+              className='shadow-sm bg-background hover:bg-muted/50 transition-colors'
+              onClick={() => setIsEditBaseInfoOpen(true)}
+            >
+              <Pencil className='w-4 h-4 mr-2 text-muted-foreground' /> Sửa thông tin
+            </Button>
+            <Button
+              variant='outline'
+              className='shadow-sm bg-background hover:bg-muted/50 transition-colors'
+              onClick={() => setIsEditStatusOpen(true)}
+            >
+              <Settings className='w-4 h-4 mr-2 text-muted-foreground' /> Cập nhật Trạng thái
+            </Button>
+          </div>
         </div>
-        <div className='flex gap-3'>
-          <Button variant='outline' onClick={() => handleOpenChapterDialog()} className='shadow-sm'>
-            <Plus className='w-4 h-4 mr-2' /> Thêm chương
-          </Button>
-          <Button onClick={handleSaveFrame} disabled={isUpdating} className='shadow-lg px-6'>
-            {isUpdating ? 'Đang lưu...' : 'Lưu cấu trúc khóa học'}
-          </Button>
+
+        {/* Curriculum Toolbar */}
+        <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/60'>
+          <div>
+            <h2 className='text-xl flex flex-col font-bold tracking-tight text-foreground'>Chương trình giảng dạy</h2>
+            <p className='text-sm text-muted-foreground mt-1'>Quản lý các chương và bài học trong khóa học</p>
+          </div>
+          <div className='flex items-center gap-3'>
+            <Button variant='secondary' onClick={() => handleOpenChapterDialog()} className='shadow-sm font-medium'>
+              <Plus className='w-4 h-4 mr-2' /> Thêm chương
+            </Button>
+            <Button
+              onClick={handleSaveFrame}
+              disabled={isUpdating}
+              className='shadow-sm px-6 font-medium bg-primary text-primary-foreground hover:bg-primary/90'
+            >
+              {isUpdating ? 'Đang lưu...' : 'Lưu cấu trúc'}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -374,9 +485,34 @@ export default function ChaptersPage() {
                                       className='flex items-center gap-3 p-3 ml-6 bg-card border rounded-lg shadow-sm hover:border-primary/50 transition-all group/lesson'
                                     >
                                       <GripVertical className='w-4 h-4 text-muted-foreground/50' />
-                                      <FileText className='w-4 h-4 text-primary/60' />
-                                      <span className='text-sm font-medium flex-1'>
-                                        Bài {lIndex + 1}: {lesson.title}
+                                      {lesson.type === 'VIDEO' ? (
+                                        <Video className='w-4 h-4 text-rose-500' />
+                                      ) : lesson.type === 'QUIZ' ? (
+                                        <HelpCircle className='w-4 h-4 text-amber-500' />
+                                      ) : (
+                                        <FileText className='w-4 h-4 text-blue-500' />
+                                      )}
+                                      <span className='text-sm font-medium flex-1 flex items-center gap-2'>
+                                        <span className='truncate max-w-[200px] sm:max-w-xs md:max-w-sm lg:max-w-md'>
+                                          Bài {lIndex + 1}: {lesson.title}
+                                        </span>
+                                        {lesson.type === 'VIDEO' && lesson.duration != null && (
+                                          <span className='inline-flex items-center gap-1 text-[10px] bg-rose-500/10 text-rose-600 px-1.5 py-0.5 rounded font-semibold shrink-0'>
+                                            <Clock className='w-3 h-3' />
+                                            {Math.floor(lesson.duration / 60)}:
+                                            {(lesson.duration % 60).toString().padStart(2, '0')}
+                                          </span>
+                                        )}
+                                        {lesson.type === 'QUIZ' && (
+                                          <span className='inline-flex items-center gap-1 text-[10px] bg-amber-500/10 text-amber-600 px-1.5 py-0.5 rounded font-semibold shrink-0'>
+                                            Quiz
+                                          </span>
+                                        )}
+                                        {lesson.type === 'TEXT' && (
+                                          <span className='inline-flex items-center gap-1 text-[10px] bg-blue-500/10 text-blue-600 px-1.5 py-0.5 rounded font-semibold shrink-0'>
+                                            Văn bản
+                                          </span>
+                                        )}
                                       </span>
                                       <div className='flex opacity-0 group-hover/lesson:opacity-100 transition-opacity'>
                                         {lesson.type === 'VIDEO' && (
@@ -397,7 +533,11 @@ export default function ChaptersPage() {
                                           onClick={() => {
                                             if (lesson.id.startsWith('ls-')) {
                                               handleOpenLessonDialog(chapter.id, lesson)
+                                            } else if (lesson.type === 'TEXT') {
+                                              // TEXT lesson → trang editor blog riêng
+                                              router.push(`/studio/courses/${courseId}/lesson/${lesson.id}/edit`)
                                             } else {
+                                              // VIDEO / QUIZ → dialog popup
                                               setEditingLessonId(lesson.id)
                                             }
                                           }}
@@ -405,12 +545,12 @@ export default function ChaptersPage() {
                                         >
                                           <Pencil className='size-4' />
                                         </Button>
-                                        {lesson.id.startsWith('ls-') && (
-                                          <Button
-                                            variant='ghost'
-                                            size='icon'
-                                            className='h-7 w-7 text-destructive'
-                                            onClick={() => {
+                                        <Button
+                                          variant='ghost'
+                                          size='icon'
+                                          className='h-7 w-7 text-destructive'
+                                          onClick={() => {
+                                            if (lesson.id.startsWith('ls-')) {
                                               setChapters(
                                                 chapters.map((ch) =>
                                                   ch.id === chapter.id
@@ -418,12 +558,14 @@ export default function ChaptersPage() {
                                                     : ch
                                                 )
                                               )
-                                            }}
-                                            title='Xóa bài học chưa lưu'
-                                          >
-                                            <Trash2 className='w-3.5 h-3.5' />
-                                          </Button>
-                                        )}
+                                            } else {
+                                              setLessonToDelete(lesson)
+                                            }
+                                          }}
+                                          title={lesson.id.startsWith('ls-') ? 'Xóa bài học chưa lưu' : 'Xóa bài học'}
+                                        >
+                                          <Trash2 className='w-3.5 h-3.5' />
+                                        </Button>
                                       </div>
                                     </div>
                                   )}
@@ -490,22 +632,93 @@ export default function ChaptersPage() {
 
       {/* Video Preview Dialog */}
       <Dialog open={!!previewLessonId} onOpenChange={(open) => !open && setPreviewLessonId(null)}>
-        <DialogContent className='max-w-4xl bg-black border-border shadow-2xl overflow-hidden p-0 gap-0 sm:rounded-2xl'>
+        <DialogContent className='max-w-[95vw] md:max-w-5xl lg:max-w-6xl xl:max-w-7xl bg-black border border-white/10 shadow-2xl overflow-hidden p-0 gap-0 sm:rounded-2xl'>
           <DialogHeader className='opacity-0 absolute p-0 m-0 h-0 w-0'>
             <DialogTitle>Video Preview</DialogTitle>
           </DialogHeader>
-          <div className='relative aspect-video w-full bg-black/90 flex items-center justify-center'>
+
+          {/* Nút Close to, nổi bật */}
+          <Button
+            variant='ghost'
+            onClick={() => setPreviewLessonId(null)}
+            className='absolute top-3 right-3 z-50 bg-black/40 hover:bg-red-600 hover:text-white text-white/80 rounded-full w-12 h-12 flex items-center justify-center transition-all duration-300 backdrop-blur-sm shadow-xl border border-white/10 group'
+            title='Đóng video'
+          >
+            <X className='!w-7 !h-7 transition-transform group-hover:scale-110 group-hover:rotate-90' />
+          </Button>
+
+          <div className='relative aspect-video w-full bg-[#0a0a0a] flex items-center justify-center'>
             {isFetchingPreview ? (
-              <div className='text-white flex items-center gap-2'>
-                <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div>
-                <span className='font-medium'>Đang tải video...</span>
+              <div className='text-white flex flex-col items-center gap-3'>
+                <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary'></div>
+                <span className='font-medium opacity-80 tracking-wide'>Đang tải video...</span>
               </div>
-            ) : previewLesson?.type === 'VIDEO' && previewLesson.videoUrl ? (
-              <ReactPlayer url={previewLesson.videoUrl} width='100%' height='100%' controls playing />
+            ) : !!previewLessonId && previewLesson?.type === 'VIDEO' && previewLesson.videoUrl ? (
+              <div className='w-full h-full relative group'>
+                {/* Auto convert 'watch?v=' to '/embed/' if needed for YouTube */}
+                {previewLesson.videoUrl.includes('youtube.com') || previewLesson.videoUrl.includes('youtu.be') ? (
+                  <iframe
+                    className='absolute top-0 left-0 w-full h-full rounded-b-2xl sm:rounded-2xl'
+                    src={previewLesson.videoUrl
+                      .replace('watch?v=', 'embed/')
+                      .replace('youtu.be/', 'youtube.com/embed/')}
+                    title='YouTube video player'
+                    frameBorder='0'
+                    allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+                    allowFullScreen
+                  />
+                ) : (
+                  <video
+                    controls
+                    className='w-full h-full object-contain rounded-b-2xl sm:rounded-2xl'
+                    src={previewLesson.videoUrl}
+                    autoPlay
+                  />
+                )}
+              </div>
             ) : (
-              <div className='text-muted-foreground font-medium'>Không tìm thấy video hợp lệ.</div>
+              <div className='text-muted-foreground font-medium'>Không tìm thấy video hoặc bản xem trước đã đóng.</div>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Lesson Confirmation Dialog */}
+      <Dialog open={!!lessonToDelete} onOpenChange={(open) => !open && setLessonToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa bài học</DialogTitle>
+          </DialogHeader>
+          <div className='py-4'>
+            Bạn có chắc chắn muốn xóa bài học <span className='font-bold'>{lessonToDelete?.title}</span> không? Hành
+            động này không thể hoàn tác.
+          </div>
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setLessonToDelete(null)} disabled={deleteLessonMutation.isPending}>
+              Hủy
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={() => {
+                if (lessonToDelete) {
+                  deleteLessonMutation.mutate(lessonToDelete.id, {
+                    onSuccess: () => {
+                      setChapters(
+                        chapters.map((ch) => ({
+                          ...ch,
+                          lessons: ch.lessons.filter((ls) => ls.id !== lessonToDelete.id)
+                        }))
+                      )
+                      setLessonToDelete(null)
+                    }
+                  })
+                }
+              }}
+              disabled={deleteLessonMutation.isPending}
+            >
+              {deleteLessonMutation.isPending ? 'Đang xóa...' : 'Xóa'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -514,6 +727,11 @@ export default function ChaptersPage() {
         open={!!editingLessonId}
         onOpenChange={(open) => !open && setEditingLessonId(null)}
       />
+
+      {/* Course Edit Dialogs */}
+      <EditCourseMetadataDialog courseId={courseId} open={isEditBaseInfoOpen} onOpenChange={setIsEditBaseInfoOpen} />
+
+      <EditCourseStatusDialog courseId={courseId} open={isEditStatusOpen} onOpenChange={setIsEditStatusOpen} />
     </div>
   )
 }

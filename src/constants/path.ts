@@ -21,6 +21,7 @@ export const PATH = {
 
   // CONTENT_MANAGER + ADMIN
   CREATE_LESSON: '/studio/courses/:id/lesson/new',
+  LESSON_TEXT_EDIT: '/studio/courses/:courseId/lesson/:lessonId/edit',
   COURSE_EDIT_STEP1: '/studio/courses/:id/edit/step-1',
   COURSE_NEW_STEP1: '/studio/courses/new/step-1',
   COURSE_NEW_STEP2: '/studio/courses/new/step-2',
