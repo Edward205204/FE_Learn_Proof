@@ -30,12 +30,12 @@ export function AIProcessingScreen() {
         {/* Pulsing rings */}
         <div className="absolute inset-0 border-2 border-primary/10 rounded-full animate-ping duration-[3s]" />
         <div className="absolute inset-4 border-2 border-primary/20 rounded-full animate-ping duration-[2s]" />
-        
+
         {/* Orbiting dots */}
         <div className="absolute inset-0 animate-spin duration-[10s]">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-primary rounded-full shadow-[0_0_10px_rgba(var(--primary),0.5)]" />
         </div>
-        
+
         {/* Center brain Icon */}
         <div className="w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center shadow-xl border-4 border-white">
           <Brain className="w-16 h-16 text-primary animate-pulse" />
@@ -83,8 +83,8 @@ function StatusBadge({ icon, text, active }: { icon: React.ReactNode; text: stri
   return (
     <div className={cn(
       "flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all duration-500",
-      active 
-        ? "bg-green-50 border-green-200 text-green-600" 
+      active
+        ? "bg-green-50 border-green-200 text-green-600"
         : "bg-secondary border-secondary text-muted-foreground/40"
     )}>
       {icon}
