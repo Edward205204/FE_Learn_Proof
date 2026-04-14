@@ -134,6 +134,21 @@ export function usePublishCourseMutation(courseId: string) {
   })
 }
 
+export function useUpdateCourseStatusMutation(courseId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED') => courseApi.updateCourseStatus(courseId, status),
+    onSuccess: () => {
+      toast.success('Đã cập nhật trạng thái khóa học.')
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.detail(courseId) })
+    },
+    onError: () => {
+      toast.error('Có lỗi xảy ra khi cập nhật trạng thái.')
+    }
+  })
+}
+
 export function useRenameChapterMutation(courseId: string) {
   const queryClient = useQueryClient()
   return useMutation({

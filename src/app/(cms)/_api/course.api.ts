@@ -43,6 +43,9 @@ const courseApi = {
 
   publishCourse: (courseId: string, body: PublishCourseBody) => http.patch(`/courses/${courseId}/publish`, body),
 
+  updateCourseStatus: (courseId: string, status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED') =>
+    http.patch(`/courses/${courseId}/status`, { status }),
+
   deleteCourse: (courseId: string) => http.delete(`/courses/${courseId}`),
 
   reorderChapter: (body: ReorderChapterPayload) => http.patch('/courses/reorder/chapters', body),

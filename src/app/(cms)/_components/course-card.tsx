@@ -8,6 +8,8 @@ import { BookOpen, Pencil, Star, TrendingUp, Users } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useUpdateCourseStatusMutation } from '../_hooks/use-course-mutation'
 import type { ManagerCourseItem } from '../_utils/zod'
 import {
   formatDate,
@@ -27,6 +29,7 @@ interface CourseCardProps {
 
 export function CourseCard({ course, onPrefetch }: CourseCardProps) {
   const [editOpen, setEditOpen] = useState(false)
+  const statusMutation = useUpdateCourseStatusMutation(course.id)
 
   const analytics = course.overallAnalytics
 
@@ -93,12 +96,34 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                 </div>
 
                 <div className='flex items-center gap-2 mt-3.5 flex-wrap'>
-                  <Badge
-                    variant={STATUS_VARIANT[course.status]}
-                    className='text-[10px] px-2 h-5 shadow-none tracking-wide uppercase'
+                  <div
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }}
                   >
-                    {STATUS_LABEL[course.status]}
-                  </Badge>
+                    <Select
+                      value={course.status}
+                      onValueChange={(val: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED') => statusMutation.mutate(val)}
+                      disabled={statusMutation.isPending}
+                    >
+                      <SelectTrigger className='h-5 p-0 border-0 shadow-none focus:ring-0 gap-0 mr-1 [&>sv\\g]:hidden'>
+                        <Badge
+                          variant={STATUS_VARIANT[course.status]}
+                          className='text-[10px] px-2 h-5 shadow-none tracking-wide uppercase cursor-pointer hover:opacity-80'
+                        >
+                          <SelectValue />
+                        </Badge>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(STATUS_LABEL).map(([key, label]) => (
+                          <SelectItem key={key} value={key} className='text-xs font-medium'>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <Badge
                     variant='outline'
                     className={`text-[10px] px-2 h-5 uppercase tracking-wide shadow-none ${LEVEL_CLASS[course.level]}`}
