@@ -13,8 +13,6 @@ const TITLE_BY_PREFIX: Array<{ prefix: string; title: string }> = [
   { prefix: PATH.COURSE_NEW_STEP1, title: 'Tạo khóa học' },
   { prefix: PATH.STUDIO_COURSES, title: 'Khóa học' },
   { prefix: PATH.FEEDBACK_LIST, title: 'Feedback' },
-  { prefix: PATH.QUIZ_LESSON, title: 'Quiz' },
-  { prefix: PATH.QUIZ_STANDALONE, title: 'Quiz' },
   { prefix: PATH.STUDIO_COURSES, title: 'Khóa học' }
 ]
 

@@ -27,7 +27,8 @@ import { toast } from 'sonner'
 import {
   useGetManagerCourseDetailQuery,
   useCompleteCourseMutation,
-  useRenameChapterMutation
+  useRenameChapterMutation,
+  useUpdateCourseChaptersFrameMutation
 } from '@/app/(cms)/_hooks/use-course-mutation'
 import { useDeleteLessonMutation } from '@/app/(cms)/_hooks/use-lesson'
 import { useReorderQueue } from '@/app/(cms)/_hooks/use-reorder'
@@ -102,6 +103,7 @@ export default function ChaptersPage() {
   })
 
   const renameChapterMutation = useRenameChapterMutation(courseId)
+  const updateCourseChaptersFrameMutation = useUpdateCourseChaptersFrameMutation(courseId)
 
   useEffect(() => {
     if (!mappedChaptersFromServer.length) return
@@ -134,25 +136,36 @@ export default function ChaptersPage() {
 
   const handleSaveChapter = () => {
     if (!inputText.trim()) return
+    const chapterTitle = inputText.trim()
 
     if (activeChapterId) {
       // Gọi API đổi tên chapter thật sự
       renameChapterMutation.mutate(
-        { chapterId: activeChapterId, title: inputText.trim() },
+        { chapterId: activeChapterId, title: chapterTitle },
         {
           onSuccess: () => {
             // Cập nhật local state ngay để UI phản hồi nhanh (optimistic)
-            setChapters(chapters.map((ch) => (ch.id === activeChapterId ? { ...ch, title: inputText.trim() } : ch)))
+            setChapters(chapters.map((ch) => (ch.id === activeChapterId ? { ...ch, title: chapterTitle } : ch)))
             setIsChapterDialogOpen(false)
             setInputText('')
           }
         }
       )
     } else {
-      setChapters([...chapters, { id: `ch-${Date.now()}`, title: inputText, lessons: [] }])
-      toast.success('Đã thêm chương mới')
-      setIsChapterDialogOpen(false)
-      setInputText('')
+      updateCourseChaptersFrameMutation.mutate(
+        {
+          chapterList: [...chapters.map((ch, index) => ({ title: ch.title, order: index + 1 })), {
+            title: chapterTitle,
+            order: chapters.length + 1
+          }]
+        },
+        {
+          onSuccess: () => {
+            setIsChapterDialogOpen(false)
+            setInputText('')
+          }
+        }
+      )
     }
   }
 
@@ -611,8 +624,11 @@ export default function ChaptersPage() {
             <Button variant='outline' onClick={() => setIsChapterDialogOpen(false)}>
               Hủy
             </Button>
-            <Button onClick={handleSaveChapter} disabled={renameChapterMutation.isPending}>
-              {renameChapterMutation.isPending ? 'Đang lưu...' : 'Lưu'}
+            <Button
+              onClick={handleSaveChapter}
+              disabled={renameChapterMutation.isPending || updateCourseChaptersFrameMutation.isPending}
+            >
+              {renameChapterMutation.isPending || updateCourseChaptersFrameMutation.isPending ? 'Đang lưu...' : 'Lưu'}
             </Button>
           </DialogFooter>
         </DialogContent>

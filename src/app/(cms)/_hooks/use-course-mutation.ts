@@ -103,10 +103,13 @@ export function useUpdateCourseBaseInfoMutation(courseId: string) {
 }
 
 export function useUpdateCourseChaptersFrameMutation(courseId: string) {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (body: UpdateCourseChaptersFrameBody) => courseApi.updateCourseChaptersFrame(courseId, body),
     onSuccess: () => {
       toast.success('Đã lưu cấu trúc chương.')
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.detailManager(courseId) })
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.detail(courseId) })
     },
     onError: () => {
       toast.error('Có lỗi xảy ra khi lưu cấu trúc chương.')

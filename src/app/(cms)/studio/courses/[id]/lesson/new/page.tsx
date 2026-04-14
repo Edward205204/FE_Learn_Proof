@@ -15,9 +15,28 @@ import { ProfessionalEditor } from '@/components/common/professional-editor'
 import { QuestionCard } from '../../../../../_components/question-card'
 import { useCreateLessonMutation } from '@/app/(cms)/_hooks/use-lesson'
 import { toast } from 'sonner'
-import type { CreateLessonBody } from '@/app/(cms)/_api/lesson.api'
+import type { CreateLessonBody, QuizDataPayload } from '@/app/(cms)/_api/lesson.api'
 
-/* ---------------- SCHEMA ---------------- */
+const answerRowSchema = z.object({
+  text: z.string().min(1, 'Nhập đáp án'),
+  isCorrect: z.boolean()
+})
+
+const questionBlockSchema = z
+  .object({
+    questionText: z.string().min(5, 'Câu hỏi phải có ít nhất 5 ký tự'),
+    answers: z.array(answerRowSchema).min(2, 'Mỗi câu hỏi phải có ít nhất 2 đáp án')
+  })
+  .superRefine((q, ctx) => {
+    const correctCount = q.answers.filter((a) => a.isCorrect).length
+    if (correctCount !== 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Mỗi câu hỏi phải có đúng một đáp án đúng',
+        path: ['answers']
+      })
+    }
+  })
 
 const lessonSchema = z
   .object({
@@ -28,17 +47,10 @@ const lessonSchema = z
     }),
     videoUrl: z.string().optional(),
     content: z.string().optional(),
-    questions: z.array(
-      z.object({
-        questionText: z.string().min(1, 'Nhập nội dung câu hỏi'),
-        answers: z.array(
-          z.object({
-            text: z.string().min(1, 'Nhập đáp án'),
-            isCorrect: z.boolean()
-          })
-        )
-      })
-    )
+    /** Bài trắc nghiệm thuần (type QUIZ) — map → POST /lesson `quizData` */
+    questions: z.array(questionBlockSchema),
+    /** Tùy chọn cho VIDEO/TEXT — cùng payload `quizData`, khớp VideoLessonStrategy / TextLessonStrategy */
+    supplementalQuiz: z.array(questionBlockSchema)
   })
   .superRefine((data, ctx) => {
     if (data.type === 'video' && (!data.videoUrl || data.videoUrl.trim() === '')) {
@@ -57,25 +69,12 @@ const lessonSchema = z
       })
     }
 
-    if (data.type === 'quiz') {
-      if (!data.questions || data.questions.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Phải có ít nhất một câu hỏi',
-          path: ['questions']
-        })
-      } else {
-        data.questions.forEach((q, idx) => {
-          const correctCount = q.answers.filter((a) => a.isCorrect).length
-          if (correctCount !== 1) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: 'Mỗi câu hỏi phải có chính xác một đáp án đúng',
-              path: ['questions', idx, 'answers']
-            })
-          }
-        })
-      }
+    if (data.type === 'quiz' && data.questions.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Phải có ít nhất một câu hỏi',
+        path: ['questions']
+      })
     }
   })
 
@@ -87,6 +86,16 @@ const DEFAULT_QUESTION: LessonForm['questions'][number] = {
     { text: '', isCorrect: true },
     { text: '', isCorrect: false }
   ]
+}
+
+function mapBlocksToQuizData(rows: LessonForm['questions']): QuizDataPayload {
+  return rows.map((q) => ({
+    content: q.questionText.trim(),
+    answers: q.answers.map((a) => ({
+      content: a.text.trim(),
+      isCorrect: a.isCorrect
+    }))
+  }))
 }
 
 /* ---------------- PAGE ---------------- */
@@ -108,7 +117,8 @@ export default function LessonEditorPage() {
       title: '',
       shortDescription: '',
       type: 'video',
-      questions: []
+      questions: [],
+      supplementalQuiz: []
     }
   })
 
@@ -119,9 +129,21 @@ export default function LessonEditorPage() {
     name: 'questions'
   })
 
+  const {
+    fields: supFields,
+    append: supAppend,
+    remove: supRemove
+  } = useFieldArray({
+    control: form.control,
+    name: 'supplementalQuiz'
+  })
+
   const nextStep = async () => {
     const valid = await form.trigger(['title', 'shortDescription', 'type'])
     if (!valid) return
+    if (form.getValues('type') === 'quiz' && form.getValues('questions').length === 0) {
+      append(DEFAULT_QUESTION)
+    }
     setStep(2)
   }
 
@@ -140,7 +162,8 @@ export default function LessonEditorPage() {
         chapterId,
         shortDesc: data.shortDescription,
         fullDesc: data.content,
-        videoId: data.videoUrl || '' // TODO: map properly to video ID/URL based on provider
+        videoId: data.videoUrl || '',
+        ...(data.supplementalQuiz.length > 0 ? { quizData: mapBlocksToQuizData(data.supplementalQuiz) } : {})
       }
     } else if (data.type === 'text') {
       payload = {
@@ -148,7 +171,8 @@ export default function LessonEditorPage() {
         title: data.title,
         chapterId,
         shortDesc: data.shortDescription,
-        textContent: data.content || '' // Require content
+        textContent: data.content || '',
+        ...(data.supplementalQuiz.length > 0 ? { quizData: mapBlocksToQuizData(data.supplementalQuiz) } : {})
       }
     } else {
       payload = {
@@ -156,10 +180,7 @@ export default function LessonEditorPage() {
         title: data.title,
         chapterId,
         shortDesc: data.shortDescription,
-        quizData: data.questions.map((q) => ({
-          content: q.questionText,
-          answers: q.answers.map((a) => ({ content: a.text, isCorrect: a.isCorrect }))
-        }))
+        quizData: mapBlocksToQuizData(data.questions)
       }
     }
 
@@ -272,8 +293,8 @@ export default function LessonEditorPage() {
                   </label>
                   <Select
                     disabled={isTypeLocked}
+                    value={lessonType}
                     onValueChange={(value) => form.setValue('type', value as LessonForm['type'])}
-                    defaultValue={form.getValues('type')}
                   >
                     <SelectTrigger className='h-14 rounded-2xl bg-background border-border/50 focus-visible:ring-primary/20 px-4 text-base font-semibold'>
                       <SelectValue placeholder='Chọn định dạng' />
@@ -380,6 +401,37 @@ export default function LessonEditorPage() {
               </Card>
             )}
 
+            {/* QUIZ bổ sung cho VIDEO — `quizData` tùy chọn (VideoLessonStrategy) */}
+            {lessonType === 'video' && (
+              <div className='space-y-6 mt-8'>
+                <div className='rounded-2xl border border-border/50 bg-muted/20 px-5 py-4'>
+                  <h3 className='font-extrabold text-lg tracking-tight'>Bài kiểm tra cuối bài (tùy chọn)</h3>
+                  <p className='text-muted-foreground text-sm mt-1'>
+                    Thêm trắc nghiệm kèm bài video; quiz được tạo cùng lúc khi lưu bài học.
+                  </p>
+                </div>
+                {supFields.map((field, index) => (
+                  <QuestionCard
+                    key={field.id}
+                    index={index}
+                    form={form}
+                    onRemove={supRemove}
+                    showAnswers
+                    namePrefix='supplementalQuiz'
+                  />
+                ))}
+                <Button
+                  type='button'
+                  variant='outline'
+                  className='w-full border-dashed border-2 py-8 rounded-3xl font-bold bg-muted/20'
+                  onClick={() => supAppend(DEFAULT_QUESTION)}
+                >
+                  <Plus className='w-5 h-5 mr-2 text-primary' />
+                  Thêm câu hỏi trắc nghiệm
+                </Button>
+              </div>
+            )}
+
             {/* TEXT */}
             {lessonType === 'text' && (
               <Card className='border-none shadow-none bg-transparent'>
@@ -395,6 +447,34 @@ export default function LessonEditorPage() {
                       {form.formState.errors.content.message}
                     </p>
                   )}
+                </div>
+
+                <div className='space-y-6 mt-10 pt-8 border-t border-border/40'>
+                  <div className='rounded-2xl border border-border/50 bg-muted/20 px-5 py-4'>
+                    <h3 className='font-extrabold text-lg tracking-tight'>Bài kiểm tra cuối bài (tùy chọn)</h3>
+                    <p className='text-muted-foreground text-sm mt-1'>
+                      Quiz kèm bài đọc được tạo cùng lúc khi lưu (tùy chọn).
+                    </p>
+                  </div>
+                  {supFields.map((field, index) => (
+                    <QuestionCard
+                      key={field.id}
+                      index={index}
+                      form={form}
+                      onRemove={supRemove}
+                      showAnswers
+                      namePrefix='supplementalQuiz'
+                    />
+                  ))}
+                  <Button
+                    type='button'
+                    variant='outline'
+                    className='w-full border-dashed border-2 py-8 rounded-3xl font-bold bg-muted/20'
+                    onClick={() => supAppend(DEFAULT_QUESTION)}
+                  >
+                    <Plus className='w-5 h-5 mr-2 text-primary' />
+                    Thêm câu hỏi trắc nghiệm
+                  </Button>
                 </div>
               </Card>
             )}
