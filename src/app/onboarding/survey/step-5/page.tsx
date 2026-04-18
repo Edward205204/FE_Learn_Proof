@@ -11,7 +11,7 @@ export default function OnboardingStep5() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push(`${PATH.ONBOARDING}/finish`)
+      router.push(`${PATH.ONBOARDING}/survey/finish`)
     }, 5000) // Wait for the animation to "finish"
     return () => clearTimeout(timer)
   }, [router])

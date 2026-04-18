@@ -41,11 +41,11 @@ export default function OnboardingStep3() {
   }
 
   const goNext = () => {
-    router.push(`${PATH.ONBOARDING}/step4`)
+    router.push(`${PATH.ONBOARDING}/survey/step-4`)
   }
 
   const goBack = () => {
-    router.push(`${PATH.ONBOARDING}/step2`)
+    router.push(`${PATH.ONBOARDING}/survey/step-2`)
   }
 
   return (

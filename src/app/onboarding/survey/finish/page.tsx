@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import { PATH } from '../../../../constants/path'
+import { useUpdateProfileMutation } from '@/app/(auth)/_hooks/use-auth-mutation'
 
 const ROADMAP_STEPS = [
   {
@@ -49,6 +50,7 @@ const ROADMAP_STEPS = [
 export default function OnboardingFinishPage() {
   const router = useRouter()
   const [activeStep, setActiveStep] = useState(1)
+  const updateProfileMutation = useUpdateProfileMutation()
 
   const currentStepData = ROADMAP_STEPS.find((s) => s.id === activeStep) || ROADMAP_STEPS[0]
 
@@ -188,11 +190,19 @@ export default function OnboardingFinishPage() {
 
               <div className='space-y-4 pt-4 border-t border-rose-100'>
                 <Button
-                  onClick={() => router.push(PATH.HOME)}
+                  onClick={() => {
+                    updateProfileMutation.mutate({ isOnboardingCompleted: true }, {
+                      onSuccess: () => {
+                        router.push(PATH.HOME)
+                      }
+                    })
+                  }}
+                  disabled={updateProfileMutation.isPending}
                   size='lg'
                   className='w-full rounded-2xl py-8 text-xl font-bold shadow-xl shadow-primary/30'
                 >
-                  Lưu lộ trình và Bắt đầu <Rocket className='ml-2 w-6 h-6' />
+                  {updateProfileMutation.isPending ? 'Đang lưu...' : 'Lưu lộ trình và Bắt đầu'}{' '}
+                  <Rocket className='ml-2 w-6 h-6' />
                 </Button>
                 <p className='text-center text-xs text-muted-foreground italic'>
                   Bạn luôn có thể quay lại để tùy chỉnh sau khi bắt đầu học.

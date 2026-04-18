@@ -22,7 +22,9 @@ interface CourseCardProps {
 export default function CourseCard({ course }: CourseCardProps) {
   const rating = course.overallAnalytics?.avgRating ?? 0
   const totalStudents = course.overallAnalytics?.totalStudents ?? 0
-  const displayPrice = course.isFree ? 'Miễn phí' : `$${course.price.toFixed(2)}`
+  const displayPrice = course.isFree
+    ? 'Miễn phí'
+    : course.price.toLocaleString('vi-VN') + ' ₫'
   const hasDiscount = !course.isFree && course.originalPrice && course.originalPrice > course.price
 
   return (
@@ -76,7 +78,9 @@ export default function CourseCard({ course }: CourseCardProps) {
               {displayPrice}
             </span>
             {hasDiscount && (
-              <span className='text-xs text-muted-foreground line-through'>${course.originalPrice!.toFixed(2)}</span>
+              <span className='text-xs text-muted-foreground line-through'>
+                {course.originalPrice!.toLocaleString('vi-VN')} ₫
+              </span>
             )}
           </div>
         </div>
