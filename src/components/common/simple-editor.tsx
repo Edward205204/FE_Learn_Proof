@@ -19,6 +19,11 @@ export function SimpleEditor({
 }) {
   const editor = useEditor({
     immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        spellcheck: 'false'
+      }
+    },
     extensions: [
       StarterKit,
       Underline,

@@ -20,7 +20,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { SimpleEditor } from '@/components/common/simple-editor'
 
 import { LEVEL_OPTIONS } from '@/app/(cms)/_constants/course-workflow'
-import { createCourseStep1Schema, type CreateCourseStep1, type Categories } from '@/app/(cms)/_utils/zod'
+import {
+  updateCourseBaseInfoSchema,
+  type UpdateCourseBaseInfo,
+  type CreateCourseStep1,
+  type Categories
+} from '@/app/(cms)/_utils/zod'
 import {
   useGetCourseBaseInfoQuery,
   useGetCategoriesQuery,
@@ -39,15 +44,18 @@ export function EditCourseMetadataDialog({ courseId, open, onOpenChange }: Props
   const { data: categories } = useGetCategoriesQuery()
   const updateMutation = useUpdateCourseBaseInfoMutation(courseId ?? '')
 
-  const form = useForm<CreateCourseStep1>({
-    resolver: zodResolver(createCourseStep1Schema),
+  const form = useForm<UpdateCourseBaseInfo>({
+    resolver: zodResolver(updateCourseBaseInfoSchema),
     defaultValues: {
       title: '',
       categoryId: '',
       level: 'BEGINNER',
       shortDesc: '',
       fullDesc: '',
-      thumbnail: null
+      thumbnail: null,
+      isFree: true,
+      price: 0,
+      originalPrice: null
     }
   })
 
@@ -60,7 +68,10 @@ export function EditCourseMetadataDialog({ courseId, open, onOpenChange }: Props
       level: baseInfo.level,
       shortDesc: baseInfo.shortDesc,
       fullDesc: baseInfo.fullDesc,
-      thumbnail: baseInfo.thumbnail ?? null
+      thumbnail: baseInfo.thumbnail ?? null,
+      isFree: baseInfo.isFree ?? true,
+      price: baseInfo.price ?? 0,
+      originalPrice: baseInfo.originalPrice ?? null
     })
   }, [baseInfo, form])
 
@@ -74,8 +85,8 @@ export function EditCourseMetadataDialog({ courseId, open, onOpenChange }: Props
   const shortDescValue = useWatch({ control: form.control, name: 'shortDesc' })
   const shortDescLen = shortDescValue?.length ?? 0
 
-  const onSubmit = async (data: CreateCourseStep1) => {
-    await updateMutation.mutateAsync(data)
+  const onSubmit = async (data: UpdateCourseBaseInfo) => {
+    await updateMutation.mutateAsync(data as unknown as CreateCourseStep1)
     onOpenChange(false)
   }
 
@@ -191,6 +202,53 @@ export function EditCourseMetadataDialog({ courseId, open, onOpenChange }: Props
                   </FormItem>
                 )}
               />
+
+              {/* Giá cả */}
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <FormField
+                  control={form.control}
+                  name='price'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='font-semibold'>Giá bán (VNĐ)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type='number'
+                          placeholder='0 = Miễn phí'
+                          {...field}
+                          onChange={(e) => {
+                            const val = Number(e.target.value)
+                            field.onChange(val)
+                            form.setValue('isFree', val === 0)
+                          }}
+                          className='h-10'
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='originalPrice'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className='font-semibold'>Giá gốc (VNĐ) (Tùy chọn)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type='number'
+                          placeholder='Để trống không giảm giá'
+                          value={field.value ?? ''}
+                          onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                          className='h-10'
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <DialogFooter className='pt-2 gap-2'>
                 <Button

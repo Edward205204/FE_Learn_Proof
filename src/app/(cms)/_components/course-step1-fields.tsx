@@ -2,16 +2,18 @@
 
 import { useId, useRef, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import { CloudUpload, Sparkles } from 'lucide-react'
+import { CloudUpload, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { SimpleEditor } from '@/components/common/simple-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import { LEVEL_OPTIONS } from '@/app/(cms)/_constants/course-workflow'
 import type { Categories, CreateCourseStep1 } from '@/app/(cms)/_utils/zod'
+import mediaApi from '@/app/(cms)/_api/media.api'
+import { config } from '@/constants/config'
 
 type Props = {
   form: UseFormReturn<CreateCourseStep1>
@@ -24,6 +26,39 @@ export function CourseStep1Fields({ form, categories, shortDescriptionLength, th
   const inputId = useId()
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [hasPickedFile, setHasPickedFile] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+
+  // Dùng form.watch để trigger re-render khi giá trị thay đổi
+  const watchThumbnail = form.watch('thumbnail')
+  const displayThumbnailUrl = watchThumbnail || thumbnailUrl
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      setIsUploading(true)
+      const res = await mediaApi.uploadImage(file)
+      // res.data.url hoặc res.url tuỳ theo axios config response interceptor
+      const url = res.data?.url || (res as unknown as { url: string }).url || ''
+      if (url) {
+        // Lắp config.BE_URL nếu là đường dẫn tương đối để pass Zod schema "url()"
+        const fullUrl = url.startsWith('http') ? url : `${config.BE_URL}${url}`
+        form.setValue('thumbnail', fullUrl, { shouldValidate: true })
+        setHasPickedFile(true)
+        toast.success('Upload ảnh bìa thành công')
+      }
+    } catch (error) {
+      console.error('Upload lỗi:', error)
+      toast.error('Upload ảnh thất bại, vui lòng thử lại!')
+    } finally {
+      setIsUploading(false)
+      // reset input value to allow selecting the same file again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
 
   return (
     <>
@@ -122,40 +157,13 @@ export function CourseStep1Fields({ form, categories, shortDescriptionLength, th
         )}
       />
 
-      <div className='bg-primary/5 border border-primary/20 rounded-xl p-6 space-y-4'>
-        <div className='flex items-center gap-2 text-primary font-semibold'>
-          <Sparkles className='w-4 h-4 text-primary fill-primary/20' />
-          <span className='text-sm'>Ngữ cảnh cho AI Assistant</span>
-        </div>
-        <p className='text-sm text-primary/80 leading-relaxed'>
-          Dán đề cương, ghi chú hoặc ý tưởng chi tiết vào đây. AI sẽ dùng thông tin này để tự động tạo nội dung chương
-          học, mô tả bài học và câu hỏi quiz ở các bước tiếp theo.
-        </p>
-        <FormField
-          control={form.control}
-          name='fullDesc'
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Textarea
-                  placeholder='Ví dụ: Tuần 1: Giới thiệu khái niệm. Tuần 2: Thực hành chuyên sâu... Bao gồm mục tiêu học tập và kiến thức trọng tâm.'
-                  className='min-h-[150px] bg-background border-primary/20 focus-visible:ring-primary/30'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-
       <div className='space-y-3'>
         <label className='text-sm font-semibold'>Ảnh bìa khóa học</label>
 
-        {thumbnailUrl ? (
+        {displayThumbnailUrl ? (
           <div className='rounded-xl overflow-hidden ring-1 ring-border/50 bg-muted'>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={thumbnailUrl} alt='Thumbnail hiện tại' className='w-full max-h-[220px] object-cover' />
+            <img src={displayThumbnailUrl} alt='Thumbnail hiện tại' className='w-full max-h-[220px] object-cover' />
           </div>
         ) : null}
 
@@ -165,30 +173,40 @@ export function CourseStep1Fields({ form, categories, shortDescriptionLength, th
           type='file'
           accept='image/*'
           className='hidden'
-          onChange={() => {
-            // Chưa có API upload: chỉ mở picker cho UX, không thay đổi payload submit
-            setHasPickedFile(true)
-          }}
+          onChange={handleFileChange}
+          disabled={isUploading}
         />
 
         <div
-          className='border-2 border-dashed border-muted-foreground/20 rounded-xl p-10 flex flex-col items-center justify-center bg-secondary/10 hover:bg-secondary/20 transition-colors cursor-pointer group'
-          onClick={() => fileInputRef.current?.click()}
+          className={`border-2 border-dashed border-muted-foreground/20 rounded-xl p-10 flex flex-col items-center justify-center bg-secondary/10 hover:bg-secondary/20 transition-colors ${
+            isUploading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer group'
+          }`}
+          onClick={() => !isUploading && fileInputRef.current?.click()}
           role='button'
           tabIndex={0}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click()
+            if (!isUploading && (e.key === 'Enter' || e.key === ' ')) fileInputRef.current?.click()
           }}
         >
           <div className='h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform'>
-            <CloudUpload className='w-6 h-6 text-primary' />
+            {isUploading ? (
+              <Loader2 className='w-6 h-6 text-primary animate-spin' />
+            ) : (
+              <CloudUpload className='w-6 h-6 text-primary' />
+            )}
           </div>
           <p className='text-sm font-medium'>
-            <span className='text-primary hover:underline'>Nhấn để tải lên</span> hoặc kéo thả vào đây
+            {isUploading ? (
+              <span>Đang tải lên...</span>
+            ) : (
+              <span>
+                <span className='text-primary hover:underline'>Nhấn để tải lên</span> hoặc kéo thả vào đây
+              </span>
+            )}
           </p>
           <p className='text-xs text-muted-foreground mt-1'>Khuyến nghị: 1280x720px. Tối đa 5MB (JPG, PNG).</p>
-          {hasPickedFile ? (
-            <p className='text-xs text-muted-foreground mt-2'>Đã chọn file (chưa upload do chưa có API).</p>
+          {hasPickedFile && displayThumbnailUrl && !isUploading ? (
+            <p className='text-xs text-green-600 mt-2 font-medium'>Đã upload ảnh thành công.</p>
           ) : null}
         </div>
       </div>
