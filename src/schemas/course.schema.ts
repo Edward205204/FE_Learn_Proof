@@ -29,6 +29,7 @@ export const CourseItemResponseSchema = z.object({
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
   shortDesc: z.string(),
   createdAt: z.coerce.date(),
+  isEnrolled: z.boolean().optional().default(false),
   category: z.object({
     name: z.string(),
     slug: z.string()
@@ -99,6 +100,7 @@ export const CourseDetailResponseSchema = z.object({
   expectedDays: z.number().int().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  isEnrolled: z.boolean().optional().default(false),
   category: z.object({
     name: z.string(),
     slug: z.string()
@@ -131,6 +133,7 @@ export const HomeCourseCardSchema = z.object({
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
   shortDesc: z.string(),
   createdAt: z.coerce.date(),
+  isEnrolled: z.boolean().optional().default(false),
   category: z.object({ name: z.string(), slug: z.string() }),
   creator: z.object({ fullName: z.string(), avatar: z.string().nullable() }),
   overallAnalytics: z

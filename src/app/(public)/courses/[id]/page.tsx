@@ -320,6 +320,11 @@ export default function CourseDetailPage() {
                   <span className='text-3xl font-black text-slate-900 dark:text-white'>
                     {courseData.isFree ? 'Miễn phí' : `${courseData.price.toLocaleString('vi-VN')} đ`}
                   </span>
+                  {courseData.isEnrolled && (
+                    <Badge className='bg-emerald-50 text-emerald-600 border-none font-black text-[10px] tracking-tight'>
+                      ĐÃ SỞ HỮU
+                    </Badge>
+                  )}
                   {courseData.originalPrice && courseData.originalPrice > courseData.price && (
                     <>
                       <span className='text-lg text-slate-400 line-through font-bold'>
@@ -334,48 +339,60 @@ export default function CourseDetailPage() {
                 </div>
 
                 <Button
-                  className='w-full h-14 bg-rose-600 hover:bg-rose-700 text-white font-black text-base rounded-2xl shadow-xl shadow-rose-200 dark:shadow-rose-900/20 active:scale-[0.98] transition-all disabled:opacity-70'
+                  className={cn(
+                    'w-full h-14 font-black text-base rounded-2xl shadow-xl active:scale-[0.98] transition-all disabled:opacity-70',
+                    courseData.isEnrolled
+                      ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200 dark:shadow-emerald-900/20'
+                      : 'bg-rose-600 hover:bg-rose-700 shadow-rose-200 dark:shadow-rose-900/20'
+                  )}
                   disabled={addMutation.isPending}
                   onClick={async () => {
+                    if (courseData.isEnrolled) {
+                      router.push(`/courses/${courseData.id}/lessons`)
+                      return
+                    }
                     await addMutation.mutateAsync(courseIdOrSlug)
                     router.push(PATH.CHECKOUT)
                   }}
                 >
-                  {addMutation.isPending ? 'Đang xử lý...' : 'Đăng ký ngay'}
+                  {addMutation.isPending ? 'Đang xử lý...' : courseData.isEnrolled ? 'Vào học ngay' : 'Đăng ký ngay'}
                 </Button>
 
-                <div className='flex gap-3 mt-3 mb-8'>
-                  <Button
-                    variant='outline'
-                    className='flex-1 h-12 rounded-2xl border-2 border-slate-200 dark:border-slate-700 font-black text-sm text-slate-700 dark:text-slate-200 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all gap-2 active:scale-[0.98] disabled:opacity-50'
-                    onClick={() => addMutation.mutate(courseIdOrSlug)}
-                    disabled={addMutation.isPending}
-                  >
-                    <ShoppingCart size={16} />
-                    {addMutation.isPending ? 'Đang thêm...' : 'Thêm giỏ hàng'}
-                  </Button>
+                {!courseData.isEnrolled && (
+                  <div className='flex gap-3 mt-3 mb-8'>
+                    <Button
+                      variant='outline'
+                      className='flex-1 h-12 rounded-2xl border-2 border-slate-200 dark:border-slate-700 font-black text-sm text-slate-700 dark:text-slate-200 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all gap-2 active:scale-[0.98] disabled:opacity-50'
+                      onClick={() => addMutation.mutate(courseIdOrSlug)}
+                      disabled={addMutation.isPending}
+                    >
+                      <ShoppingCart size={16} />
+                      {addMutation.isPending ? 'Đang thêm...' : 'Thêm giỏ hàng'}
+                    </Button>
 
-                  <button
-                    onClick={toggleWishlist}
-                    disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
-                    className={`h-12 w-12 shrink-0 rounded-2xl border-2 flex items-center justify-center transition-all active:scale-[0.92] disabled:opacity-50 ${
-                      isWishlisted
-                        ? 'border-rose-400 bg-rose-50 dark:bg-rose-500/10 text-rose-500'
-                        : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-rose-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10'
-                    }`}
-                    title={isWishlisted ? 'Bỏ yêu thích' : 'Yêu thích'}
-                  >
-                    {addToWishlistMutation.isPending || removeFromWishlistMutation.isPending ? (
-                      <Loader2 size={18} className='animate-spin' />
-                    ) : (
-                      <Heart
-                        size={18}
-                        className='transition-all duration-200'
-                        fill={isWishlisted ? 'currentColor' : 'none'}
-                      />
-                    )}
-                  </button>
-                </div>
+                    <button
+                      onClick={toggleWishlist}
+                      disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
+                      className={`h-12 w-12 shrink-0 rounded-2xl border-2 flex items-center justify-center transition-all active:scale-[0.92] disabled:opacity-50 ${
+                        isWishlisted
+                          ? 'border-rose-400 bg-rose-50 dark:bg-rose-500/10 text-rose-500'
+                          : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-rose-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10'
+                      }`}
+                      title={isWishlisted ? 'Bỏ yêu thích' : 'Yêu thích'}
+                    >
+                      {addToWishlistMutation.isPending || removeFromWishlistMutation.isPending ? (
+                        <Loader2 size={18} className='animate-spin' />
+                      ) : (
+                        <Heart
+                          size={18}
+                          className='transition-all duration-200'
+                          fill={isWishlisted ? 'currentColor' : 'none'}
+                        />
+                      )}
+                    </button>
+                  </div>
+                )}
+                {courseData.isEnrolled && <div className='mb-8' />}
 
                 <div className='space-y-5'>
                   <p className='text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]'>Khóa học bao gồm:</p>

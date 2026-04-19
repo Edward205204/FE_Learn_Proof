@@ -50,6 +50,11 @@ export default function CourseCard({ course }: CourseCardProps) {
         >
           {LEVEL_LABEL[course.level]}
         </span>
+        {course.isEnrolled && (
+          <span className='absolute top-2 right-2 px-2 py-0.5 rounded text-[0.65rem] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 uppercase tracking-wide shadow-sm'>
+            Đã sở hữu
+          </span>
+        )}
       </div>
 
       {/* Body */}
