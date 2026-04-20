@@ -5,13 +5,13 @@ import { Star, MessageCircle, Send, CornerDownRight } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { useSubmitReviewMutation, useUpdateReviewMutation, useDeleteReviewMutation } from '@/app/(learner)/_hooks/use-course'
+import { useSubmitReviewMutation, useUpdateReviewMutation, useDeleteReviewMutation, useLearnerReplyToReviewMutation } from '@/app/(learner)/_hooks/use-course'
 import { CourseDetailResponse, CourseReview } from '@/schemas/course.schema'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { useAuthStore } from '@/store/auth.store'
-import { Trash2, Edit2, X } from 'lucide-react'
+import { Trash2, Edit2, X, Reply } from 'lucide-react'
 
 interface CourseReviewsProps {
   courseId: string
@@ -36,10 +36,20 @@ export function CourseReviews({
   const [comment, setComment] = useState('')
   const [isWriting, setIsWriting] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [replyingId, setReplyingId] = useState<string | null>(null)
+  const [learnerReplyText, setLearnerReplyText] = useState('')
 
   const submitMutation = useSubmitReviewMutation(courseId)
   const updateMutation = useUpdateReviewMutation(courseId)
   const deleteMutation = useDeleteReviewMutation(courseId)
+  const learnerReplyMutation = useLearnerReplyToReviewMutation()
+
+  const handleLearnerReply = async (reviewId: string) => {
+    if (!learnerReplyText.trim()) return
+    await learnerReplyMutation.mutateAsync({ reviewId, content: learnerReplyText })
+    setLearnerReplyText('')
+    setReplyingId(null)
+  }
 
   const handleSubmit = async () => {
     if (!comment.trim()) return
@@ -227,29 +237,98 @@ export function CourseReviews({
                     <div className='shrink-0 pt-1'>
                       <CornerDownRight size={20} className='text-rose-500' />
                     </div>
-                    <div className='flex-1 space-y-3'>
-                      <div className='flex items-center gap-3'>
-                        <Avatar className='h-8 w-8 border border-rose-100'>
-                          <AvatarImage src={instructorAvatar || undefined} />
-                          <AvatarFallback className='bg-rose-600 text-white text-[10px] font-black'>
-                            INST
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className='text-[11px] font-black text-slate-900 dark:text-white'>
-                            {instructorName} 
-                            <span className='ml-2 text-[9px] text-white bg-rose-500 px-1.5 py-0.5 rounded-md uppercase tracking-tighter'>Giảng viên</span>
-                          </p>
-                          {review.instructorReplyAt && (
-                             <p className='text-[9px] font-bold text-slate-400'>
-                               {format(new Date(review.instructorReplyAt), 'dd MMMM, yyyy', { locale: vi })}
-                             </p>
-                          )}
+                    <div className='flex-1 space-y-4'>
+                      <div className='flex justify-between items-start'>
+                        <div className='flex items-center gap-3'>
+                          <Avatar className='h-8 w-8 border border-rose-100'>
+                            <AvatarImage src={instructorAvatar || undefined} />
+                            <AvatarFallback className='bg-rose-600 text-white text-[10px] font-black'>
+                              INST
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className='text-[11px] font-black text-slate-900 dark:text-white'>
+                              {instructorName} 
+                              <span className='ml-2 text-[9px] text-white bg-rose-500 px-1.5 py-0.5 rounded-md uppercase tracking-tighter'>Giảng viên</span>
+                            </p>
+                            {review.instructorReplyAt && (
+                               <p className='text-[9px] font-bold text-slate-400'>
+                                 {format(new Date(review.instructorReplyAt), 'dd MMMM, yyyy', { locale: vi })}
+                               </p>
+                            )}
+                          </div>
                         </div>
+
+                        {isMyReview(review) && !review.learnerReply && (
+                          <button 
+                            onClick={() => setReplyingId(review.id)}
+                            className='text-[10px] font-black text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1.5'
+                          >
+                            <Reply size={12} />
+                            PHẢN HỒI LẠI
+                          </button>
+                        )}
                       </div>
+                      
                       <p className='text-sm text-slate-600 dark:text-slate-300 font-bold bg-rose-50/30 dark:bg-rose-900/10 p-5 rounded-2xl rounded-tl-none border-l-2 border-rose-500 leading-relaxed italic'>
                         &quot;{review.instructorReply}&quot;
                       </p>
+
+                      {/* Learner Reply Input */}
+                      {replyingId === review.id && (
+                        <div className='space-y-3 animate-in slide-in-from-top-2 duration-200'>
+                          <Textarea 
+                            value={learnerReplyText}
+                            onChange={(e) => setLearnerReplyText(e.target.value)}
+                            placeholder='Nhập phản hồi của bạn...'
+                            className='min-h-[80px] rounded-xl text-xs bg-white dark:bg-slate-950 p-3 border-slate-100 dark:border-slate-800'
+                          />
+                          <div className='flex justify-end gap-2'>
+                            <Button 
+                              variant='ghost' 
+                              size='sm' 
+                              onClick={() => {
+                                setReplyingId(null)
+                                setLearnerReplyText('')
+                              }}
+                              className='h-8 text-[10px] font-bold'
+                            >
+                              Hủy
+                            </Button>
+                            <Button 
+                              size='sm' 
+                              onClick={() => handleLearnerReply(review.id)}
+                              disabled={!learnerReplyText.trim() || learnerReplyMutation.isPending}
+                              className='h-8 text-[10px] font-black bg-rose-600 hover:bg-rose-700'
+                            >
+                              {learnerReplyMutation.isPending ? 'Đang gửi...' : 'Gửi phản hồi'}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Success / Display Learner Reply */}
+                      {review.learnerReply && (
+                        <div className='mt-4 pt-4 border-t border-slate-50 dark:border-slate-800 flex gap-4'>
+                           <div className='shrink-0 pt-1'>
+                            <CornerDownRight size={16} className='text-slate-400 opacity-50' />
+                          </div>
+                          <div className='flex-1 space-y-2'>
+                            <div className='flex items-center gap-2'>
+                              <Avatar className='h-6 w-6 border border-slate-100'>
+                                <AvatarImage src={review.user.avatar || undefined} />
+                                <AvatarFallback className='text-[8px]'>{review.user.fullName.substring(0, 2).toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                              <p className='text-[10px] font-black text-slate-500'>
+                                Bạn <span className='text-slate-400 font-medium ml-1'>· {review.learnerReplyAt ? format(new Date(review.learnerReplyAt), 'dd MMMM, yyyy', { locale: vi }) : ''}</span>
+                              </p>
+                            </div>
+                            <p className='text-xs text-slate-500 font-medium bg-slate-50 dark:bg-white/5 p-4 rounded-xl rounded-tl-none leading-relaxed'>
+                              {review.learnerReply}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

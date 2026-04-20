@@ -65,3 +65,18 @@ export const useDeleteReviewMutation = (courseId: string) => {
     }
   })
 }
+
+export const useLearnerReplyToReviewMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { reviewId: string; content: string }) =>
+      learnerCourseApi.learnerReplyToReview(data.reviewId, data.content),
+    onSuccess: () => {
+      toast.success('Đã gửi phản hồi của bạn!')
+      queryClient.invalidateQueries({ queryKey: ['course-detail'] })
+    },
+    onError: () => {
+      toast.error('Gửi phản hồi thất bại.')
+    }
+  })
+}

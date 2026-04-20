@@ -267,6 +267,7 @@ export const interactionSchema = z.object({
   status: z.enum(['unresolved', 'resolved']).optional(),
   lessonUrl: z.string().optional(),
   reply: z.string().optional(),
+  learnerFollowUp: z.string().optional(),
   isPinned: z.boolean().default(false),
   createdAt: z.union([z.string(), z.date()]).optional()
 })
@@ -405,6 +406,8 @@ export const ReviewItemSchema = z.object({
   comment: z.string().nullable(),
   instructorReply: z.string().nullable(),
   instructorReplyAt: z.coerce.date().nullable(),
+  learnerReply: z.string().nullable(),
+  learnerReplyAt: z.coerce.date().nullable(),
   userId: z.string(),
   courseId: z.string(),
   createdAt: z.coerce.date(),

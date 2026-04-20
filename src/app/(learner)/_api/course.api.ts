@@ -35,7 +35,9 @@ const learnerCourseApi = {
   updateReview: (courseId: string, data: { rating: number; comment: string }) =>
     http.patch(`/courses/${courseId}/reviews`, data),
 
-  deleteReview: (courseId: string) => http.delete(`/courses/${courseId}/reviews`)
+  deleteReview: (courseId: string) => http.delete(`/courses/${courseId}/reviews`),
+  learnerReplyToReview: (reviewId: string, content: string) =>
+    http.post(`/reviews/${reviewId}/learner-reply`, { content })
 }
 
 export default learnerCourseApi

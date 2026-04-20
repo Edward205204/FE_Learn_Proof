@@ -38,7 +38,9 @@ function mapReviewToInteraction(item: ReviewItem): InteractionValues {
     content: item.comment || '(Không có nội dung)',
     rating: item.rating,
     reply: item.instructorReply || undefined,
+    learnerFollowUp: item.learnerReply || undefined,
     status: item.instructorReply ? 'resolved' : 'unresolved',
+    isPinned: false,
     createdAt: item.createdAt
   }
 }
@@ -68,9 +70,11 @@ export default function FeedbackListPage() {
   if (filter === 'all') {
     const dList = (discussions.data?.data || []).map(mapDiscussionToInteraction)
     const rList = (reviews.data?.data || []).map(mapReviewToInteraction)
-    allInteractions = [...dList, ...rList].sort(
-      (a, b) => new Date(b.createdAt as any).getTime() - new Date(a.createdAt as any).getTime()
-    )
+    allInteractions = [...dList, ...rList].sort((a, b) => {
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+      return dateB - dateA
+    })
   } else if (filter === 'discussion') {
     allInteractions = (discussions.data?.data || []).map(mapDiscussionToInteraction)
   } else if (filter === 'review') {
@@ -132,7 +136,7 @@ export default function FeedbackListPage() {
           defaultValue='all'
           className='w-full md:w-auto shrink-0'
           onValueChange={(v) => {
-            setFilter(v as any)
+            setFilter(v as typeof filter)
             setPage(1)
           }}
         >

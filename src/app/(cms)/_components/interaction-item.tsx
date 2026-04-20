@@ -211,6 +211,19 @@ export function InteractionItem({ data }: InteractionItemProps) {
             <CheckCircle2 className='h-3.5 w-3.5' /> ĐÃ PHẢN HỒI
           </div>
         )}
+
+        {data.learnerFollowUp && (
+          <div className='mt-4 pl-4 border-l-2 border-primary/20 bg-primary/5 p-3 rounded-r-xl'>
+            <div className='flex items-center gap-2 mb-1.5'>
+              <Avatar className='h-5 w-5'>
+                <AvatarImage src={data.user.avatar} />
+                <AvatarFallback className='text-[8px]'>{data.user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <span className='text-[11px] font-bold text-foreground/70'>{data.user.name} (Học viên)</span>
+            </div>
+            <p className='text-xs text-foreground/80 italic font-medium'>&quot;{data.learnerFollowUp}&quot;</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

@@ -82,7 +82,9 @@ export const CourseReviewSchema = z.object({
     avatar: z.string().nullable()
   }),
   instructorReply: z.string().nullable().optional(),
-  instructorReplyAt: z.coerce.date().nullable().optional()
+  instructorReplyAt: z.coerce.date().nullable().optional(),
+  learnerReply: z.string().nullable().optional(),
+  learnerReplyAt: z.coerce.date().nullable().optional()
 })
 
 export type CourseReview = z.infer<typeof CourseReviewSchema>
