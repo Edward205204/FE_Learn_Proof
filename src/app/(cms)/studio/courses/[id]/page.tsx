@@ -204,15 +204,16 @@ export default function ChaptersPage() {
   }, [])
 
   const handleSaveFrame = () => {
+    const newChapters = chapters.filter((ch) => ch.id.startsWith('ch-'))
+    if (newChapters.length === 0) {
+      toast.info('Không có chương mới nào cần lưu.')
+      return
+    }
+    // Chỉ gửi chương mới (chưa lưu vào DB) — tránh createMany nhân bản chương cũ
     const payload = {
-      chapterList: chapters.map((ch, cIndex) => ({
+      chapterList: newChapters.map((ch) => ({
         title: ch.title,
-        order: cIndex + 1,
-        lessons: ch.lessons.map((ls, lIndex) => ({
-          title: ls.title,
-          order: lIndex + 1,
-          type: 'VIDEO' as const // Mặc định type là VIDEO nếu tạo nhanh qua UI frame
-        }))
+        order: chapters.indexOf(ch) + 1
       }))
     }
     updateChaptersFrame(payload)

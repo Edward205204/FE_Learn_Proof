@@ -35,10 +35,17 @@ export default function CreateCourseStep1Page() {
   const shortDescriptionLength = shortDescValue?.length ?? 0
 
   const onNext = async (data: CreateCourseStep1) => {
-    const res = await createCourseMutation.mutateAsync(data)
-    const courseId = res.data.id
-    persistDraftCourseId(courseId)
-    router.push(`${PATH.COURSE_NEW_STEP2}?courseId=${courseId}`)
+    try {
+      const res = await createCourseMutation.mutateAsync(data)
+      const courseId = res.data.id
+      persistDraftCourseId(courseId)
+      router.push(`${PATH.COURSE_NEW_STEP2}?courseId=${courseId}`)
+    } catch (error: unknown) {
+      // Đã bắt lỗi để ko văng màn hình đỏ. Hiện alert để xem chi tiết mã lỗi 400 là gì.
+      const errorData = (error as { response?: { data?: unknown } })?.response?.data
+      alert('Chi tiết lỗi từ BE:\n' + JSON.stringify(errorData, null, 2))
+      console.error(error)
+    }
   }
 
   return (

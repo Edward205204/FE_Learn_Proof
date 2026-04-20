@@ -76,14 +76,17 @@ export default function EditCourseStep2Page() {
       return
     }
 
-    const hasNewChapters = chapters.some((c) => c.id.startsWith('temp-'))
-    if (!hasNewChapters) {
+    const newChapters = chapters.filter((c) => c.id.startsWith('temp-'))
+    if (newChapters.length === 0) {
       router.push(`${PATH.STUDIO_COURSES}/courses/${courseId}/edit/step3`)
       return
     }
 
     const body: UpdateCourseChaptersFrameBody = {
-      chapterList: chapters.map((c, idx) => ({ title: c.title, order: idx + 1 }))
+      chapterList: newChapters.map((c, idx) => ({
+        title: c.title,
+        order: idx + 1
+      }))
     }
     const parsed = updateCourseChaptersFrameSchema.safeParse(body)
     if (!parsed.success) return

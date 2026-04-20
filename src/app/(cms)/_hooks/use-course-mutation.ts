@@ -92,6 +92,7 @@ export function useUpdateCourseBaseInfoMutation(courseId: string) {
     onSuccess: () => {
       toast.success('Đã cập nhật thông tin cơ bản.')
       queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.detail(courseId) })
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.all })
     },
     onError: () => {
       toast.error('Có lỗi xảy ra khi cập nhật thông tin cơ bản.')
