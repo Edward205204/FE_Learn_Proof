@@ -11,6 +11,7 @@ import {
   History as HistoryIcon,
   LayoutDashboard
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { PATH } from '@/constants/path'
@@ -18,8 +19,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useHeader } from '@/hooks/use-header'
 import { Role } from '@/@types/user'
 import { useRef, useEffect, useState } from 'react'
+import { useNotificationStore } from '@/store/notification.store'
 
 export default function Header() {
+  const router = useRouter()
   const { user, isLoggedIn, isMenuOpen, toggleMenu, handleLogout, closeMenu } = useHeader()
 
   const menuRef = useRef<HTMLDivElement>(null)
@@ -29,39 +32,9 @@ export default function Header() {
   const [showAllNotifs, setShowAllNotifs] = useState(false)
   const notifRef = useRef<HTMLDivElement>(null)
 
-  const NOTIFICATIONS = [
-    {
-      id: 1,
-      title: 'Cập nhật khóa học mới',
-      message: 'Khóa học "Mastering Figma" vừa có bài giảng mới. Hãy vào xem ngay!',
-      time: '2 giờ trước',
-      unread: true
-    },
-    {
-      id: 2,
-      title: 'Thanh toán thành công',
-      message: 'Đơn hàng #12938 đã được xác nhận. Bạn đã có thể bắt đầu học khóa UI/UX.',
-      time: '1 ngày trước',
-      unread: false
-    },
-    {
-      id: 3,
-      title: 'Chào mừng bạn đến với LearnProof!',
-      message: 'Khám phá ngay hàng ngàn khóa học chất lượng để bắt đầu hành trình nâng cấp bản thân.',
-      time: '2 ngày trước',
-      unread: false
-    },
-    {
-      id: 4,
-      title: 'Giảm giá cuối tuần lên đến 50%',
-      message: 'Áp dụng mã WEEKEND50 cho tất cả khóa học Lập trình. Số lượng có hạn!',
-      time: '3 ngày trước',
-      unread: false
-    }
-  ]
-
-  const displayedNotifs = showAllNotifs ? NOTIFICATIONS : NOTIFICATIONS.slice(0, 2)
-  const unreadCount = NOTIFICATIONS.filter((n) => n.unread).length
+  const { notifications, markAsRead } = useNotificationStore()
+  const displayedNotifs = showAllNotifs ? notifications : notifications.slice(0, 5)
+  const unreadCount = notifications.filter((n) => n.unread).length
 
   // Close notif when clicking outside
   useEffect(() => {
@@ -220,40 +193,47 @@ export default function Header() {
                     </div>
 
                     <div className='max-h-[360px] overflow-y-auto overscroll-contain'>
-                      {displayedNotifs.map((noti) => (
-                        <div
-                          key={noti.id}
-                          className={`p-4 border-b dark:border-[oklch(0.274_0.006_286.033)] hover:bg-[oklch(0.967_0.001_0)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors cursor-pointer ${noti.unread ? 'bg-rose-50/30 dark:bg-rose-900/10' : ''}`}
-                        >
-                          <p
-                            className={`text-sm ${noti.unread ? 'font-semibold' : 'font-medium'} text-[oklch(0.141_0.005_285.823)] dark:text-gray-100`}
+                      {displayedNotifs.length > 0 ? (
+                        displayedNotifs.map((noti) => (
+                          <div
+                            key={noti.id}
+                            onClick={() => {
+                              markAsRead(noti.id)
+                              if (noti.link) router.push(noti.link)
+                            }}
+                            className={`p-4 border-b dark:border-[oklch(0.274_0.006_286.033)] hover:bg-[oklch(0.967_0.001_0)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors cursor-pointer ${noti.unread ? 'bg-rose-50/30 dark:bg-rose-900/10' : ''}`}
                           >
-                            {noti.title}
-                          </p>
-                          <p className='text-xs text-[oklch(0.552_0.016_285.938)] mt-1 line-clamp-2'>{noti.message}</p>
-                          <p
-                            className={`text-[10px] mt-2 ${noti.unread ? 'text-[oklch(0.577_0.245_27.325)] font-bold' : 'text-[oklch(0.552_0.016_285.938)] font-medium'}`}
-                          >
-                            {noti.time}
-                          </p>
+                            <p
+                              className={`text-sm ${noti.unread ? 'font-semibold' : 'font-medium'} text-[oklch(0.141_0.005_285.823)] dark:text-gray-100`}
+                            >
+                              {noti.title}
+                            </p>
+                            <p className='text-xs text-[oklch(0.552_0.016_285.938)] mt-1 line-clamp-2'>
+                              {noti.message}
+                            </p>
+                            <p
+                              className={`text-[10px] mt-2 ${noti.unread ? 'text-[oklch(0.577_0.245_27.325)] font-bold' : 'text-[oklch(0.552_0.016_285.938)] font-medium'}`}
+                            >
+                              {noti.time}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <div className='p-8 text-center'>
+                          <p className='text-sm text-muted-foreground'>Không có thông báo nào</p>
                         </div>
-                      ))}
+                      )}
                     </div>
 
-                    {!showAllNotifs && NOTIFICATIONS.length > 2 && (
-                      <div className='p-3 border-t dark:border-[oklch(0.274_0.006_286.033)] text-center bg-gray-50/50 dark:bg-transparent'>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            setShowAllNotifs(true)
-                          }}
-                          className='text-xs text-[oklch(0.577_0.245_27.325)] font-bold hover:underline transition-all'
-                        >
-                          Xem tất cả thông báo
-                        </button>
-                      </div>
-                    )}
+                    <div className='p-3 border-t dark:border-[oklch(0.274_0.006_286.033)] text-center bg-gray-50/50 dark:bg-transparent'>
+                      <Link
+                        href='/notifications'
+                        onClick={() => setIsNotifOpen(false)}
+                        className='text-xs text-[oklch(0.577_0.245_27.325)] font-bold hover:underline transition-all'
+                      >
+                        Xem tất cả thông báo
+                      </Link>
+                    </div>
                   </div>
                 </div>
               )}

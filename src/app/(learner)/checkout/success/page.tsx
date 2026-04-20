@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button'
 import { PATH } from '@/constants/path'
 import enrollmentApi from '@/app/(learner)/_api/enrollment.api'
 import { toast } from 'sonner'
+import { useNotificationStore } from '@/store/notification.store'
 
 export default function CheckoutSuccessPage() {
+  const { addNotification } = useNotificationStore()
   const searchParams = useSearchParams()
   const courseIds = Array.from(new Set(searchParams.get('courseIds')?.split(',').filter(Boolean) || []))
   const [isEnrolling, setIsEnrolling] = useState(true)
@@ -23,7 +25,13 @@ export default function CheckoutSuccessPage() {
 
       try {
         await Promise.all(courseIds.map((id) => enrollmentApi.createEnrollment(id)))
-        // toast.success('Đã kích hoạt khóa học thành công')
+        addNotification({
+          type: 'success',
+          title: 'Thanh toán thành công',
+          message: `Chào mừng bạn đến với ${courseIds.length} khóa học mới! Hãy bắt đầu học ngay nhé.`,
+          time: 'Vừa xong',
+          link: PATH.MY_COURSES
+        })
       } catch (error) {
         console.error('Enrollment failed:', error)
         toast.error('Có lỗi xảy ra khi kích hoạt khóa học')
@@ -33,6 +41,7 @@ export default function CheckoutSuccessPage() {
     }
 
     enrollAll()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -70,9 +79,7 @@ export default function CheckoutSuccessPage() {
                 </h2>
               </div>
               <div className='text-right'>
-                <p className='text-3xl font-black text-[oklch(0.577_0.245_27.325)]'>
-                  {courseIds.length} khóa học
-                </p>
+                <p className='text-3xl font-black text-[oklch(0.577_0.245_27.325)]'>{courseIds.length} khóa học</p>
               </div>
             </div>
 
@@ -81,7 +88,9 @@ export default function CheckoutSuccessPage() {
                 <p className='text-[10px] uppercase tracking-widest font-black text-[oklch(0.552_0.016_285.938)] mb-1.5'>
                   Mã giao dịch
                 </p>
-                <p className='font-bold text-gray-900 dark:text-white'>#LP-{Math.floor(Math.random() * 90000000 + 10000000)}</p>
+                <p className='font-bold text-gray-900 dark:text-white'>
+                  #LP-{Math.floor(Math.random() * 90000000 + 10000000)}
+                </p>
               </div>
               <div>
                 <p className='text-[10px] uppercase tracking-widest font-black text-[oklch(0.552_0.016_285.938)] mb-1.5'>
