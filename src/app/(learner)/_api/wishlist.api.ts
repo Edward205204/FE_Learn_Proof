@@ -16,6 +16,7 @@ export interface WishlistItem {
     }
     overallAnalytics?: {
       totalStudents: number
+      avgRating: number
     }
   }
 }

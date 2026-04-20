@@ -98,10 +98,17 @@ export default function WishlistPage() {
                   <p className='text-sm text-[oklch(0.552_0.016_285.938)] mb-3'>{item.course.creator.fullName}</p>
 
                   <div className='flex items-center gap-2 mb-4'>
-                    <span className='font-bold text-[oklch(0.577_0.245_27.325)]'>5.0</span>
+                    <span className='font-bold text-[oklch(0.577_0.245_27.325)]'>
+                      {item.course.overallAnalytics?.avgRating?.toFixed(1) || '0.0'}
+                    </span>
                     <div className='flex text-[oklch(0.577_0.245_27.325)]'>
                       {[1, 2, 3, 4, 5].map((s) => (
-                        <Star key={s} size={16} fill='currentColor' />
+                        <Star 
+                          key={s} 
+                          size={14} 
+                          fill={s <= Math.round(item.course.overallAnalytics?.avgRating || 0) ? 'currentColor' : 'none'} 
+                          strokeWidth={s <= Math.round(item.course.overallAnalytics?.avgRating || 0) ? 0 : 2}
+                        />
                       ))}
                     </div>
                   </div>

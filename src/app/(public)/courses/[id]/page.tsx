@@ -28,14 +28,23 @@ import { useParams, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { PATH } from '@/constants/path'
 import { useAddToCartMutation } from '@/app/(learner)/_hooks/use-cart'
-import { useCourseDetailQuery } from '../../_hooks/use-course'
+import { useCourseDetailQuery } from '@/app/(public)/_hooks/use-course'
 import {
   useWishlistQuery,
   useAddToWishlistMutation,
   useRemoveFromWishlistMutation
 } from '@/app/(learner)/_hooks/use-wishlist'
 import type { WishlistItem } from '@/app/(learner)/_api/wishlist.api'
-import { getCourseThumbnailUrl } from '@/utils/course'
+import { getCourseThumbnailUrl, getVideoUrl } from '@/utils/course'
+import { useGetLessonForLearnerQuery } from '@/app/(learner)/_hooks/use-lesson'
+import { VideoPlayer } from '@/app/(learner)/_components/video-player'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { CourseReviews } from '@/app/(public)/_components/course-reviews'
 
 export default function CourseDetailPage() {
   const params = useParams()
@@ -50,11 +59,22 @@ export default function CourseDetailPage() {
   const removeFromWishlistMutation = useRemoveFromWishlistMutation()
 
   const [expandedChapters, setExpandedChapters] = useState<string[]>([])
+  const [previewLessonId, setPreviewLessonId] = useState<string | null>(null)
+
+  const { data: lessonPreviewData, isLoading: isLoadingPreview } = useGetLessonForLearnerQuery(previewLessonId || '')
 
   const isWishlisted = useMemo(
     () => (wishlistData as WishlistItem[] | undefined)?.some((item) => item.courseId === courseData?.id) || false,
     [wishlistData, courseData?.id]
   )
+
+  const firstVideoLesson = useMemo(() => {
+    for (const chapter of courseData?.chapters || []) {
+      const videoLesson = chapter.lessons.find((l) => l.type === 'VIDEO')
+      if (videoLesson) return videoLesson
+    }
+    return null
+  }, [courseData?.chapters])
 
   const toggleWishlist = () => {
     if (!courseData) return
@@ -118,9 +138,10 @@ export default function CourseDetailPage() {
             <h1 className='text-5xl md:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight'>
               {courseData.title}
             </h1>
-            <p className='text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-2xl'>
-              {courseData.shortDesc}
-            </p>
+            <div 
+              className='text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-2xl'
+              dangerouslySetInnerHTML={{ __html: courseData.shortDesc }}
+            />
 
             <div className='flex flex-wrap items-center gap-8 pt-4'>
               <div className='flex items-center gap-3'>
@@ -166,9 +187,10 @@ export default function CourseDetailPage() {
                 Mô tả khóa học
               </h2>
             </div>
-            <div className='prose prose-slate dark:prose-invert max-w-none text-slate-600 dark:text-slate-400 font-medium leading-[1.8] whitespace-pre-line'>
-              {courseData.fullDesc}
-            </div>
+            <div 
+              className='prose prose-slate dark:prose-invert max-w-none text-slate-600 dark:text-slate-400 font-medium leading-[1.8]'
+              dangerouslySetInnerHTML={{ __html: courseData.fullDesc }}
+            />
           </section>
 
           {/* Curriculum Section */}
@@ -205,10 +227,15 @@ export default function CourseDetailPage() {
                   {expandedChapters.includes(chapter.id) && (
                     <div className='px-5 pb-5 animate-in slide-in-from-top-2 duration-300'>
                       <div className='space-y-2'>
-                        {chapter.lessons.map((lesson) => (
+                         {chapter.lessons.map((lesson) => (
                           <div
                             key={lesson.id}
-                            className='flex items-center justify-between p-5 rounded-2xl bg-slate-50/50 dark:bg-white/5 hover:bg-white dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-700 group'
+                            onClick={() => {
+                              if (lesson.type === 'VIDEO') {
+                                setPreviewLessonId(lesson.id)
+                              }
+                            }}
+                            className='flex items-center justify-between p-5 rounded-2xl bg-slate-50/50 dark:bg-white/5 hover:bg-white dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-700 group cursor-pointer'
                           >
                             <div className='flex items-center gap-4'>
                               <div className='w-9 h-9 rounded-full bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center shrink-0'>
@@ -224,9 +251,16 @@ export default function CourseDetailPage() {
                                 {lesson.title}
                               </span>
                             </div>
-                            <span className='text-[10px] font-black text-slate-400 tracking-tighter tabular-nums'>
-                              {formatDuration(lesson.duration)}
-                            </span>
+                            <div className='flex items-center gap-3'>
+                              {lesson.type === 'VIDEO' && (
+                                <Badge variant='secondary' className='bg-rose-50 text-rose-500 border-none text-[9px] font-black uppercase tracking-tighter'>
+                                  Xem thử
+                                </Badge>
+                              )}
+                              <span className='text-[10px] font-black text-slate-400 tracking-tighter tabular-nums'>
+                                {formatDuration(lesson.duration)}
+                              </span>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -238,53 +272,14 @@ export default function CourseDetailPage() {
           </section>
 
           {/* Reviews Section */}
-          {courseData.reviews && courseData.reviews.length > 0 && (
-            <section>
-              <div className='flex items-center gap-3 mb-8'>
-                <div className='w-8 h-8 rounded-full bg-rose-500/10 flex items-center justify-center'>
-                  <Star size={16} className='text-rose-600' />
-                </div>
-                <h2 className='text-xl font-black text-slate-900 dark:text-white uppercase tracking-wider'>
-                  Đánh giá từ học viên
-                </h2>
-              </div>
-
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                {courseData.reviews.map((review) => (
-                  <div
-                    key={review.id}
-                    className='bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm'
-                  >
-                    <div className='flex items-center gap-3 mb-6'>
-                      <Avatar className='h-10 w-10'>
-                        <AvatarImage src={review.user.avatar || undefined} />
-                        <AvatarFallback>{review.user.fullName.substring(0, 2).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className='text-sm font-black text-slate-900 dark:text-white leading-none mb-1'>
-                          {review.user.fullName}
-                        </p>
-                        <div className='flex gap-0.5'>
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <Star
-                              key={s}
-                              size={10}
-                              fill={s <= review.rating ? 'currentColor' : 'none'}
-                              strokeWidth={s <= review.rating ? 0 : 1}
-                              className={s <= review.rating ? 'text-amber-400' : 'text-slate-300'}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <p className='text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic'>
-                      &ldquo;{review.comment}&rdquo;
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+          <CourseReviews 
+            courseId={courseData.id}
+            isEnrolled={!!courseData.isEnrolled}
+            userReview={courseData.userReview}
+            reviews={courseData.reviews}
+            instructorName={courseData.creator.fullName}
+            instructorAvatar={courseData.creator.avatar}
+          />
         </div>
 
         {/* Right Column */}
@@ -306,7 +301,10 @@ export default function CourseDetailPage() {
                   </div>
                 )}
                 <div className='absolute inset-0 bg-slate-900/40 flex items-center justify-center'>
-                  <div className='w-16 h-16 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform cursor-pointer'>
+                  <div 
+                    onClick={() => firstVideoLesson && setPreviewLessonId(firstVideoLesson.id)}
+                    className='w-16 h-16 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform cursor-pointer'
+                  >
                     <Play size={24} fill='currentColor' className='ml-1' />
                   </div>
                 </div>
@@ -348,7 +346,13 @@ export default function CourseDetailPage() {
                   disabled={addMutation.isPending}
                   onClick={async () => {
                     if (courseData.isEnrolled) {
-                      router.push(`/courses/${courseData.id}/lessons`)
+                      // Tìm bài học đầu tiên để redirect trực tiếp cho nhanh
+                      const firstLessonId = courseData.chapters?.[0]?.lessons?.[0]?.id
+                      if (firstLessonId) {
+                        router.push(`/courses/${courseData.id}/lessons/${firstLessonId}`)
+                      } else {
+                        router.push(`/courses/${courseData.id}/lessons`)
+                      }
                       return
                     }
                     await addMutation.mutateAsync(courseIdOrSlug)
@@ -430,6 +434,28 @@ export default function CourseDetailPage() {
           </div>
         </div>
       </div>
+      <Dialog open={!!previewLessonId} onOpenChange={(open) => !open && setPreviewLessonId(null)}>
+        <DialogContent className='max-w-4xl p-0 overflow-hidden bg-black border-none'>
+          <DialogHeader className='absolute top-4 left-6 z-50 pointer-events-none'>
+            <DialogTitle className='text-white font-black text-xl drop-shadow-md'>
+              Xem thử: {lessonPreviewData?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className='aspect-video w-full'>
+            {isLoadingPreview ? (
+              <div className='w-full h-full flex items-center justify-center bg-slate-900'>
+                <Loader2 className='w-10 h-10 animate-spin text-rose-500' />
+              </div>
+            ) : (
+              <VideoPlayer 
+                url={lessonPreviewData?.videoUrl || ''} 
+                lessonId={previewLessonId || ''} 
+                lastPosition={0} 
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

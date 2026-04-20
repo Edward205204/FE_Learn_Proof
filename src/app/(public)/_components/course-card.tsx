@@ -63,14 +63,15 @@ export default function CourseCard({ course }: CourseCardProps) {
         <p className='text-xs text-muted-foreground'>{course.creator.fullName}</p>
 
         {/* Meta */}
-        <div className='flex items-center justify-between mt-auto pt-2'>
-          <div className='flex items-center gap-1.5'>
-            <Star size={12} className='fill-amber-400 text-amber-400' />
-            <span className='text-xs font-bold text-amber-500'>{rating > 0 ? rating.toFixed(1) : '—'}</span>
+        <div className='flex items-center justify-between mt-auto pt-3 border-t border-slate-50 dark:border-slate-800/50'>
+          <div className='flex items-center gap-2'>
+            <div className='flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-400/10 text-amber-500'>
+              <Star size={10} fill='currentColor' strokeWidth={0} />
+              <span className='text-[10px] font-black'>{rating > 0 ? rating.toFixed(1) : '0.0'}</span>
+            </div>
             {totalStudents > 0 && (
-              <span className='flex items-center gap-0.5 text-[0.68rem] text-muted-foreground ml-1'>
-                <Users size={11} />
-                {totalStudents.toLocaleString('vi-VN')}
+              <span className='text-[10px] font-bold text-slate-400'>
+                ({totalStudents.toLocaleString('vi-VN')})
               </span>
             )}
           </div>

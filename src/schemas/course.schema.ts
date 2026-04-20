@@ -77,10 +77,15 @@ export const CourseReviewSchema = z.object({
   comment: z.string().nullable(),
   createdAt: z.coerce.date(),
   user: z.object({
+    id: z.string(),
     fullName: z.string(),
     avatar: z.string().nullable()
-  })
+  }),
+  instructorReply: z.string().nullable().optional(),
+  instructorReplyAt: z.coerce.date().nullable().optional()
 })
+
+export type CourseReview = z.infer<typeof CourseReviewSchema>
 
 export const CourseDetailResponseSchema = z.object({
   id: z.string(),
@@ -118,6 +123,7 @@ export const CourseDetailResponseSchema = z.object({
       completionRate: z.number()
     })
     .nullable(),
+  userReview: CourseReviewSchema.nullable().optional(),
   reviews: z.array(CourseReviewSchema)
 })
 

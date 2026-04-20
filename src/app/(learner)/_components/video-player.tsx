@@ -28,6 +28,8 @@ const ReactPlayer = dynamic(() => import('react-player'), {
   ssr: false
 }) as unknown as React.ComponentType<VideoReactPlayerProps & React.RefAttributes<ReactPlayerInstance>>
 
+import { getVideoUrl } from '@/utils/course'
+
 interface VideoPlayerProps {
   url: string
   lastPosition: number // Tính bằng giây (s)
@@ -36,6 +38,7 @@ interface VideoPlayerProps {
 }
 
 export function VideoPlayer({ url, lastPosition, lessonId, onEnded }: VideoPlayerProps) {
+  const formattedUrl = getVideoUrl(url)
   const playerRef = useRef<ReactPlayerInstance | null>(null)
   const [hasJumped, setHasJumped] = useState(false)
 
@@ -73,11 +76,32 @@ export function VideoPlayer({ url, lastPosition, lessonId, onEnded }: VideoPlaye
     return () => clearInterval(heartbeatInterval)
   }, [lessonId])
 
+  const isYoutube = formattedUrl.includes('youtube.com') || formattedUrl.includes('youtu.be')
+
+  if (isYoutube) {
+    const embedUrl = formattedUrl
+      .replace('watch?v=', 'embed/')
+      .replace('youtu.be/', 'youtube.com/embed/')
+
+    return (
+      <div className='relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl border border-white/10'>
+        <iframe
+          className='w-full h-full'
+          src={embedUrl}
+          title='YouTube video player'
+          allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+          allowFullScreen
+        />
+      </div>
+    )
+  }
+
   return (
     <div className='relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl border border-white/10'>
       <ReactPlayer
+        key={formattedUrl}
         ref={playerRef}
-        url={url}
+        url={formattedUrl}
         width='100%'
         height='100%'
         controls

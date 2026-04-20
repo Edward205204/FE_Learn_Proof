@@ -131,49 +131,58 @@ export default function LessonPage() {
   }
 
   return (
-    <main className='max-w-[1400px] mx-auto py-10 px-4 md:px-8 grid grid-cols-1 lg:grid-cols-4 gap-10'>
-      {/* Lõi Render theo loại bài học */}
-      <div className='lg:col-span-3 space-y-6'>
-        {activeLesson.type === 'video' && (
-          <div className='animate-in fade-in slide-in-from-bottom-4 duration-500'>
-            <VideoPlayer
-              url={activeLesson.videoUrl}
-              lastPosition={activeLesson.lastPosition}
-              lessonId={activeLesson.id}
-              onEnded={handleVideoEnded}
+    <div className='min-h-screen bg-[oklch(0.985_0_0)] dark:bg-[oklch(0.141_0.005_285.823)]'>
+      <main className='max-w-[1440px] mx-auto py-8 px-4 md:px-8 lg:px-10'>
+        <div className='grid grid-cols-1 lg:grid-cols-12 gap-8 items-start'>
+          {/* Lõi Render theo loại bài học */}
+          <div className='lg:col-span-8 xl:col-span-9 space-y-8'>
+            {activeLesson.type === 'video' && (
+              <div className='animate-in fade-in slide-in-from-bottom-4 duration-500'>
+                <VideoPlayer
+                  url={activeLesson.videoUrl}
+                  lastPosition={activeLesson.lastPosition}
+                  lessonId={activeLesson.id}
+                  onEnded={handleVideoEnded}
+                />
+                <div className='mt-8 space-y-6'>
+                  <h1 className='text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight'>
+                    {activeLesson.title}
+                  </h1>
+                  <LessonTabs
+                    lessonId={activeLesson.id}
+                    description={activeLesson.description}
+                    materials={activeLesson.materials}
+                    isEnrolled={chaptersRaw && chaptersRaw.length > 0}
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeLesson.type === 'reading' && (
+              <div className='animate-in fade-in slide-in-from-bottom-4 duration-500 bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-slate-100 dark:border-slate-800'>
+                <ReadingContent lesson={activeLesson} />
+              </div>
+            )}
+
+            {activeLesson.type === 'quiz' && (
+              <div className='animate-in fade-in slide-in-from-bottom-4 duration-500 bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-slate-100 dark:border-slate-800'>
+                <QuizContainer lesson={activeLesson} onSubmit={handleQuizSubmit} />
+              </div>
+            )}
+          </div>
+
+          {/* Cột Sidebar - Khóa cứng */}
+          <div className='lg:col-span-4 xl:col-span-3 lg:sticky lg:top-28 h-fit lg:h-[calc(100vh-140px)] z-20'>
+            <CurriculumSidebar
+              chapters={chapters}
+              currentLessonId={activeLesson.id}
+              prevLessonId={prevLessonId}
+              nextLessonId={nextLessonId}
+              onLessonClick={handleNavigate}
             />
-            <h1 className='text-3xl font-bold text-foreground mt-6'>{activeLesson.title}</h1>
-            <LessonTabs
-              lessonId={activeLesson.id}
-              description={activeLesson.description}
-              materials={activeLesson.materials}
-            />
           </div>
-        )}
-
-        {activeLesson.type === 'reading' && (
-          <div className='animate-in fade-in slide-in-from-bottom-4 duration-500'>
-            <ReadingContent lesson={activeLesson} />
-          </div>
-        )}
-
-        {activeLesson.type === 'quiz' && (
-          <div className='animate-in fade-in slide-in-from-bottom-4 duration-500'>
-            <QuizContainer lesson={activeLesson} onSubmit={handleQuizSubmit} />
-          </div>
-        )}
-      </div>
-
-      {/* Cột Sidebar */}
-      <div className='lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)]'>
-        <CurriculumSidebar
-          chapters={chapters}
-          currentLessonId={activeLesson.id}
-          prevLessonId={prevLessonId}
-          nextLessonId={nextLessonId}
-          onLessonClick={handleNavigate}
-        />
-      </div>
-    </main>
+        </div>
+      </main>
+    </div>
   )
 }

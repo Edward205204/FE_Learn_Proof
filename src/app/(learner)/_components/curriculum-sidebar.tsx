@@ -40,7 +40,7 @@ export function CurriculumSidebar({
   const progressPercent = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0
 
   return (
-    <div className='bg-background rounded-xl p-6 shadow-sm border border-border h-full flex flex-col overflow-hidden'>
+    <div className='bg-white dark:bg-slate-900 rounded-[2rem] p-6 shadow-sm border border-slate-100 dark:border-slate-800 h-full flex flex-col overflow-hidden'>
       {/* Header — PB24 */}
       <div className='mb-8 px-2 shrink-0'>
         <h3 className='font-bold text-lg text-foreground tracking-tight'>Nội dung khóa học</h3>
@@ -49,11 +49,14 @@ export function CurriculumSidebar({
         </p>
 
         {/* Thanh Progress Bar */}
-        <div className='relative mt-5'>
-          <span className='absolute -top-5 right-0 text-[10px] font-bold text-primary'>{progressPercent}%</span>
-          <div className='w-full bg-muted h-1.5 rounded-full overflow-hidden'>
+        <div className='relative mt-6'>
+          <div className='flex items-center justify-between mb-2'>
+            <span className='text-[10px] font-black text-rose-500 uppercase tracking-wider'>Tiến độ học tập</span>
+            <span className='text-[10px] font-black text-rose-500'>{progressPercent}%</span>
+          </div>
+          <div className='w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden'>
             <div
-              className='bg-primary h-full rounded-full transition-all duration-500 ease-out'
+              className='bg-rose-500 h-full rounded-full transition-all duration-700 ease-out shadow-[0_0_8px_rgba(244,63,94,0.4)]'
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -107,12 +110,12 @@ export function CurriculumSidebar({
 
                       <span
                         className={cn(
-                          'text-[13px] leading-snug break-words',
+                          'text-[13px] leading-snug break-words transition-colors',
                           isActive
-                            ? 'font-bold text-primary'
+                            ? 'font-black text-rose-600'
                             : lesson.isCompleted
-                              ? 'font-medium text-muted-foreground'
-                              : 'font-medium text-foreground/90'
+                              ? 'font-bold text-slate-400'
+                              : 'font-bold text-slate-700 dark:text-slate-300 group-hover:text-rose-600'
                         )}
                       >
                         {lesson.title}

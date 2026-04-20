@@ -4,7 +4,7 @@ import { config } from '@/constants/config'
 
 const homeApi = {
   getHomeSections: () =>
-    fetch(`${config.BE_URL}/courses/home-sections`, { next: { revalidate: 30 } }),
+    fetch(`${config.BE_URL}/courses/home-sections`, { cache: 'no-store' }),
 
   getCategories: () => http.get<CategoryWithCount[]>('/courses/categories')
 }

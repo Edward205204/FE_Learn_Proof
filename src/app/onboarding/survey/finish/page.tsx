@@ -12,7 +12,23 @@ import { useUpdateProfileMutation } from '@/app/(auth)/_hooks/use-auth-mutation'
 import { useOnboardingData } from '../layout'
 import { useAuthStore } from '@/store/auth.store'
 
-const MOCK_ROADMAPS: Record<string, any[]> = {
+interface Lesson {
+  id: number
+  type: string
+  title: string
+  duration: string
+}
+
+interface RoadmapStep {
+  id: number
+  title: string
+  stats: string
+  tags: string[]
+  icon: React.ReactNode
+  lessons: Lesson[]
+}
+
+const MOCK_ROADMAPS: Record<string, RoadmapStep[]> = {
   web: [
     {
       id: 1,
@@ -106,7 +122,7 @@ export default function OnboardingFinishPage() {
   const updateProfileMutation = useUpdateProfileMutation()
 
   const ROADMAP_STEPS = MOCK_ROADMAPS[onboardingData.field] || MOCK_ROADMAPS.web
-  const currentStepData = ROADMAP_STEPS.find((s: any) => s.id === activeStep) || ROADMAP_STEPS[0]
+  const currentStepData = ROADMAP_STEPS.find((s: RoadmapStep) => s.id === activeStep) || ROADMAP_STEPS[0]
   const isAlreadyCompleted = user?.isOnboardingCompleted
 
   return (
@@ -160,7 +176,7 @@ export default function OnboardingFinishPage() {
             <div className='absolute left-6 top-10 bottom-10 w-0.5 bg-rose-200' />
 
             <div className='space-y-6'>
-              {ROADMAP_STEPS.map((step: any) => (
+              {ROADMAP_STEPS.map((step: RoadmapStep) => (
                 <div key={step.id} className='relative pl-14 cursor-pointer' onClick={() => setActiveStep(step.id)}>
                   {/* Step Dot/Icon */}
                   <div
@@ -217,7 +233,7 @@ export default function OnboardingFinishPage() {
               </div>
 
               <div className='space-y-4 mb-8'>
-                {currentStepData.lessons.map((lesson: any) => (
+                {currentStepData.lessons.map((lesson: Lesson) => (
                   <div
                     key={lesson.id}
                     className='flex items-center gap-4 p-4 rounded-3xl bg-rose-50/50 hover:bg-rose-50 border border-transparent hover:border-rose-100 transition-all cursor-pointer'
