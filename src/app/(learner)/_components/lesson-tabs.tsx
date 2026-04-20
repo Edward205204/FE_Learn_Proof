@@ -3,57 +3,53 @@
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { Send, FileText, Download, Bot, Lock } from 'lucide-react'
-
-import { useAuthStore } from '@/store/auth.store'
-import { LessonComments } from './lesson-comments'
+import { Send, FileText, Download, Bot } from 'lucide-react'
+import { LessonDiscussion } from './lesson-discussion'
 
 interface LessonTabsProps {
   courseId: string
   lessonId: string
   description: string
   materials: { title: string; size: string; url: string }[]
-  isEnrolled?: boolean
 }
 
-export function LessonTabs({ lessonId, courseId, description, materials, isEnrolled = false }: LessonTabsProps) {
-  const { user } = useAuthStore()
+export function LessonTabs({ courseId, lessonId, description, materials }: LessonTabsProps) {
   const [aiInput, setAiInput] = useState('')
 
   const handleSendAi = () => {
-    if (!aiInput.trim() || !isEnrolled) return
-    console.log('Sending to AI:', { lessonId, userId: user?.id, content: aiInput })
+    if (!aiInput.trim()) return
+    console.log('Sending to AI:', { lessonId, content: aiInput })
     setAiInput('')
   }
 
   return (
     <Tabs defaultValue='description' className='w-full'>
-      {/* ... (TabsList unchanged) ... */}
-      <TabsList className='bg-slate-100/50 dark:bg-slate-800/50 p-1.5 rounded-[1.25rem] w-fit h-auto gap-1 mb-8 border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm'>
+      {/* Tab Headers */}
+      <TabsList className='bg-transparent border-b border-border rounded-none w-full justify-start h-auto p-0 mb-6 gap-2'>
         <TabsTrigger
           value='description'
-          className='rounded-[0.875rem] px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 data-[state=active]:text-rose-600 data-[state=active]:shadow-md transition-all font-black text-xs uppercase tracking-wider text-slate-500'
+          className='data-[state=active]:text-primary data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none border-b-2 border-transparent px-2 py-3 font-semibold text-muted-foreground transition-all'
         >
           Mô tả
         </TabsTrigger>
         <TabsTrigger
           value='ai'
-          className='rounded-[0.875rem] px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 data-[state=active]:text-rose-600 data-[state=active]:shadow-md transition-all font-black text-xs uppercase tracking-wider text-slate-500 flex items-center gap-2'
+          className='data-[state=active]:text-primary data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none border-b-2 border-transparent px-2 py-3 font-semibold text-muted-foreground transition-all flex items-center gap-1.5'
         >
-          Hỏi đáp AI
-          <span className='bg-rose-500 text-white text-[8px] px-1.5 py-0.5 rounded-full font-black tracking-normal'>
-            NEW
+          Hỏi đáp AI{' '}
+          <span className='bg-primary/10 text-primary text-[9px] px-1.5 py-0.5 rounded-full uppercase font-bold tracking-wide'>
+            Mới
           </span>
         </TabsTrigger>
         <TabsTrigger
           value='discussion'
-          className='rounded-[0.875rem] px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 data-[state=active]:text-rose-600 data-[state=active]:shadow-md transition-all font-black text-xs uppercase tracking-wider text-slate-500'
+          className='data-[state=active]:text-primary data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none border-b-2 border-transparent px-2 py-3 font-semibold text-muted-foreground transition-all'
         >
           Thảo luận
         </TabsTrigger>
         <TabsTrigger
           value='materials'
-          className='rounded-[0.875rem] px-6 py-2.5 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 data-[state=active]:text-rose-600 data-[state=active]:shadow-md transition-all font-black text-xs uppercase tracking-wider text-slate-500'
+          className='data-[state=active]:text-primary data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none border-b-2 border-transparent px-2 py-3 font-semibold text-muted-foreground transition-all'
         >
           Tài liệu
         </TabsTrigger>
@@ -76,46 +72,36 @@ export function LessonTabs({ lessonId, courseId, description, materials, isEnrol
                 <Bot size={20} />
               </div>
               <div className='bg-background p-4 rounded-2xl rounded-tl-none shadow-sm text-[15px] text-foreground max-w-[85%] border border-border leading-relaxed'>
-                {
-                  'Chào mừng bạn đến với trợ lý AI của LearnProof! Tôi đã nắm vững nội dung bài học. Bạn có bất kỳ thắc mắc nào về lý thuyết hay cách áp dụng thực tế không?'
-                }
+                Chào mừng bạn đến với trợ lý AI của LearnProof! Tôi đã nắm vững nội dung bài học về <b>OKLCH</b>. Bạn có
+                bất kỳ thắc mắc nào về lý thuyết hay cách áp dụng thực tế không?
               </div>
             </div>
           </div>
 
           {/* Form nhập liệu Pill-style */}
           <div className='relative mt-4'>
-            {isEnrolled ? (
-              <>
-                <input
-                  type='text'
-                  value={aiInput}
-                  onChange={(e) => setAiInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSendAi()}
-                  placeholder='Đặt câu hỏi về bài học này...'
-                  className='w-full bg-background border border-input rounded-full py-4 pl-6 pr-14 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all shadow-sm'
-                />
-                <Button
-                  onClick={handleSendAi}
-                  size='icon'
-                  className='absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full h-11 w-11 bg-primary hover:bg-primary/90 shadow-md shadow-primary/20'
-                >
-                  <Send size={18} className='text-primary-foreground' />
-                </Button>
-              </>
-            ) : (
-              <div className='w-full bg-muted/20 border border-dashed border-border rounded-full py-4 px-6 text-sm text-muted-foreground flex items-center justify-center gap-2'>
-                <Lock size={16} />
-                Bạn cần sở hữu khóa học này để đặt câu hỏi cho AI.
-              </div>
-            )}
+            <input
+              type='text'
+              value={aiInput}
+              onChange={(e) => setAiInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendAi()}
+              placeholder='Đặt câu hỏi về bài học này...'
+              className='w-full bg-background border border-input rounded-full py-4 pl-6 pr-14 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all shadow-sm'
+            />
+            <Button
+              onClick={handleSendAi}
+              size='icon'
+              className='absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full h-11 w-11 bg-primary hover:bg-primary/90 shadow-md shadow-primary/20'
+            >
+              <Send size={18} className='text-primary-foreground' />
+            </Button>
           </div>
         </div>
       </TabsContent>
 
       {/* --- PHẦN THẢO LUẬN --- */}
       <TabsContent value='discussion' className='mt-6 w-full min-w-0'>
-        <LessonComments courseId={courseId} lessonId={lessonId} isEnrolled={isEnrolled} />
+        <LessonDiscussion courseId={courseId} lessonId={lessonId} />
       </TabsContent>
 
       {/* --- PHẦN TÀI LIỆU --- */}

@@ -1,18 +1,21 @@
 'use client'
+import { LessonTabs } from '@/app/(learner)/_components/lesson-tabs'
 import { useEffect, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
-import { useMutation } from '@tanstack/react-query'
-import { LessonTabs } from '@/app/(learner)/_components/lesson-tabs'
 import { VideoPlayer } from '../../../../_components/video-player'
+
 import { CurriculumSidebar } from '../../../../_components/curriculum-sidebar'
 import { ReadingContent } from '../../../../_components/reading-content'
 import { QuizContainer } from '../../../../_components/quiz-container'
 import { LessonDiscussion } from '../../../../_components/lesson-discussion'
 import { useGetCourseProgressQuery } from '../../../../_hooks/use-course'
+import learnerLessonApi from '../../../../_api/lesson.api'
 import learnerQuizApi from '../../../../_api/quiz.api'
-import { useGetLessonForLearnerQuery, useMarkLessonCompleteMutation } from '../../../../_hooks/use-lesson'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import type { LessonData, SidebarChapter } from '../../../../_utils/lesson-types'
+
 function formatDuration(seconds?: number | null) {
   if (!seconds) return '--:--'
   const mins = Math.floor(seconds / 60)
@@ -21,35 +24,35 @@ function formatDuration(seconds?: number | null) {
 }
 
 export default function LessonPage() {
-  const params = useParams<{ id: string; lessonId: string }>()
+  const queryClient = useQueryClient()
   const router = useRouter()
+  const params = useParams<{ id: string; lessonId: string }>()
   const courseId = params.id
   const routeLessonId = params.lessonId
 
-  const { data: chaptersRaw, isLoading: isProgressLoading, isError: isProgressError } = useGetCourseProgressQuery(courseId)
-  const markCompleteMutation = useMarkLessonCompleteMutation(courseId)
-  const submitQuizMutation = useMutation({
-    mutationFn: ({ quizId, submission }: { quizId: string; submission: { questionId: string; answerId: string }[] }) =>
-      learnerQuizApi.submitQuiz(quizId, submission).then((res) => res.data)
-  })
+  const {
+    data: progressData,
+    isLoading: isProgressLoading,
+    isError: isProgressError
+  } = useGetCourseProgressQuery(courseId)
 
-  // 4. Map Chapters to Sidebar Format
   const chapters: SidebarChapter[] = useMemo(
     () =>
-      (chaptersRaw || []).map((ch) => ({
-        id: ch.id,
-        title: ch.title,
-        lessons: ch.lessons.map((l) => ({
-          id: l.id,
-          title: l.title,
-          duration: formatDuration(l.duration),
-          isCompleted: l.progress?.[0]?.isCompleted ?? false,
+      (progressData || []).map((chapter) => ({
+        id: chapter.id,
+        title: chapter.title,
+        lessons: chapter.lessons.map((lesson) => ({
+          id: lesson.id,
+          title: lesson.title,
+          duration: formatDuration(lesson.duration),
+          isCompleted: lesson.progress?.[0]?.isCompleted ?? false,
           isLocked: false,
-          type: l.type === 'VIDEO' ? 'video' : l.type === 'TEXT' ? 'reading' : 'quiz'
+          type: lesson.type === 'TEXT' ? 'reading' : lesson.type === 'QUIZ' ? 'quiz' : 'video'
         }))
       })),
-    [chaptersRaw]
+    [progressData]
   )
+
   const allLessons = useMemo(() => chapters.flatMap((c) => c.lessons), [chapters])
   const fallbackLessonId = useMemo(() => allLessons.find((l) => !l.isCompleted)?.id || allLessons[0]?.id, [allLessons])
   const currentLessonId = routeLessonId === 'start' ? fallbackLessonId : routeLessonId
@@ -63,49 +66,65 @@ export default function LessonPage() {
   }, [allLessons, courseId, fallbackLessonId, routeLessonId, router])
 
   const {
-    data: lessonRaw,
+    data: lessonData,
     isLoading: isLessonLoading,
     isError: isLessonError
-  } = useGetLessonForLearnerQuery(currentLessonId || '')
+  } = useQuery({
+    queryKey: ['learner_lesson', currentLessonId],
+    queryFn: () => learnerLessonApi.getLessonForLearner(currentLessonId!).then((res) => res.data),
+    enabled: Boolean(currentLessonId)
+  })
+
+  const markCompleteMutation = useMutation({
+    mutationFn: (lessonId: string) => learnerLessonApi.markLessonComplete(lessonId, courseId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['learner_course', courseId, 'progress'] })
+      toast.success('Đã cập nhật tiến độ bài học.')
+    }
+  })
+
+  const submitQuizMutation = useMutation({
+    mutationFn: ({ quizId, submission }: { quizId: string; submission: { questionId: string; answerId: string }[] }) =>
+      learnerQuizApi.submitQuiz(quizId, submission).then((res) => res.data)
+  })
 
   const activeLesson: LessonData | null = useMemo(() => {
-    if (!lessonRaw) return null
-    if (lessonRaw.type === 'VIDEO') {
+    if (!lessonData) return null
+    if (lessonData.type === 'VIDEO') {
       return {
-        id: lessonRaw.id,
+        id: lessonData.id,
         type: 'video',
-        title: lessonRaw.title,
-        videoUrl: lessonRaw.videoUrl,
+        title: lessonData.title,
+        videoUrl: lessonData.videoUrl,
         lastPosition: 0,
-        description: lessonRaw.shortDesc || 'Không có mô tả cho bài học này.',
+        description: lessonData.shortDesc || 'Không có mô tả cho bài học này.',
         materials: []
       }
     }
-    if (lessonRaw.type === 'TEXT') {
-      const textContent = lessonRaw.textContent || ''
-      const wordCount = textContent.trim() ? textContent.trim().split(/\s+/).length : 0
+    if (lessonData.type === 'TEXT') {
+      const wordCount = lessonData.textContent.trim().split(/\s+/).length
       return {
-        id: lessonRaw.id,
+        id: lessonData.id,
         type: 'reading',
-        title: lessonRaw.title,
-        content: textContent,
+        title: lessonData.title,
+        content: lessonData.textContent,
         estimatedMinutes: Math.max(1, Math.ceil(wordCount / 220)),
         materials: []
       }
     }
     return {
-      id: lessonRaw.id,
+      id: lessonData.id,
       type: 'quiz',
-      title: lessonRaw.title,
+      title: lessonData.title,
       isFinalExam: false,
-      quizId: lessonRaw.quiz?.id,
-      questions: (lessonRaw.quiz?.questions || []).map((q) => ({
+      quizId: lessonData.quiz?.id,
+      questions: (lessonData.quiz?.questions || []).map((q) => ({
         id: q.id,
         text: q.content,
         options: q.answers.map((a) => ({ id: a.id, text: a.content }))
       }))
     }
-  }, [lessonRaw])
+  }, [lessonData])
 
   const currentIndex = allLessons.findIndex((l) => l.id === currentLessonId)
   const prevLessonId = allLessons[currentIndex - 1]?.id ?? null
@@ -165,7 +184,6 @@ export default function LessonPage() {
               url={activeLesson.videoUrl}
               lastPosition={activeLesson.lastPosition}
               lessonId={activeLesson.id}
-              onEnded={() => markCompleteMutation.mutate(activeLesson.id)}
             />
             <h1 className='mt-6 w-full wrap-break-word text-3xl font-bold text-foreground'>{activeLesson.title}</h1>
             <LessonTabs
@@ -173,7 +191,6 @@ export default function LessonPage() {
               lessonId={activeLesson.id}
               description={activeLesson.description}
               materials={activeLesson.materials}
-              isEnrolled
             />
           </div>
         )}

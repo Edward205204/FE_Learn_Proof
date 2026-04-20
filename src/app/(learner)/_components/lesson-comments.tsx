@@ -6,12 +6,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuthStore } from '@/store/auth.store'
 import {
@@ -24,7 +19,6 @@ import {
   useDeleteReplyMutation
 } from '../../(cms)/_hooks/use-interaction'
 import { DiscussionItem, DiscussionReply } from '../../(cms)/_utils/zod'
-import { cn } from '@/lib/utils'
 
 interface LessonCommentsProps {
   courseId: string
@@ -34,7 +28,7 @@ interface LessonCommentsProps {
 
 export function LessonComments({ courseId, lessonId, isEnrolled }: LessonCommentsProps) {
   const { user } = useAuthStore()
-  const [page, setPage] = useState(1)
+  const [page] = useState(1)
   const [content, setContent] = useState('')
 
   const { data, isLoading } = useLessonCommentsQuery(courseId, lessonId, page, 100)
@@ -87,7 +81,7 @@ export function LessonComments({ courseId, lessonId, isEnrolled }: LessonComment
             ))}
           </div>
         ) : data?.data && data.data.length > 0 ? (
-          data.data.map((item) => (
+          data.data.map((item: DiscussionItem) => (
             <CommentItem key={item.id} item={item} currentUserId={user?.id} isEnrolled={isEnrolled} />
           ))
         ) : (
@@ -120,10 +114,7 @@ function CommentItem({
 
   const handleUpdate = () => {
     if (!editContent.trim()) return
-    updateMutation.mutate(
-      { commentId: item.id, content: editContent },
-      { onSuccess: () => setIsEditing(false) }
-    )
+    updateMutation.mutate({ commentId: item.id, content: editContent }, { onSuccess: () => setIsEditing(false) })
   }
 
   const handleDelete = () => {
@@ -166,7 +157,11 @@ function CommentItem({
             {isOwner && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant='ghost' size='icon' className='h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity'>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity'
+                  >
                     <MoreVertical className='h-3.5 w-3.5' />
                   </Button>
                 </DropdownMenuTrigger>
@@ -174,7 +169,10 @@ function CommentItem({
                   <DropdownMenuItem onClick={() => setIsEditing(true)} className='gap-2 text-xs font-bold'>
                     <Pencil className='h-3.5 w-3.5' /> Sửa
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleDelete} className='gap-2 text-xs font-bold text-destructive hover:!text-destructive'>
+                  <DropdownMenuItem
+                    onClick={handleDelete}
+                    className='gap-2 text-xs font-bold text-destructive hover:!text-destructive'
+                  >
                     <Trash2 className='h-3.5 w-3.5' /> Xoá
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -190,13 +188,19 @@ function CommentItem({
                 className='min-h-[80px] rounded-xl text-sm p-3'
               />
               <div className='flex justify-end gap-2'>
-                <Button variant='ghost' size='sm' onClick={() => setIsEditing(false)} className='text-xs h-8 font-bold'>Hủy</Button>
-                <Button size='sm' onClick={handleUpdate} className='text-xs h-8 font-bold'>Lưu thay đổi</Button>
+                <Button variant='ghost' size='sm' onClick={() => setIsEditing(false)} className='text-xs h-8 font-bold'>
+                  Hủy
+                </Button>
+                <Button size='sm' onClick={handleUpdate} className='text-xs h-8 font-bold'>
+                  Lưu thay đổi
+                </Button>
               </div>
             </div>
           ) : (
             <>
-              <p className='text-[15px] leading-relaxed text-foreground/90 font-medium whitespace-pre-line'>{item.content}</p>
+              <p className='text-[15px] leading-relaxed text-foreground/90 font-medium whitespace-pre-line'>
+                {item.content}
+              </p>
               <div className='flex items-center gap-4 mt-2'>
                 <button
                   onClick={() => setIsReplying(!isReplying)}
@@ -219,8 +223,17 @@ function CommentItem({
                 className='min-h-[80px] rounded-xl text-sm p-3'
               />
               <div className='flex justify-end gap-2'>
-                <Button variant='ghost' size='sm' onClick={() => setIsReplying(false)} className='text-xs h-8 font-bold'>Hủy</Button>
-                <Button size='sm' onClick={handleReply} className='text-xs h-8 font-bold'>Gửi trả lời</Button>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={() => setIsReplying(false)}
+                  className='text-xs h-8 font-bold'
+                >
+                  Hủy
+                </Button>
+                <Button size='sm' onClick={handleReply} className='text-xs h-8 font-bold'>
+                  Gửi trả lời
+                </Button>
               </div>
             </div>
           )}
@@ -248,10 +261,7 @@ function ReplyItem({ reply, currentUserId }: { reply: DiscussionReply; currentUs
 
   const handleUpdate = () => {
     if (!editContent.trim()) return
-    updateMutation.mutate(
-      { replyId: reply.id, content: editContent },
-      { onSuccess: () => setIsEditing(false) }
-    )
+    updateMutation.mutate({ replyId: reply.id, content: editContent }, { onSuccess: () => setIsEditing(false) })
   }
 
   const handleDelete = () => {
@@ -303,8 +313,17 @@ function ReplyItem({ reply, currentUserId }: { reply: DiscussionReply; currentUs
               className='min-h-[60px] rounded-lg text-sm p-2.5'
             />
             <div className='flex justify-end gap-1.5'>
-              <Button variant='ghost' size='sm' onClick={() => setIsEditing(false)} className='text-[10px] h-7 font-bold'>Hủy</Button>
-              <Button size='sm' onClick={handleUpdate} className='text-[10px] h-7 font-bold'>Lưu</Button>
+              <Button
+                variant='ghost'
+                size='sm'
+                onClick={() => setIsEditing(false)}
+                className='text-[10px] h-7 font-bold'
+              >
+                Hủy
+              </Button>
+              <Button size='sm' onClick={handleUpdate} className='text-[10px] h-7 font-bold'>
+                Lưu
+              </Button>
             </div>
           </div>
         ) : (
