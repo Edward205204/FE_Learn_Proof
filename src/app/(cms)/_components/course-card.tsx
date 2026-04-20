@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { BookOpen, Pencil, Trash2 } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -22,6 +23,7 @@ import {
 } from '../_constants/course-manager'
 import { PATH } from '@/constants/path'
 import { EditCourseMetadataDialog } from './edit-course-metadata-dialog'
+import { config } from '@/constants/config'
 
 interface CourseCardProps {
   course: ManagerCourseItem
@@ -33,8 +35,13 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const statusMutation = useUpdateCourseStatusMutation(course.id)
   const deleteCourseMutation = useDeleteCourseMutation()
-
-  const analytics = course.overallAnalytics
+  const thumbnailUrl = course.thumbnail
+    ? course.thumbnail.startsWith('http')
+      ? course.thumbnail
+      : course.thumbnail.startsWith('/media/')
+        ? `${config.BE_URL}${course.thumbnail}`
+        : `${config.BE_URL}/media/${course.thumbnail}`
+    : null
 
   return (
     <>
@@ -50,11 +57,12 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
             <div className='flex flex-col sm:flex-row items-start gap-4 sm:gap-6'>
               {/* Image Section */}
               <div className='relative aspect-video w-full sm:w-44 shrink-0 rounded-xl bg-muted/50 overflow-hidden border border-border/50'>
-                {course.thumbnail ? (
+                {thumbnailUrl ? (
                   <Image
                     fill
-                    src={course.thumbnail}
+                    src={thumbnailUrl}
                     alt={course.title}
+                    unoptimized
                     className='object-cover transition-transform duration-500 group-hover:scale-105'
                     sizes='(max-width: 640px) 100vw, 176px'
                   />
@@ -178,12 +186,13 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                   )} */}
                   <div className='flex-1' />
                   <span className='opacity-70'>{formatDate(course.createdAt)}</span>
-                  {!course.isCompleted && (
+                  {course.isCompleted && (
                     <Badge
                       variant='outline'
-                      className='text-[9px] px-1.5 py-0 h-4 bg-amber-500/10 text-amber-600 border-amber-500/20 shadow-none'
+                      className='text-[9px] px-1.5 py-0 h-4 bg-emerald-500/10 text-emerald-700 border-emerald-500/30 shadow-none'
                     >
-                      Chưa hoàn thiện
+                      <CheckCircle2 className='size-3 mr-1' />
+                      Đã hoàn thiện
                     </Badge>
                   )}
                 </div>

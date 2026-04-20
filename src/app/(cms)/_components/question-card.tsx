@@ -1,20 +1,34 @@
 import { Trash2 } from 'lucide-react'
-import { UseFormReturn } from 'react-hook-form'
+import { FieldValues, Path, UseFormReturn } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { QuizFormValues } from '../_utils/zod'
 import { AnswerList } from './answer-list'
 
-interface QuestionCardProps {
-  index: number
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  form: UseFormReturn<any>
-  onRemove: (index: number) => void
-  showAnswers?: boolean
+type QuizAnswer = { text: string; isCorrect: boolean }
+type QuizQuestion = { questionText: string; answers: QuizAnswer[] }
+type QuizSectionKey = 'questions' | 'supplementalQuiz'
+
+type QuizEditableForm = FieldValues & {
+  questions: QuizQuestion[]
+  supplementalQuiz?: QuizQuestion[]
 }
 
-export function QuestionCard({ index, form, onRemove, showAnswers = true }: QuestionCardProps) {
+interface QuestionCardProps<TForm extends QuizEditableForm> {
+  index: number
+  form: UseFormReturn<TForm>
+  onRemove: (index: number) => void
+  showAnswers?: boolean
+  namePrefix?: QuizSectionKey
+}
+
+export function QuestionCard<TForm extends QuizEditableForm>({
+  index,
+  form,
+  onRemove,
+  showAnswers = true,
+  namePrefix = 'questions'
+}: QuestionCardProps<TForm>) {
   return (
     <Card className='relative overflow-visible border border-border/60 shadow-sm rounded-2xl bg-card focus-within:ring-4 focus-within:ring-primary/10 focus-within:border-primary/30 transition-all duration-300'>
       <CardContent className='p-6 sm:p-8'>
@@ -39,7 +53,7 @@ export function QuestionCard({ index, form, onRemove, showAnswers = true }: Ques
               Nội dung câu hỏi
             </label>
             <Input
-              {...form.register(`questions.${index}.questionText`)}
+              {...form.register(`${namePrefix}.${index}.questionText` as Path<TForm>)}
               placeholder='VD: Tính chất OOP nào dưới đây cho phép...'
               className='text-base font-medium py-6 bg-muted/10 border-border/50 focus-visible:ring-primary/20 rounded-xl'
             />
@@ -50,7 +64,7 @@ export function QuestionCard({ index, form, onRemove, showAnswers = true }: Ques
               <label className='text-[11px] font-bold uppercase tracking-wider text-muted-foreground block mb-2 mt-4'>
                 Các đáp án
               </label>
-              <AnswerList questionIndex={index} form={form as UseFormReturn<QuizFormValues>} />
+              <AnswerList questionIndex={index} form={form} namePrefix={namePrefix} />
             </div>
           )}
         </div>

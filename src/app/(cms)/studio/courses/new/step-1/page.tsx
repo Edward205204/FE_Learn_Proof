@@ -32,6 +32,7 @@ export default function CreateCourseStep1Page() {
   })
 
   const shortDescValue = useWatch({ control: form.control, name: 'shortDesc' })
+  const thumbnailValue = useWatch({ control: form.control, name: 'thumbnail' })
   const shortDescriptionLength = shortDescValue?.length ?? 0
 
   const onNext = async (data: CreateCourseStep1) => {
@@ -62,7 +63,7 @@ export default function CreateCourseStep1Page() {
             form={form}
             categories={categories}
             shortDescriptionLength={shortDescriptionLength}
-            thumbnailUrl={form.getValues('thumbnail')}
+            thumbnailUrl={thumbnailValue}
           />
 
           <div className='pt-6 border-t flex items-center justify-between'>

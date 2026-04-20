@@ -10,7 +10,7 @@ export interface QuizQuestion {
   id: string
   text: string
   options: { id: string; text: string }[]
-  correctOptionId: string
+  correctOptionId?: string
 }
 
 // --- Lesson variants ---
@@ -39,6 +39,7 @@ export interface QuizLesson {
   type: 'quiz'
   title: string
   isFinalExam: boolean
+  quizId?: string
   questions: QuizQuestion[]
 }
 

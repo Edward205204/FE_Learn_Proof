@@ -28,14 +28,16 @@ import { useParams, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { PATH } from '@/constants/path'
 import { useAddToCartMutation } from '@/app/(learner)/_hooks/use-cart'
-import { useCourseDetailQuery } from '@/app/(public)/_hooks/use-course'
+import { useCourseDetailQuery } from '../../_hooks/use-course'
+import { useGetEnrollmentStatusQuery } from '@/app/(learner)/_hooks/use-enrollment'
 import {
   useWishlistQuery,
   useAddToWishlistMutation,
   useRemoveFromWishlistMutation
 } from '@/app/(learner)/_hooks/use-wishlist'
 import type { WishlistItem } from '@/app/(learner)/_api/wishlist.api'
-import { getCourseThumbnailUrl, getVideoUrl } from '@/utils/course'
+import { useAuthStore } from '@/store/auth.store'
+import { getCourseThumbnailUrl } from '@/utils/course'
 import { useGetLessonForLearnerQuery } from '@/app/(learner)/_hooks/use-lesson'
 import { VideoPlayer } from '@/app/(learner)/_components/video-player'
 import {
@@ -50,8 +52,15 @@ export default function CourseDetailPage() {
   const params = useParams()
   const router = useRouter()
   const courseSlug = params?.id as string
+  const { accessToken } = useAuthStore()
+  const isLoggedIn = Boolean(accessToken)
 
   const { data: courseData, isLoading, isError } = useCourseDetailQuery(courseSlug)
+  const { data: enrollmentStatus, isLoading: isEnrollmentLoading } = useGetEnrollmentStatusQuery(
+    courseData?.id || '',
+    isLoggedIn
+  )
+  const isEnrolled = enrollmentStatus?.enrolled ?? false
   const { data: wishlistData } = useWishlistQuery()
 
   const addMutation = useAddToCartMutation()
@@ -86,6 +95,7 @@ export default function CourseDetailPage() {
   }
 
   const courseIdOrSlug = courseData?.id || courseSlug
+  const learningHref = `/courses/${courseData?.id || courseSlug}/lessons/start`
 
   if (isLoading) {
     return (
@@ -336,43 +346,44 @@ export default function CourseDetailPage() {
                   )}
                 </div>
 
+                {isLoggedIn && isEnrolled && (
+                  <div className='mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700'>
+                    Bạn đã sở hữu khóa học này.
+                  </div>
+                )}
+
                 <Button
                   className={cn(
                     'w-full h-14 font-black text-base rounded-2xl shadow-xl active:scale-[0.98] transition-all disabled:opacity-70',
-                    courseData.isEnrolled
+                    isLoggedIn && isEnrolled
                       ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200 dark:shadow-emerald-900/20'
                       : 'bg-rose-600 hover:bg-rose-700 shadow-rose-200 dark:shadow-rose-900/20'
                   )}
-                  disabled={addMutation.isPending}
+                  disabled={addMutation.isPending || isEnrollmentLoading}
                   onClick={async () => {
-                    if (courseData.isEnrolled) {
-                      // Tìm bài học đầu tiên để redirect trực tiếp cho nhanh
-                      const firstLessonId = courseData.chapters?.[0]?.lessons?.[0]?.id
-                      if (firstLessonId) {
-                        router.push(`/courses/${courseData.id}/lessons/${firstLessonId}`)
-                      } else {
-                        router.push(`/courses/${courseData.id}/lessons`)
-                      }
+                    if (isLoggedIn && isEnrolled) {
+                      router.push(learningHref)
                       return
                     }
                     await addMutation.mutateAsync(courseIdOrSlug)
                     router.push(PATH.CHECKOUT)
                   }}
                 >
-                  {addMutation.isPending ? 'Đang xử lý...' : courseData.isEnrolled ? 'Vào học ngay' : 'Đăng ký ngay'}
+                  {isEnrollmentLoading ? 'Đang kiểm tra...' : isLoggedIn && isEnrolled ? 'Học ngay' : 'Đăng ký ngay'}
                 </Button>
 
-                {!courseData.isEnrolled && (
-                  <div className='flex gap-3 mt-3 mb-8'>
+                <div className='flex gap-3 mt-3 mb-8'>
+                  {!isLoggedIn || !isEnrolled ? (
                     <Button
                       variant='outline'
                       className='flex-1 h-12 rounded-2xl border-2 border-slate-200 dark:border-slate-700 font-black text-sm text-slate-700 dark:text-slate-200 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all gap-2 active:scale-[0.98] disabled:opacity-50'
                       onClick={() => addMutation.mutate(courseIdOrSlug)}
-                      disabled={addMutation.isPending}
+                      disabled={addMutation.isPending || isEnrollmentLoading}
                     >
                       <ShoppingCart size={16} />
-                      {addMutation.isPending ? 'Đang thêm...' : 'Thêm giỏ hàng'}
+                      {isEnrollmentLoading ? 'Đang kiểm tra...' : addMutation.isPending ? 'Đang thêm...' : 'Thêm giỏ hàng'}
                     </Button>
+                  ) : null}
 
                     <button
                       onClick={toggleWishlist}
@@ -395,8 +406,7 @@ export default function CourseDetailPage() {
                       )}
                     </button>
                   </div>
-                )}
-                {courseData.isEnrolled && <div className='mb-8' />}
+                {isLoggedIn && isEnrolled && <div className='mb-8' />}
 
                 <div className='space-y-5'>
                   <p className='text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]'>Khóa học bao gồm:</p>
