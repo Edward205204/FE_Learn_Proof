@@ -39,11 +39,10 @@ export type LearnerLessonDetail =
       chapterId: string
       quiz: LearnerQuiz
     }
-const lessonApi = {
-  getLessonForLearner: (lessonId: string) => http.get<LearnerLessonDetail>(`/lesson/${lessonId}/learn`),
 
-  markLessonComplete: (lessonId: string, courseId: string) =>
-    http.post(`/lesson/${lessonId}/complete`, { courseId })
+const learnerLessonApi = {
+  getLessonForLearner: (lessonId: string) => http.get<LearnerLessonDetail>(`/lesson/${lessonId}/learn`),
+  markLessonComplete: (lessonId: string, courseId: string) => http.post(`/lesson/${lessonId}/complete`, { courseId })
 }
 
-export default lessonApi
+export default learnerLessonApi
