@@ -1,48 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Check, ArrowRight, Download, Users, Mail, Award, Loader2 } from 'lucide-react'
+import { Check, ArrowRight, Download, Users, Mail, Award, XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PATH } from '@/constants/path'
-import enrollmentApi from '@/app/(learner)/_api/enrollment.api'
-import { toast } from 'sonner'
-import { useNotificationStore } from '@/store/notification.store'
 
 export default function CheckoutSuccessPage() {
-  const { addNotification } = useNotificationStore()
   const searchParams = useSearchParams()
+  const success = searchParams.get('success') === 'true'
+  const message = searchParams.get('message') || (success ? 'Thanh toán thành công.' : 'Thanh toán thất bại.')
+  const txnRef = searchParams.get('txnRef') || ''
   const courseIds = Array.from(new Set(searchParams.get('courseIds')?.split(',').filter(Boolean) || []))
-  const [isEnrolling, setIsEnrolling] = useState(true)
-
-  useEffect(() => {
-    const enrollAll = async () => {
-      if (courseIds.length === 0) {
-        setIsEnrolling(false)
-        return
-      }
-
-      try {
-        await Promise.all(courseIds.map((id) => enrollmentApi.createEnrollment(id)))
-        addNotification({
-          type: 'success',
-          title: 'Thanh toán thành công',
-          message: `Chào mừng bạn đến với ${courseIds.length} khóa học mới! Hãy bắt đầu học ngay nhé.`,
-          time: 'Vừa xong',
-          link: PATH.MY_COURSES
-        })
-      } catch (error) {
-        console.error('Enrollment failed:', error)
-        toast.error('Có lỗi xảy ra khi kích hoạt khóa học')
-      } finally {
-        setIsEnrolling(false)
-      }
-    }
-
-    enrollAll()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return (
     <div className='min-h-screen bg-[oklch(0.98_0.005_286.32)] dark:bg-[oklch(0.12_0.005_285.823)] flex flex-col items-center justify-center py-16 px-6'>
@@ -54,17 +23,21 @@ export default function CheckoutSuccessPage() {
           <div className='absolute -bottom-24 -right-24 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl' />
 
           {/* Icon */}
-          <div className='w-24 h-24 rounded-full bg-[oklch(0.577_0.245_27.325)] flex items-center justify-center text-white mb-10 shadow-xl shadow-[oklch(0.577_0.245_27.325)]/30 animate-in zoom-in-50 duration-500'>
-            {isEnrolling ? <Loader2 size={48} className='animate-spin' /> : <Check size={48} strokeWidth={4} />}
+          <div
+            className={`w-24 h-24 rounded-full flex items-center justify-center text-white mb-10 shadow-xl animate-in zoom-in-50 duration-500 ${
+              success
+                ? 'bg-[oklch(0.577_0.245_27.325)] shadow-[oklch(0.577_0.245_27.325)]/30'
+                : 'bg-red-500 shadow-red-500/30'
+            }`}
+          >
+            {success ? <Check size={48} strokeWidth={4} /> : <XCircle size={48} strokeWidth={3} />}
           </div>
 
           <h1 className='text-4xl md:text-5xl font-extrabold text-[oklch(0.141_0.005_285.823)] dark:text-white mb-6'>
-            {isEnrolling ? 'Đang kích hoạt...' : 'Thanh toán thành công!'}
+            {success ? 'Thanh toán thành công!' : 'Thanh toán chưa thành công'}
           </h1>
           <p className='text-[oklch(0.552_0.016_285.938)] text-lg max-w-lg mb-12 font-medium leading-relaxed'>
-            {isEnrolling
-              ? 'Chúng tôi đang thiết lập khóa học cho bạn, vui lòng đợi trong giây lát.'
-              : 'Chào mừng bạn đến với khóa học mới. Bạn đã có thể bắt đầu học ngay bây giờ.'}
+            {message}
           </p>
 
           {/* Receipt Summary Card (Simplified for mock) */}
@@ -75,7 +48,7 @@ export default function CheckoutSuccessPage() {
                   Trạng thái
                 </p>
                 <h2 className='text-xl font-extrabold text-[oklch(0.141_0.005_285.823)] dark:text-white'>
-                  {isEnrolling ? 'Đang xử lý' : 'Đã đăng ký thành công'}
+                  {success ? 'Đã kích hoạt khóa học' : 'Đơn thanh toán thất bại'}
                 </h2>
               </div>
               <div className='text-right'>
@@ -89,7 +62,7 @@ export default function CheckoutSuccessPage() {
                   Mã giao dịch
                 </p>
                 <p className='font-bold text-gray-900 dark:text-white'>
-                  #LP-{Math.floor(Math.random() * 90000000 + 10000000)}
+                  {txnRef || 'N/A'}
                 </p>
               </div>
               <div>
@@ -105,11 +78,10 @@ export default function CheckoutSuccessPage() {
           <div className='flex flex-col sm:flex-row gap-5 w-full max-w-md'>
             <Button
               asChild
-              disabled={isEnrolling}
               className='flex-1 h-16 bg-[oklch(0.577_0.245_27.325)] hover:bg-[oklch(0.477_0.245_27.325)] text-white gap-2 rounded-2xl font-black text-lg shadow-lg shadow-[oklch(0.577_0.245_27.325)]/20 transition-all active:scale-[0.98]'
             >
-              <Link href={PATH.MY_COURSES}>
-                Bắt đầu học ngay <ArrowRight size={20} />
+              <Link href={success ? PATH.MY_COURSES : PATH.CHECKOUT}>
+                {success ? 'Bắt đầu học ngay' : 'Thử thanh toán lại'} <ArrowRight size={20} />
               </Link>
             </Button>
             <Button

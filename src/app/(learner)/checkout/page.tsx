@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
 import {
   CreditCard,
   Wallet,
@@ -14,8 +13,7 @@ import {
   Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { PATH } from '@/constants/path'
-import { useCartQuery, useCheckoutMutation } from '../_hooks/use-cart'
+import { useCartQuery, useCreatePaymentFromCartMutation } from '../_hooks/use-cart'
 import { toast } from 'sonner'
 
 const PAYMENT_METHODS = [
@@ -46,10 +44,9 @@ const PAYMENT_METHODS = [
 ]
 
 export default function CheckoutPage() {
-  const router = useRouter()
   const [paymentMethod, setPaymentMethod] = useState('qr')
   const { data: cartData, isLoading: isCartLoading } = useCartQuery()
-  const checkoutMutation = useCheckoutMutation()
+  const createPaymentMutation = useCreatePaymentFromCartMutation()
 
   const cartItems = useMemo(() => cartData?.items || [], [cartData])
   const totalPrice = useMemo(() => cartItems.reduce((sum, item) => sum + item.course.price, 0), [cartItems])
@@ -65,14 +62,17 @@ export default function CheckoutPage() {
       return
     }
 
-    checkoutMutation.mutate(undefined, {
+    createPaymentMutation.mutate(undefined, {
       onSuccess: (res) => {
-        toast.success('Thanh toán thành công')
-        const courseIds = res.data.courseIds.join(',')
-        router.push(`${PATH.CHECKOUT_SUCCESS}?courseIds=${courseIds}`)
+        const paymentUrl = res.data.paymentUrl
+        if (!paymentUrl) {
+          toast.error('Không thể khởi tạo phiên thanh toán')
+          return
+        }
+        window.location.href = paymentUrl
       },
       onError: () => {
-        toast.error('Đã xảy ra lỗi khi thanh toán')
+        toast.error('Đã xảy ra lỗi khi tạo phiên thanh toán')
       }
     })
   }
@@ -237,10 +237,10 @@ export default function CheckoutPage() {
               {/* Checkout Button */}
               <Button
                 onClick={handleCheckout}
-                disabled={checkoutMutation.isPending || cartItems.length === 0}
+                  disabled={createPaymentMutation.isPending || cartItems.length === 0}
                 className='w-full h-16 bg-[oklch(0.577_0.245_27.325)] hover:bg-[oklch(0.477_0.245_27.325)] text-white gap-2 rounded-3xl font-black text-lg shadow-lg shadow-[oklch(0.577_0.245_27.325)]/20 transition-all active:scale-[0.98]'
               >
-                {checkoutMutation.isPending ? (
+                  {createPaymentMutation.isPending ? (
                   <Loader2 className='animate-spin' />
                 ) : (
                   <>

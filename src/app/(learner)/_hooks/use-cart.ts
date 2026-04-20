@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import cartApi from '../_api/cart.api'
+import paymentApi from '../_api/payment.api'
 
 export const CART_QUERY_KEY = ['cart']
 
-export function useCartQuery() {
+export function useCartQuery(enabled = true) {
   return useQuery({
     queryKey: CART_QUERY_KEY,
+    enabled,
     queryFn: async () => {
       const res = await cartApi.getCart()
       return res.data
@@ -49,5 +51,17 @@ export function useCheckoutMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY })
     }
+  })
+}
+
+export function useCreatePaymentFromCartMutation() {
+  return useMutation({
+    mutationFn: paymentApi.createPaymentFromCart,
+  })
+}
+
+export function useCreatePaymentMutation() {
+  return useMutation({
+    mutationFn: paymentApi.createPayment,
   })
 }
