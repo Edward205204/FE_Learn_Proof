@@ -26,8 +26,7 @@ import Link from 'next/link'
 import { useState, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { PATH } from '@/constants/path'
-import { useAddToCartMutation } from '@/app/(learner)/_hooks/use-cart'
+import { useAddToCartMutation, useCreatePaymentMutation } from '@/app/(learner)/_hooks/use-cart'
 import { useCourseDetailQuery } from '../../_hooks/use-course'
 import { useGetEnrollmentStatusQuery } from '@/app/(learner)/_hooks/use-enrollment'
 import {
@@ -64,6 +63,7 @@ export default function CourseDetailPage() {
   const { data: wishlistData } = useWishlistQuery()
 
   const addMutation = useAddToCartMutation()
+  const createPaymentMutation = useCreatePaymentMutation()
   const addToWishlistMutation = useAddToWishlistMutation()
   const removeFromWishlistMutation = useRemoveFromWishlistMutation()
 
@@ -359,17 +359,26 @@ export default function CourseDetailPage() {
                       ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200 dark:shadow-emerald-900/20'
                       : 'bg-rose-600 hover:bg-rose-700 shadow-rose-200 dark:shadow-rose-900/20'
                   )}
-                  disabled={addMutation.isPending || isEnrollmentLoading}
+                  disabled={addMutation.isPending || createPaymentMutation.isPending || isEnrollmentLoading}
                   onClick={async () => {
                     if (isLoggedIn && isEnrolled) {
                       router.push(learningHref)
                       return
                     }
-                    await addMutation.mutateAsync(courseIdOrSlug)
-                    router.push(PATH.CHECKOUT)
+                    const result = await createPaymentMutation.mutateAsync([courseIdOrSlug])
+                    const paymentUrl = result.data.paymentUrl
+                    if (paymentUrl) {
+                      window.location.href = paymentUrl
+                    }
                   }}
                 >
-                  {isEnrollmentLoading ? 'Đang kiểm tra...' : isLoggedIn && isEnrolled ? 'Học ngay' : 'Đăng ký ngay'}
+                  {isEnrollmentLoading
+                    ? 'Đang kiểm tra...'
+                    : createPaymentMutation.isPending
+                      ? 'Đang chuyển thanh toán...'
+                      : isLoggedIn && isEnrolled
+                        ? 'Học ngay'
+                        : 'Đăng ký ngay'}
                 </Button>
 
                 <div className='flex gap-3 mt-3 mb-8'>

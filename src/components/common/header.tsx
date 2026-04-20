@@ -10,7 +10,8 @@ import {
   BookOpen,
   History as HistoryIcon,
   LayoutDashboard,
-  Map as MapIcon
+  Map as MapIcon,
+  ShoppingCart
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -21,6 +22,7 @@ import { useHeader } from '@/hooks/use-header'
 import { Role } from '@/@types/user'
 import { useRef, useEffect, useState } from 'react'
 import { useNotificationStore } from '@/store/notification.store'
+import { useCartQuery } from '@/app/(learner)/_hooks/use-cart'
 
 export default function Header() {
   const router = useRouter()
@@ -36,6 +38,8 @@ export default function Header() {
   const { notifications, markAsRead } = useNotificationStore()
   const displayedNotifs = showAllNotifs ? notifications : notifications.slice(0, 5)
   const unreadCount = notifications.filter((n) => n.unread).length
+  const { data: cartData } = useCartQuery(isLoggedIn)
+  const cartCount = cartData?.items?.length || 0
 
   // Close notif when clicking outside
   useEffect(() => {
@@ -142,7 +146,18 @@ export default function Header() {
             <Link className='hover:text-[oklch(0.577_0.245_27.325)] transition-colors' href='/wishlist'>
               Yêu thích
             </Link>
-            <Link className='hover:text-[oklch(0.577_0.245_27.325)] transition-colors' href='/cart'>
+            <Link
+              className='hover:text-[oklch(0.577_0.245_27.325)] transition-colors inline-flex items-center gap-2'
+              href='/cart'
+            >
+              <span className='relative inline-flex items-center'>
+                <ShoppingCart size={16} />
+                {isLoggedIn && cartCount > 0 && (
+                  <span className='absolute -right-2 -top-2 min-w-4 h-4 px-1 rounded-full bg-[oklch(0.577_0.245_27.325)] text-white text-[10px] leading-4 font-black text-center'>
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
+              </span>
               Giỏ hàng
             </Link>
 
