@@ -150,6 +150,7 @@ export default function LessonPage() {
                   </h1>
                   <LessonTabs
                     lessonId={activeLesson.id}
+                    courseId={courseId}
                     description={activeLesson.description}
                     materials={activeLesson.materials}
                     isEnrolled={chaptersRaw && chaptersRaw.length > 0}

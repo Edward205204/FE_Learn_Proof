@@ -95,7 +95,25 @@ const interactionApi = {
    * POST /courses/:courseId/reviews
    * Học viên gửi đánh giá khoá học
    */
-  createReview: (courseId: string, payload: CreateReviewPayload) => http.post(`/courses/${courseId}/reviews`, payload)
+  createReview: (courseId: string, payload: CreateReviewPayload) => http.post(`/courses/${courseId}/reviews`, payload),
+
+  /**
+   * GET /reviews
+   * Content Manager: Lấy tất cả đánh giá của các khoá học của mình
+   */
+  getAllReviews: (params: PaginationParams = {}) => http.get('/reviews', { params }),
+
+  /**
+   * POST /reviews/:id/replies
+   * Content Manager: Phản hồi một đánh giá
+   */
+  replyToReview: (reviewId: string, payload: ContentPayload) => http.post(`/reviews/${reviewId}/replies`, payload),
+
+  /**
+   * DELETE /reviews/:id
+   * Content Manager: Xoá một đánh giá
+   */
+  deleteReviewById: (reviewId: string) => http.delete(`/reviews/${reviewId}`)
 }
 
 export default interactionApi

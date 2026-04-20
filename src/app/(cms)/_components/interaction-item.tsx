@@ -1,11 +1,19 @@
+import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Pin, ExternalLink, Star, CheckCircle2, Clock } from 'lucide-react'
+import { Pin, ExternalLink, Star, CheckCircle2, Clock, Trash2, Send } from 'lucide-react'
 import { InteractionValues } from '../_utils/zod'
 import { cn } from '@/lib/utils'
+import {
+  useReplyMutation,
+  useReplyToReviewMutation,
+  useDeleteCommentMutation,
+  useDeleteReviewMutation,
+  usePinMutation
+} from '../_hooks/use-interaction'
 
 function relativeTime(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date
@@ -30,8 +38,43 @@ interface InteractionItemProps {
 }
 
 export function InteractionItem({ data }: InteractionItemProps) {
+  const [replyContent, setReplyContent] = useState(data.reply || '')
   const isResolved = data.status === 'resolved'
   const accentColor = data.type === 'review' ? 'bg-primary' : 'bg-orange-400'
+
+  const replyDiscussion = useReplyMutation()
+  const replyReview = useReplyToReviewMutation()
+  const deleteComment = useDeleteCommentMutation()
+  const deleteReview = useDeleteReviewMutation()
+  const pinComment = usePinMutation()
+
+  const handleReply = () => {
+    if (!replyContent.trim()) return
+    if (data.type === 'discussion') {
+      replyDiscussion.mutate({ commentId: data.id, content: replyContent })
+    } else {
+      replyReview.mutate({ reviewId: data.id, content: replyContent })
+    }
+  }
+
+  const handleDelete = () => {
+    if (confirm('Bạn có chắc chắn muốn xoá tương tác này không?')) {
+      if (data.type === 'discussion') {
+        deleteComment.mutate(data.id)
+      } else {
+        deleteReview.mutate(data.id)
+      }
+    }
+  }
+
+  const handlePin = () => {
+    if (data.type === 'discussion') {
+      pinComment.mutate({ commentId: data.id, isPinned: data.isPinned })
+    }
+  }
+
+  const isPending =
+    replyDiscussion.isPending || replyReview.isPending || deleteComment.isPending || deleteReview.isPending
 
   return (
     <Card className='border border-border/50 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group bg-card/50 backdrop-blur-sm'>
@@ -62,7 +105,7 @@ export function InteractionItem({ data }: InteractionItemProps) {
                 >
                   {TYPE_LABEL[data.type]}
                 </Badge>
-                {data.type === 'discussion' && (
+                {(data.type === 'discussion' || data.type === 'review') && (
                   <Badge
                     variant={isResolved ? 'default' : 'secondary'}
                     className={cn(
@@ -72,7 +115,7 @@ export function InteractionItem({ data }: InteractionItemProps) {
                         : 'bg-muted text-muted-foreground border-none'
                     )}
                   >
-                    {isResolved ? 'Đã giải quyết' : 'Chưa giải quyết'}
+                    {isResolved ? 'Đã phản hồi' : 'Chưa phản hồi'}
                   </Badge>
                 )}
               </div>
@@ -87,16 +130,30 @@ export function InteractionItem({ data }: InteractionItemProps) {
             </div>
           </div>
 
-          <Button
-            variant='ghost'
-            size='icon'
-            className={cn(
-              'h-8 w-8 transition-colors',
-              data.isPinned ? 'text-primary bg-primary/5' : 'text-muted-foreground/40 hover:text-primary'
+          <div className='flex items-center gap-1.5'>
+            {data.type === 'discussion' && (
+              <Button
+                variant='ghost'
+                size='icon'
+                onClick={handlePin}
+                className={cn(
+                  'h-8 w-8 transition-colors',
+                  data.isPinned ? 'text-primary bg-primary/5' : 'text-muted-foreground/40 hover:text-primary'
+                )}
+              >
+                <Pin className={cn('h-4 w-4', data.isPinned && 'fill-current')} />
+              </Button>
             )}
-          >
-            <Pin className={cn('h-4 w-4', data.isPinned && 'fill-current')} />
-          </Button>
+            <Button
+              variant='ghost'
+              size='icon'
+              onClick={handleDelete}
+              className='h-8 w-8 text-muted-foreground/40 hover:text-destructive transition-colors'
+              disabled={isPending}
+            >
+              <Trash2 className='h-4 w-4' />
+            </Button>
+          </div>
         </div>
 
         {/* Content Section */}
@@ -133,13 +190,17 @@ export function InteractionItem({ data }: InteractionItemProps) {
               data.type === 'review' ? `Cảm ơn ${data.user.name} về đánh giá này...` : 'Nhập phản hồi nhanh...'
             }
             className='bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary/20 transition-all resize-none min-h-[50px] max-h-[120px] text-sm pr-20 py-3 scrollbar-hide'
-            defaultValue={data.reply || ''}
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
           />
           <div className='absolute right-2 bottom-2 flex items-center gap-2'>
             <Button
               size='sm'
+              onClick={handleReply}
+              disabled={isPending || !replyContent.trim() || replyContent === data.reply}
               className='h-7 py-0 px-3 text-[11px] font-bold shadow-sm bg-primary hover:bg-primary/90 transition-all'
             >
+              <Send className='h-3 w-3 mr-1.5' />
               Gửi phản hồi
             </Button>
           </div>
@@ -147,7 +208,7 @@ export function InteractionItem({ data }: InteractionItemProps) {
 
         {isResolved && (
           <div className='flex items-center gap-1.5 text-emerald-600 text-[10px] font-bold mt-3 opacity-80'>
-            <CheckCircle2 className='h-3.5 w-3.5' /> ĐÃ GIẢI QUYẾT
+            <CheckCircle2 className='h-3.5 w-3.5' /> ĐÃ PHẢN HỒI
           </div>
         )}
       </CardContent>

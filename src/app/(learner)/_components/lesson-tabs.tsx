@@ -8,19 +8,19 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Send, FileText, Download, Bot } from 'lucide-react'
 
 import { useAuthStore } from '@/store/auth.store'
-import { Lock } from 'lucide-react'
+import { LessonComments } from './lesson-comments'
 
 interface LessonTabsProps {
   lessonId: string
+  courseId: string
   description: string
   materials: { title: string; size: string; url: string }[]
   isEnrolled?: boolean
 }
 
-export function LessonTabs({ lessonId, description, materials, isEnrolled = false }: LessonTabsProps) {
+export function LessonTabs({ lessonId, courseId, description, materials, isEnrolled = false }: LessonTabsProps) {
   const { user } = useAuthStore()
   const [aiInput, setAiInput] = useState('')
-  const [discussionInput, setDiscussionInput] = useState('')
 
   const handleSendAi = () => {
     if (!aiInput.trim() || !isEnrolled) return
@@ -28,15 +28,9 @@ export function LessonTabs({ lessonId, description, materials, isEnrolled = fals
     setAiInput('')
   }
 
-  const handleSendDiscussion = () => {
-    if (!discussionInput.trim() || !isEnrolled) return
-    console.log('Sending discussion:', { lessonId, userId: user?.id, content: discussionInput })
-    setDiscussionInput('')
-  }
-
   return (
     <Tabs defaultValue='description' className='w-full'>
-      {/* Tab Headers - Pill style */}
+      {/* ... (TabsList unchanged) ... */}
       <TabsList className='bg-slate-100/50 dark:bg-slate-800/50 p-1.5 rounded-[1.25rem] w-fit h-auto gap-1 mb-8 border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm'>
         <TabsTrigger
           value='description'
@@ -73,6 +67,7 @@ export function LessonTabs({ lessonId, description, materials, isEnrolled = fals
       </TabsContent>
 
       {/* --- PHẦN HỎI ĐÁP AI --- */}
+      {/* ... (AI content unchanged) ... */}
       <TabsContent value='ai' className='mt-6'>
         <div className='bg-muted/30 rounded-2xl p-6 min-h-[400px] flex flex-col justify-between border border-border'>
           {/* Luồng tin nhắn */}
@@ -82,7 +77,7 @@ export function LessonTabs({ lessonId, description, materials, isEnrolled = fals
                 <Bot size={20} />
               </div>
               <div className='bg-background p-4 rounded-2xl rounded-tl-none shadow-sm text-[15px] text-foreground max-w-[85%] border border-border leading-relaxed'>
-                Chào mừng bạn đến với trợ lý AI của LearnProof! Tôi đã nắm vững nội dung bài học về <b>OKLCH</b>. Bạn có
+                Chào mừng bạn đến với trợ lý AI của LearnProof! Tôi đã nắm vững nội dung bài học. Bạn có
                 bất kỳ thắc mắc nào về lý thuyết hay cách áp dụng thực tế không?
               </div>
             </div>
@@ -119,42 +114,8 @@ export function LessonTabs({ lessonId, description, materials, isEnrolled = fals
       </TabsContent>
 
       {/* --- PHẦN THẢO LUẬN --- */}
-      <TabsContent value='discussion' className='mt-6 space-y-8'>
-        <div className='flex gap-4 items-start'>
-          <Avatar className='h-10 w-10 shrink-0 border border-border'>
-            <AvatarImage src={user?.avatar || undefined} />
-            <AvatarFallback className='bg-muted text-muted-foreground font-bold text-sm'>
-              {user?.fullName?.substring(0, 1).toUpperCase() || 'U'}
-            </AvatarFallback>
-          </Avatar>
-          <div className='flex-1 space-y-3'>
-            {isEnrolled ? (
-              <>
-                <Textarea
-                  value={discussionInput}
-                  onChange={(e) => setDiscussionInput(e.target.value)}
-                  placeholder='Chia sẻ suy nghĩ của bạn về bài học này...'
-                  className='min-h-[120px] rounded-xl border-input bg-background focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary p-4 text-[15px] resize-none shadow-sm'
-                />
-                <div className='flex justify-end'>
-                  <Button
-                    onClick={handleSendDiscussion}
-                    className='bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-8 font-medium h-11 shadow-sm'
-                  >
-                    Gửi thảo luận
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <div className='h-[120px] rounded-xl border border-dashed border-border bg-muted/5 flex flex-col items-center justify-center gap-2 text-muted-foreground'>
-                <Lock size={24} className='opacity-30' />
-                <p className='text-sm font-medium'>Chỉ học viên đã mua khóa học mới có thể tham gia thảo luận.</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Danh sách các thảo luận cũ có thể render tại đây */}
+      <TabsContent value='discussion' className='mt-6 outline-none'>
+        <LessonComments courseId={courseId} lessonId={lessonId} isEnrolled={isEnrolled} />
       </TabsContent>
 
       {/* --- PHẦN TÀI LIỆU --- */}

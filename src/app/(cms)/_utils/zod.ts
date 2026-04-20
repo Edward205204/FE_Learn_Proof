@@ -403,6 +403,8 @@ export const ReviewItemSchema = z.object({
   id: z.string(),
   rating: z.number().int().min(1).max(5),
   comment: z.string().nullable(),
+  instructorReply: z.string().nullable(),
+  instructorReplyAt: z.coerce.date().nullable(),
   userId: z.string(),
   courseId: z.string(),
   createdAt: z.coerce.date(),
