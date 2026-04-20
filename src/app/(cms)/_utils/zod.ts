@@ -14,7 +14,7 @@ export const CategorySchema = z.object({
   _count: z.object({ courses: z.number().int() })
 })
 
-export type Categories = z.infer<typeof CategorySchema>
+export type Category = z.infer<typeof CategorySchema>
 //
 
 // --- Schema tạo khóa học - Bước 1 ---
@@ -23,8 +23,8 @@ export const createCourseStep1Schema = z.object({
   categoryId: z.string().min(1, 'Vui lòng chọn danh mục'),
   level: CourseLevelEnum,
   shortDesc: z.string().min(1, 'Mô tả ngắn là bắt buộc').max(250, 'Mô tả ngắn không được vượt quá 250 ký tự'),
-  fullDesc: z.string().min(1, 'Mô tả chi tiết là bắt buộc'),
-  thumbnail: z.string().url('Thumbnail phải là URL hợp lệ').nullable().optional()
+  fullDesc: z.string().default(''),
+  thumbnail: z.string().nullable().optional()
 })
 
 export const CreateCourseSt1ResponseSchema = z.object({
@@ -40,8 +40,8 @@ export const CreateCourseSt1ResponseSchema = z.object({
   status: CourseStatusEnum,
   isFree: z.boolean(),
   price: z.number(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
   category: z.object({
     id: z.string(),
     name: z.string(),

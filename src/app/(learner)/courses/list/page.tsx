@@ -19,10 +19,10 @@ import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PATH } from '@/constants/path'
-import { config } from '@/constants/config'
 import { useGetMyEnrollmentsQuery } from '../../_hooks/use-enrollment'
 import { useAuthStore } from '@/store/auth.store'
 import type { EnrollmentCourse } from '../../_api/enrollment.api'
+import { getCourseThumbnailUrl } from '@/utils/course'
 
 export default function MyCoursesPage() {
   const { user } = useAuthStore()
@@ -250,9 +250,7 @@ function EmptyState({ title, description }: { title: string; description: string
 
 function CourseCard({ enroll }: { enroll: EnrollmentCourse }) {
   const { course } = enroll
-  const imageUrl = course.thumbnail
-    ? `${config.BE_URL}/media/${course.thumbnail}`
-    : 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80'
+  const imageUrl = getCourseThumbnailUrl(course.thumbnail)
 
   return (
     <div className='group bg-white dark:bg-card rounded-2xl overflow-hidden border border-border hover:border-primary/40 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-500 flex flex-col h-full'>

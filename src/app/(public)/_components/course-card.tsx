@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Star, Users } from 'lucide-react'
 import type { HomeCourseCard } from '@/schemas/course.schema'
 import Image from 'next/image'
+import { getCourseThumbnailUrl } from '@/utils/course'
 
 const LEVEL_LABEL: Record<string, string> = {
   BEGINNER: 'Cơ bản',
@@ -35,16 +36,12 @@ export default function CourseCard({ course }: CourseCardProps) {
     >
       {/* Thumbnail */}
       <div className='relative aspect-video overflow-hidden bg-muted flex-shrink-0'>
-        {course.thumbnail ? (
-          <Image
-            fill
-            src={course.thumbnail}
-            alt={course.title}
-            className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105'
-          />
-        ) : (
-          <div className='absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20' />
-        )}
+        <Image
+          fill
+          src={getCourseThumbnailUrl(course.thumbnail)}
+          alt={course.title}
+          className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105'
+        />
         <span
           className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[0.65rem] font-bold text-white uppercase tracking-wide ${LEVEL_CLASS[course.level]}`}
         >

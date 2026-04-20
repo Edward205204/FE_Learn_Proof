@@ -1,189 +1,146 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+
 import { VideoPlayer } from '../../../../_components/video-player'
 import { LessonTabs } from '../../../../_components/lesson-tabs'
 import { CurriculumSidebar } from '../../../../_components/curriculum-sidebar'
 import { ReadingContent } from '../../../../_components/reading-content'
 import { QuizContainer } from '../../../../_components/quiz-container'
-import type {
-  LessonData,
-  QuizLesson,
-  ReadingLesson,
-  SidebarChapter,
-  VideoLesson
-} from '../../../../_utils/lesson-types'
 
-// Dữ liệu mẫu — thay bằng fetch API thực tế
-const MOCK_CHAPTERS: SidebarChapter[] = [
-  {
-    id: 'ch1',
-    title: 'Nền tảng thiết kế màu sắc',
-    lessons: [
-      {
-        id: 'l1',
-        title: 'Giới thiệu khóa học',
-        duration: '5:30',
-        isCompleted: true,
-        isLocked: false,
-        type: 'video' as const
-      },
-      {
-        id: 'l2',
-        title: 'Lý thuyết màu cơ bản (Bài đọc)',
-        duration: '12:45',
-        isCompleted: true,
-        isLocked: false,
-        type: 'reading' as const
-      },
-      {
-        id: 'l3',
-        title: 'Thiết kế với OKLCH',
-        duration: '32:10',
-        isCompleted: false,
-        isLocked: false,
-        type: 'video' as const
-      },
-      {
-        id: 'l4',
-        title: 'Quiz: Kiểm tra chương 1',
-        duration: '10:00',
-        isCompleted: false,
-        isLocked: false,
-        type: 'quiz' as const
-      }
-    ]
-  },
-  {
-    id: 'ch2',
-    title: 'Ứng dụng thực tế',
-    lessons: [
-      {
-        id: 'l5',
-        title: 'Xây dựng palette màu',
-        duration: '20:00',
-        isCompleted: false,
-        isLocked: true,
-        type: 'video' as const
-      },
-      {
-        id: 'l6',
-        title: 'Dark mode với OKLCH',
-        duration: '18:30',
-        isCompleted: false,
-        isLocked: true,
-        type: 'video' as const
-      }
-    ]
-  }
-]
-
-const MOCK_VIDEO_LESSON: VideoLesson = {
-  id: 'l3',
-  type: 'video',
-  title: 'Thiết kế với OKLCH: Tương lai của không gian màu',
-  videoUrl: 'https://your-video-url.mp4',
-  lastPosition: 125,
-  description: `Trong bài học này, chúng ta sẽ đi sâu vào mô hình màu OKLCH — một bước tiến vượt bậc so với HSL/RGB truyền thống.
-
-Bạn sẽ học được:
-• Cách OKLCH biểu diễn màu sắc theo cảm nhận con người
-• Tại sao OKLCH cho kết quả đồng đều hơn khi tạo palette
-• Cách viết giá trị OKLCH trong CSS hiện đại
-• Công cụ và workflow thực tế khi làm dự án`,
-  materials: [
-    { title: 'Giao diện mẫu OKLCH.fig', size: '12.4 MB', url: '#' },
-    { title: 'Cheat-sheet mã màu CSS.pdf', size: '2.1 MB', url: '#' }
-  ]
-}
-
-const MOCK_READING_LESSON: ReadingLesson = {
-  id: 'l2',
-  type: 'reading',
-  title: 'Lý thuyết màu cơ bản (Bài đọc)',
-  content: `OKLCH là một không gian màu mới được thiết kế để giải quyết những hạn chế của HSL và RGB.
-
-Khác với HSL (nơi các màu có cùng độ sáng Lightness lại trông khác biệt rõ rệt về độ chói trên màn hình), OKLCH được xây dựng dựa trên cách mắt người thực sự cảm nhận ánh sáng. 
-
-Cấu trúc của OKLCH:
-- L (Lightness): Độ sáng thực sự từ 0 (đen) đến 1 (trắng)
-- C (Chroma): Độ rực rỡ của màu sắc
-- H (Hue): Vòng tròn màu 360 độ
-
-Nhờ vậy, khi bạn tạo ra một palette màu bằng OKLCH, các màu sắc sẽ có độ đồng đều hoàn hảo, giúp giao diện trở nên chuyên nghiệp và dễ nhìn hơn rất nhiều so với cách tạo màu truyền thống.`,
-  estimatedMinutes: 15,
-  materials: [{ title: 'Cheat-sheet mã màu CSS.pdf', size: '2.1 MB', url: '#' }]
-}
-
-const MOCK_QUIZ_LESSON: QuizLesson = {
-  id: 'l4',
-  type: 'quiz',
-  title: 'Quiz: Kiểm tra chương 1',
-  isFinalExam: false,
-  questions: [
-    {
-      id: 'q1',
-      text: 'Mô hình màu OKLCH tập trung vào điều gì nhất so với RGB/HSL?',
-      options: [
-        { id: 'opt1', text: 'Dễ viết code hơn' },
-        { id: 'opt2', text: 'Đồng nhất với cảm nhận thị giác của mắt người' },
-        { id: 'opt3', text: 'Dung lượng nhẹ hơn khi render' }
-      ],
-      correctOptionId: 'opt2'
-    },
-    {
-      id: 'q2',
-      text: 'Chữ "L" trong OKLCH đại diện cho gì?',
-      options: [
-        { id: 'opt1', text: 'Luminance / Lightness' },
-        { id: 'opt2', text: 'Linear' },
-        { id: 'opt3', text: 'Level' }
-      ],
-      correctOptionId: 'opt1'
-    }
-  ]
-}
+import { useGetCourseProgressQuery } from '../../../../_hooks/use-course'
+import { useGetLessonForLearnerQuery, useMarkLessonCompleteMutation } from '../../../../_hooks/use-lesson'
+import type { SidebarChapter, LessonData } from '../../../../_utils/lesson-types'
 
 export default function LessonPage() {
-  const allLessons = MOCK_CHAPTERS.flatMap((c) => c.lessons)
+  const params = useParams()
+  const router = useRouter()
+  const courseId = params.id as string
+  const lessonId = params.lessonId as string
 
-  // Dùng state thay vì hằng số cứng để có thể chuyển bài
-  const [currentLessonId, setCurrentLessonId] = useState<string>('l3')
+  // 1. Fetch Curriculum & Progress
+  const { data: chaptersRaw, isLoading: isLoadingChapters } = useGetCourseProgressQuery(courseId)
 
-  // Tìm full data của bài hiện tại. Nếu là bài l2 hoặc l4 thì merge thêm mock data cho reading/quiz
-  const currentLessonMeta = allLessons.find((l) => l.id === currentLessonId) || allLessons[0]
+  // 2. Fetch Current Lesson Detail
+  const { data: lessonRaw, isLoading: isLoadingLesson } = useGetLessonForLearnerQuery(lessonId)
 
-  const activeLesson: LessonData =
-    currentLessonMeta.type === 'reading'
-      ? { ...MOCK_READING_LESSON, id: currentLessonMeta.id, title: currentLessonMeta.title }
-      : currentLessonMeta.type === 'quiz'
-        ? { ...MOCK_QUIZ_LESSON, id: currentLessonMeta.id, title: currentLessonMeta.title }
-        : { ...MOCK_VIDEO_LESSON, id: currentLessonMeta.id, title: currentLessonMeta.title }
+  // 3. Mark Complete Mutation
+  const { mutate: markComplete } = useMarkLessonCompleteMutation(courseId)
 
-  const currentIndex = allLessons.findIndex((l) => l.id === currentLessonId)
+  // 4. Map Chapters to Sidebar Format
+  const chapters: SidebarChapter[] = (chaptersRaw || []).map((ch) => ({
+    id: ch.id,
+    title: ch.title,
+    lessons: ch.lessons.map((l) => ({
+      id: l.id,
+      title: l.title,
+      duration: l.duration ? `${Math.floor(l.duration / 60)}:${(l.duration % 60).toString().padStart(2, '0')}` : '0:00',
+      isCompleted: l.progress.length > 0 && l.progress[0].isCompleted,
+      isLocked: false, // Tạm thời để false hết
+      type: l.type === 'VIDEO' ? 'video' : l.type === 'TEXT' ? 'reading' : 'quiz'
+    }))
+  }))
+
+  const allLessons = chapters.flatMap((c) => c.lessons)
+
+  // 5. Build Active Lesson Data
+  let activeLesson: LessonData | null = null
+  if (lessonRaw) {
+    if (lessonRaw.type === 'VIDEO') {
+      activeLesson = {
+        id: lessonRaw.id,
+        type: 'video',
+        title: lessonRaw.title,
+        videoUrl: lessonRaw.videoUrl || '',
+        lastPosition: 0, // FE tính toán sau
+        description: lessonRaw.shortDesc || '',
+        materials: [] // BE chưa support materials
+      }
+    } else if (lessonRaw.type === 'TEXT') {
+      activeLesson = {
+        id: lessonRaw.id,
+        type: 'reading',
+        title: lessonRaw.title,
+        content: lessonRaw.textContent || '',
+        estimatedMinutes: 5,
+        materials: []
+      }
+    } else if (lessonRaw.type === 'QUIZ') {
+      activeLesson = {
+        id: lessonRaw.id,
+        type: 'quiz',
+        title: lessonRaw.title,
+        isFinalExam: false,
+        questions: (lessonRaw.quiz?.questions || []).map((q) => ({
+          id: q.id,
+          text: q.content,
+          options: q.answers.map((a) => ({ id: a.id, text: a.content })),
+          correctOptionId: '' // QuizLearnerResponse không trả về correctId để bảo mật
+        }))
+      }
+    }
+  }
+
+  const currentIndex = allLessons.findIndex((l) => l.id === lessonId)
   const prevLessonId = allLessons[currentIndex - 1]?.id ?? null
   const nextLessonId = allLessons[currentIndex + 1]?.id ?? null
 
   const handleNavigate = (id: string) => {
-    // Cập nhật state để render lại UI thay vì chỉ log ra console
-    setCurrentLessonId(id)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    router.push(`/courses/${courseId}/lessons/${id}`)
   }
 
   const handleQuizSubmit = (answers: Record<string, string>, score: number) => {
     console.log('Quiz submitted:', { answers, score })
+    // Giả sử hoàn thành quiz là hoàn thành bài học
+    markComplete(lessonId)
+  }
+
+  const handleVideoEnded = () => {
+    markComplete(lessonId)
+  }
+
+  // Tự động mark hoàn thành cho bài đọc sau 3 giây (để demo)
+  useEffect(() => {
+    if (activeLesson?.type === 'reading' && lessonId) {
+      const timer = setTimeout(() => {
+        markComplete(lessonId)
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [activeLesson?.type, lessonId, markComplete])
+
+  if (isLoadingChapters || isLoadingLesson) {
+    return (
+      <div className='flex flex-col items-center justify-center min-h-[60vh] gap-4'>
+        <Loader2 className='w-12 h-12 animate-spin text-primary' />
+        <p className='text-muted-foreground font-medium'>Đang tải nội dung bài học...</p>
+      </div>
+    )
+  }
+
+  if (!activeLesson) {
+    return (
+      <div className='flex flex-col items-center justify-center min-h-[60vh] gap-4'>
+        <p className='text-destructive font-bold'>Không tìm thấy bài học</p>
+        <Button onClick={() => router.back()}>Quay lại</Button>
+      </div>
+    )
   }
 
   return (
-    <main className='max-w-[1200px] mx-auto py-10 px-4 md:px-8 grid grid-cols-1 lg:grid-cols-3 gap-10'>
+    <main className='max-w-[1400px] mx-auto py-10 px-4 md:px-8 grid grid-cols-1 lg:grid-cols-4 gap-10'>
       {/* Lõi Render theo loại bài học */}
-      <div className='lg:col-span-2 space-y-6'>
+      <div className='lg:col-span-3 space-y-6'>
         {activeLesson.type === 'video' && (
           <div className='animate-in fade-in slide-in-from-bottom-4 duration-500'>
             <VideoPlayer
               url={activeLesson.videoUrl}
               lastPosition={activeLesson.lastPosition}
               lessonId={activeLesson.id}
+              onEnded={handleVideoEnded}
             />
             <h1 className='text-3xl font-bold text-foreground mt-6'>{activeLesson.title}</h1>
             <LessonTabs
@@ -210,7 +167,7 @@ export default function LessonPage() {
       {/* Cột Sidebar */}
       <div className='lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)]'>
         <CurriculumSidebar
-          chapters={MOCK_CHAPTERS}
+          chapters={chapters}
           currentLessonId={activeLesson.id}
           prevLessonId={prevLessonId}
           nextLessonId={nextLessonId}

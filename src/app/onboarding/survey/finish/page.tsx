@@ -9,50 +9,105 @@ import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import { PATH } from '../../../../constants/path'
 import { useUpdateProfileMutation } from '@/app/(auth)/_hooks/use-auth-mutation'
+import { useOnboardingData } from '../layout'
+import { useAuthStore } from '@/store/auth.store'
 
-const ROADMAP_STEPS = [
-  {
-    id: 1,
-    title: 'Bước 1: Cơ bản & Nền tảng',
-    stats: '5 bài học • 2 giờ học tập',
-    tags: ['Bắt buộc', 'Nhập môn'],
-    icon: <BookOpen className='w-5 h-5' />,
-    lessons: [
-      { id: 101, type: 'video', title: 'Giới thiệu về lộ trình', duration: '12 PHÚT' },
-      { id: 102, type: 'doc', title: 'Tư duy thiết kế cơ bản', duration: '15 PHÚT' },
-      { id: 103, type: 'quiz', title: 'Kiểm tra kiến thức đầu vào', duration: '10 CÂU' }
-    ]
-  },
-  {
-    id: 2,
-    title: 'Bước 2: Kỹ năng chuyên sâu',
-    stats: '8 bài học • 5 giờ học tập',
-    tags: ['Trung cấp'],
-    icon: <Target className='w-5 h-5' />,
-    lessons: [
-      { id: 201, type: 'video', title: 'Xây dựng Component nâng cao', duration: '45 PHÚT' },
-      { id: 202, type: 'video', title: 'Quản lý State hiệu quả', duration: '30 PHÚT' }
-    ]
-  },
-  {
-    id: 3,
-    title: 'Bước 3: Dự án thực tế',
-    stats: '3 bài tập • Project cuối khóa',
-    tags: ['Thực chiến'],
-    icon: <Rocket className='w-5 h-5' />,
-    lessons: [
-      { id: 301, type: 'doc', title: 'Đề bài Project cuối khóa', duration: 'Hàng tuần' },
-      { id: 302, type: 'video', title: 'Hướng dẫn Deploy dự án', duration: '20 PHÚT' }
-    ]
-  }
-]
+const MOCK_ROADMAPS: Record<string, any[]> = {
+  web: [
+    {
+      id: 1,
+      title: 'Bước 1: HTML/CSS & Javascript cơ bản',
+      stats: '15 bài học • 10 giờ học tập',
+      tags: ['Bắt buộc', 'Frontend'],
+      icon: <BookOpen className='w-5 h-5' />,
+      lessons: [
+        { id: 101, type: 'video', title: 'Cấu trúc trang web với HTML5', duration: '45 PHÚT' },
+        { id: 102, type: 'doc', title: 'Styling hiện đại với CSS3 & Flexbox', duration: '1 GIỜ' },
+        { id: 103, type: 'quiz', title: 'Kiểm tra kiến thức Dom & Event', duration: '15 CÂU' }
+      ]
+    },
+    {
+      id: 2,
+      title: 'Bước 2: React & Next.js Framework',
+      stats: '25 bài học • 30 giờ học tập',
+      tags: ['Trung cấp', 'Thực chiến'],
+      icon: <Target className='w-5 h-5' />,
+      lessons: [
+        { id: 201, type: 'video', title: 'Component lifecycle & Hooks', duration: '2 GIỜ' },
+        { id: 202, type: 'video', title: 'Server Side Rendering vs Client Side', duration: '1 GIỜ' }
+      ]
+    },
+    {
+      id: 3,
+      title: 'Bước 3: Backend & Database Foundations',
+      stats: '12 bài học • 20 giờ học tập',
+      tags: ['Fullstack'],
+      icon: <Rocket className='w-5 h-5' />,
+      lessons: [
+        { id: 301, type: 'doc', title: 'Node.js & Express API Design', duration: '3 GIỜ' },
+        { id: 302, type: 'video', title: 'SQL vs NoSQL: Khi nào dùng cái nào?', duration: '45 PHÚT' }
+      ]
+    }
+  ],
+  mobile: [
+    {
+      id: 1,
+      title: 'Bước 1: Dart & Flutter cơ bản',
+      stats: '10 bài học • 8 giờ học tập',
+      tags: ['Bắt đầu', 'Mobile'],
+      icon: <BookOpen className='w-5 h-5' />,
+      lessons: [
+        { id: 101, type: 'video', title: 'Cài đặt môi trường Flutter', duration: '30 PHÚT' },
+        { id: 102, type: 'doc', title: 'Widgets & UI Layout cơ bản', duration: '1 GIỜ' }
+      ]
+    },
+    {
+      id: 2,
+      title: 'Bước 2: State Management & Navigation',
+      stats: '15 bài học • 12 giờ học tập',
+      tags: ['Trung cấp'],
+      icon: <Target className='w-5 h-5' />,
+      lessons: [
+        { id: 201, type: 'video', title: 'Provider & Riverpod căn bản', duration: '1 GIỜ' }
+      ]
+    }
+  ],
+  ai: [
+    {
+      id: 1,
+      title: 'Bước 1: Python cho Python cho Machine Learning',
+      stats: '8 bài học • 6 giờ học tập',
+      tags: ['Nền tảng', 'AI'],
+      icon: <BookOpen className='w-5 h-5' />,
+      lessons: [
+        { id: 101, type: 'video', title: 'Numpy & Pandas Essentials', duration: '2 GIỜ' }
+      ]
+    }
+  ],
+  blockchain: [
+    {
+      id: 1,
+      title: 'Bước 1: Solidity & Smart Contracts',
+      stats: '20 bài học • 15 giờ học tập',
+      tags: ['Web3', 'Blockchain'],
+      icon: <BookOpen className='w-5 h-5' />,
+      lessons: [
+        { id: 101, type: 'doc', title: 'Cấu trúc một Smart Contract', duration: '45 PHÚT' }
+      ]
+    }
+  ]
+}
 
 export default function OnboardingFinishPage() {
   const router = useRouter()
+  const user = useAuthStore((state) => state.user)
+  const { data: onboardingData } = useOnboardingData()
   const [activeStep, setActiveStep] = useState(1)
   const updateProfileMutation = useUpdateProfileMutation()
 
-  const currentStepData = ROADMAP_STEPS.find((s) => s.id === activeStep) || ROADMAP_STEPS[0]
+  const ROADMAP_STEPS = MOCK_ROADMAPS[onboardingData.field] || MOCK_ROADMAPS.web
+  const currentStepData = ROADMAP_STEPS.find((s: any) => s.id === activeStep) || ROADMAP_STEPS[0]
+  const isAlreadyCompleted = user?.isOnboardingCompleted
 
   return (
     <div className='min-h-screen bg-[#FFF5F7]'>
@@ -105,7 +160,7 @@ export default function OnboardingFinishPage() {
             <div className='absolute left-6 top-10 bottom-10 w-0.5 bg-rose-200' />
 
             <div className='space-y-6'>
-              {ROADMAP_STEPS.map((step) => (
+              {ROADMAP_STEPS.map((step: any) => (
                 <div key={step.id} className='relative pl-14 cursor-pointer' onClick={() => setActiveStep(step.id)}>
                   {/* Step Dot/Icon */}
                   <div
@@ -135,7 +190,7 @@ export default function OnboardingFinishPage() {
                     </h3>
                     <p className='text-xs text-muted-foreground mb-3'>{step.stats}</p>
                     <div className='flex gap-2'>
-                      {step.tags.map((tag) => (
+                      {step.tags.map((tag: string) => (
                         <Badge
                           key={tag}
                           variant='secondary'
@@ -162,7 +217,7 @@ export default function OnboardingFinishPage() {
               </div>
 
               <div className='space-y-4 mb-8'>
-                {currentStepData.lessons.map((lesson) => (
+                {currentStepData.lessons.map((lesson: any) => (
                   <div
                     key={lesson.id}
                     className='flex items-center gap-4 p-4 rounded-3xl bg-rose-50/50 hover:bg-rose-50 border border-transparent hover:border-rose-100 transition-all cursor-pointer'
@@ -191,8 +246,13 @@ export default function OnboardingFinishPage() {
               <div className='space-y-4 pt-4 border-t border-rose-100'>
                 <Button
                   onClick={() => {
+                    if (isAlreadyCompleted) {
+                      router.push(PATH.HOME)
+                      return
+                    }
                     updateProfileMutation.mutate({ isOnboardingCompleted: true }, {
                       onSuccess: () => {
+                        localStorage.removeItem('onboarding_data')
                         router.push(PATH.HOME)
                       }
                     })
@@ -201,7 +261,11 @@ export default function OnboardingFinishPage() {
                   size='lg'
                   className='w-full rounded-2xl py-8 text-xl font-bold shadow-xl shadow-primary/30'
                 >
-                  {updateProfileMutation.isPending ? 'Đang lưu...' : 'Lưu lộ trình và Bắt đầu'}{' '}
+                  {updateProfileMutation.isPending 
+                    ? 'Đang lưu...' 
+                    : isAlreadyCompleted 
+                      ? 'Về trang chủ' 
+                      : 'Lưu lộ trình và Bắt đầu'}{' '}
                   <Rocket className='ml-2 w-6 h-6' />
                 </Button>
                 <p className='text-center text-xs text-muted-foreground italic'>

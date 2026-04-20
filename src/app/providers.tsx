@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
-// import { AuthGuard } from '@/components/common/auth-guard'
+import { OnboardingGuard } from '@/components/common/onboarding-guard'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -20,9 +20,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* <AuthGuard> */}
-      {children}
-      {/* </AuthGuard> */}
+      <OnboardingGuard>{children}</OnboardingGuard>
     </QueryClientProvider>
   )
 }
