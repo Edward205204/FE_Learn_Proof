@@ -1,7 +1,7 @@
 import http from '@/utils/http'
 import { Course } from '../_types/content'
 import type {
-  Categories,
+  Category,
   CreateCourseStep1Res,
   GetMyCoursesManagerQuery,
   GetMyCoursesManagerResponse,
@@ -15,7 +15,7 @@ import type {
 } from '../_utils/zod'
 
 const courseApi = {
-  getCategories: () => http.get<Categories[]>('/courses/categories'),
+  getCategories: () => http.get<Category[]>('/courses/categories'),
 
   getMyCoursesManager: (params: GetMyCoursesManagerQuery) =>
     http.get<GetMyCoursesManagerResponse>('/courses/manager/my-courses', {

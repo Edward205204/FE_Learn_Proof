@@ -30,7 +30,7 @@ import {
   useGetCourseBaseInfoQuery,
   useGetCategoriesQuery,
   useUpdateCourseBaseInfoMutation
-} from '@/app/(cms)/_hooks/use-course-mutation'
+} from '../_hooks/use-course-mutation'
 
 interface Props {
   courseId: string | null
@@ -133,14 +133,14 @@ export function EditCourseMetadataDialog({ courseId, open, onOpenChange }: Props
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='font-semibold'>Danh mục</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
                           <SelectTrigger className='h-10'>
                             <SelectValue placeholder='Chọn danh mục' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {(categories ?? []).map((cat: Categories) => (
+                          {(categories ?? []).map((cat: Category) => (
                             <SelectItem key={cat.id} value={cat.id}>
                               {cat.name}
                             </SelectItem>
@@ -158,7 +158,7 @@ export function EditCourseMetadataDialog({ courseId, open, onOpenChange }: Props
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='font-semibold'>Trình độ</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ''}>
                         <FormControl>
                           <SelectTrigger className='h-10'>
                             <SelectValue placeholder='Chọn trình độ' />

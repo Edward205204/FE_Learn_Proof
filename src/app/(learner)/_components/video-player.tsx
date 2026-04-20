@@ -16,6 +16,7 @@ type VideoReactPlayerProps = {
   progressInterval?: number
   onReady?: () => void
   onProgress?: (state: { playedSeconds: number }) => void
+  onEnded?: () => void
   config?: {
     youtube?: Record<string, unknown>
     file?: { attributes?: Record<string, string> }
@@ -31,9 +32,10 @@ interface VideoPlayerProps {
   url: string
   lastPosition: number // Tính bằng giây (s)
   lessonId: string
+  onEnded?: () => void
 }
 
-export function VideoPlayer({ url, lastPosition, lessonId }: VideoPlayerProps) {
+export function VideoPlayer({ url, lastPosition, lessonId, onEnded }: VideoPlayerProps) {
   const playerRef = useRef<ReactPlayerInstance | null>(null)
   const [hasJumped, setHasJumped] = useState(false)
 
@@ -81,6 +83,7 @@ export function VideoPlayer({ url, lastPosition, lessonId }: VideoPlayerProps) {
         controls
         onReady={handleReady}
         onProgress={handleProgress}
+        onEnded={onEnded}
         progressInterval={5000}
         config={{
           youtube: { rel: 0 },

@@ -6,6 +6,7 @@ export const PATH = {
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',
   ONBOARDING: '/onboarding',
+  ROADMAP: '/onboarding/survey/finish',
 
   // Public SSR
   COURSES: '/courses',

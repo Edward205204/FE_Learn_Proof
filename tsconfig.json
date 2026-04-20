@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "noUnusedLocals": true, // cảnh báo nếu khai báo biến mà không dùng lint lỗi
