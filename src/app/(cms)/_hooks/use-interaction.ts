@@ -130,6 +130,13 @@ export function useCourseReviewsQuery(courseId: string, page = 1, limit = 10) {
   })
 }
 
+export function useAllReviewsQuery(page = 1, limit = 10) {
+  return useQuery({
+    queryKey: ['cms-reviews', page, limit],
+    queryFn: () => interactionApi.getAllReviews({ page, limit }).then((res) => res.data)
+  })
+}
+
 export function useCreateReviewMutation(courseId: string) {
   const queryClient = useQueryClient()
   return useMutation({
@@ -143,5 +150,30 @@ export function useCreateReviewMutation(courseId: string) {
       const msg = error.response?.data?.message || 'Có lỗi xảy ra khi gửi đánh giá.'
       toast.error(typeof msg === 'string' ? msg : 'Lỗi không xác định')
     }
+  })
+}
+
+export function useReplyToReviewMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ reviewId, content }: { reviewId: string; content: string }) =>
+      interactionApi.replyToReview(reviewId, { content }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cms-reviews'] })
+      toast.success('Đã gửi phản hồi đánh giá!')
+    },
+    onError: () => toast.error('Lỗi khi gửi phản hồi')
+  })
+}
+
+export function useDeleteReviewMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (reviewId: string) => interactionApi.deleteReviewById(reviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cms-reviews'] })
+      toast.success('Đã xoá đánh giá!')
+    },
+    onError: () => toast.error('Lỗi khi xoá đánh giá')
   })
 }

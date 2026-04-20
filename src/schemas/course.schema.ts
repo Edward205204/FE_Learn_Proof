@@ -29,6 +29,7 @@ export const CourseItemResponseSchema = z.object({
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
   shortDesc: z.string(),
   createdAt: z.coerce.date(),
+  isEnrolled: z.boolean().optional().default(false),
   category: z.object({
     name: z.string(),
     slug: z.string()
@@ -76,10 +77,15 @@ export const CourseReviewSchema = z.object({
   comment: z.string().nullable(),
   createdAt: z.coerce.date(),
   user: z.object({
+    id: z.string(),
     fullName: z.string(),
     avatar: z.string().nullable()
-  })
+  }),
+  instructorReply: z.string().nullable().optional(),
+  instructorReplyAt: z.coerce.date().nullable().optional()
 })
+
+export type CourseReview = z.infer<typeof CourseReviewSchema>
 
 export const CourseDetailResponseSchema = z.object({
   id: z.string(),
@@ -99,6 +105,7 @@ export const CourseDetailResponseSchema = z.object({
   expectedDays: z.number().int().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
+  isEnrolled: z.boolean().optional().default(false),
   category: z.object({
     name: z.string(),
     slug: z.string()
@@ -116,6 +123,7 @@ export const CourseDetailResponseSchema = z.object({
       completionRate: z.number()
     })
     .nullable(),
+  userReview: CourseReviewSchema.nullable().optional(),
   reviews: z.array(CourseReviewSchema)
 })
 
@@ -131,6 +139,7 @@ export const HomeCourseCardSchema = z.object({
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
   shortDesc: z.string(),
   createdAt: z.coerce.date(),
+  isEnrolled: z.boolean().optional().default(false),
   category: z.object({ name: z.string(), slug: z.string() }),
   creator: z.object({ fullName: z.string(), avatar: z.string().nullable() }),
   overallAnalytics: z

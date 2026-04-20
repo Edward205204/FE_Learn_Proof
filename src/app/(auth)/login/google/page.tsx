@@ -48,8 +48,10 @@ function GoogleCallbackContent() {
             router.replace(PATH.STUDIO_COURSES)
           } else if (user.role === 'ADMIN') {
             router.replace(PATH.ADMIN)
-          } else {
+          } else if (!user.isOnboardingCompleted) {
             router.replace(`${PATH.ONBOARDING}/survey/step-1`)
+          } else {
+            router.replace(PATH.HOME)
           }
         }, 1000)
       })

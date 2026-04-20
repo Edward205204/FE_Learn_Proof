@@ -11,7 +11,8 @@ import {
   BookOpen,
   CheckCircle2,
   Trophy,
-  Clock
+  Clock,
+  Star
 } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
@@ -19,10 +20,10 @@ import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PATH } from '@/constants/path'
-import { config } from '@/constants/config'
 import { useGetMyEnrollmentsQuery } from '../../_hooks/use-enrollment'
 import { useAuthStore } from '@/store/auth.store'
 import type { EnrollmentCourse } from '../../_api/enrollment.api'
+import { getCourseThumbnailUrl } from '@/utils/course'
 
 export default function MyCoursesPage() {
   const { user } = useAuthStore()
@@ -250,13 +251,7 @@ function EmptyState({ title, description }: { title: string; description: string
 
 function CourseCard({ enroll }: { enroll: EnrollmentCourse }) {
   const { course } = enroll
-  const imageUrl = course.thumbnail
-    ? course.thumbnail.startsWith('http')
-      ? course.thumbnail
-      : course.thumbnail.startsWith('/media/')
-        ? `${config.BE_URL}${course.thumbnail}`
-        : `${config.BE_URL}/media/${course.thumbnail}`
-    : 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80'
+  const imageUrl = getCourseThumbnailUrl(course.thumbnail)
 
   return (
     <div className='group bg-white dark:bg-card rounded-2xl overflow-hidden border border-border hover:border-primary/40 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-500 flex flex-col h-full'>
@@ -290,10 +285,15 @@ function CourseCard({ enroll }: { enroll: EnrollmentCourse }) {
           <h3 className='text-lg font-bold text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors'>
             {course.title}
           </h3>
-          <div className='flex items-center gap-2 text-xs text-muted-foreground font-medium'>
+          <div className='flex items-center gap-3 text-xs text-muted-foreground font-medium'>
             <div className='flex flex-row items-center gap-1.5'>
               <div className='w-1.5 h-1.5 rounded-full bg-primary/40' />
               <span>Giảng viên: {course.creator.fullName}</span>
+            </div>
+            {/* Rating Sync */}
+            <div className='flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-400/10 text-amber-500 ml-auto'>
+              <Star size={10} fill='currentColor' strokeWidth={0} />
+              <span className='text-[10px] font-black'>{(course as any).overallAnalytics?.avgRating?.toFixed(1) || '0.0'}</span>
             </div>
           </div>
         </div>

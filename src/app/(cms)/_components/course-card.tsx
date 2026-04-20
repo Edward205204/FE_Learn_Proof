@@ -3,13 +3,15 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { BookOpen, CheckCircle2, Pencil } from 'lucide-react'
+import { BookOpen, Pencil, Trash2 } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useUpdateCourseStatusMutation } from '../_hooks/use-course-mutation'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { useUpdateCourseStatusMutation, useDeleteCourseMutation } from '../_hooks/use-course-mutation'
 import type { ManagerCourseItem } from '../_utils/zod'
 import {
   formatDate,
@@ -30,7 +32,9 @@ interface CourseCardProps {
 
 export function CourseCard({ course, onPrefetch }: CourseCardProps) {
   const [editOpen, setEditOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const statusMutation = useUpdateCourseStatusMutation(course.id)
+  const deleteCourseMutation = useDeleteCourseMutation()
   const thumbnailUrl = course.thumbnail
     ? course.thumbnail.startsWith('http')
       ? course.thumbnail
@@ -81,7 +85,7 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                     </p>
                   </div>
 
-                  {/* Nút chỉnh sửa — click mở dialog, không navigate */}
+                  {/* Nút chỉnh sửa & xóa — click mở dialog, không navigate */}
                   <div
                     className='flex items-center gap-1.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity'
                     onClick={(e) => e.preventDefault()}
@@ -98,6 +102,19 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
                       title='Chỉnh sửa thông tin khóa học'
                     >
                       <Pencil className='size-3.5' />
+                    </Button>
+                    <Button
+                      variant='outline'
+                      size='icon-sm'
+                      className='bg-background hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 text-muted-foreground border-border/50 h-8 w-8 rounded-full shadow-sm transition-all'
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setDeleteOpen(true)
+                      }}
+                      title='Xóa khóa học'
+                    >
+                      <Trash2 className='size-3.5' />
                     </Button>
                   </div>
                 </div>
@@ -187,6 +204,41 @@ export function CourseCard({ course, onPrefetch }: CourseCardProps) {
 
       {/* Dialog chỉnh sửa metadata — render ngoài Link để tránh nested anchor */}
       <EditCourseMetadataDialog courseId={course.id} open={editOpen} onOpenChange={setEditOpen} />
+
+      {/* Dialog xác nhận xóa khóa học */}
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa khóa học</DialogTitle>
+          </DialogHeader>
+          <div className='py-4 space-y-2'>
+            <p>
+              Bạn có chắc chắn muốn xóa khóa học <span className='font-bold'>{course.title}</span> không?
+            </p>
+            <p className='text-sm text-destructive font-medium'>
+              Hành động này sẽ xóa toàn bộ chương, bài học và dữ liệu liên quan. Không thể hoàn tác.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setDeleteOpen(false)} disabled={deleteCourseMutation.isPending}>
+              Hủy
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={() => {
+                deleteCourseMutation.mutate(course.id, {
+                  onSuccess: () => {
+                    setDeleteOpen(false)
+                  }
+                })
+              }}
+              disabled={deleteCourseMutation.isPending}
+            >
+              {deleteCourseMutation.isPending ? 'Đang xóa...' : 'Xóa khóa học'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

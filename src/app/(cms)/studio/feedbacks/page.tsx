@@ -6,8 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { InteractionItem } from '../../_components/interaction-item'
-import { useDiscussionsQuery } from '../../_hooks/use-interaction'
-import { InteractionValues, DiscussionItem } from '../../_utils/zod'
+import { useDiscussionsQuery, useAllReviewsQuery } from '../../_hooks/use-interaction'
+import { InteractionValues, DiscussionItem, ReviewItem } from '../../_utils/zod'
 
 function mapDiscussionToInteraction(item: DiscussionItem): InteractionValues {
   return {
@@ -26,6 +26,23 @@ function mapDiscussionToInteraction(item: DiscussionItem): InteractionValues {
   }
 }
 
+function mapReviewToInteraction(item: ReviewItem): InteractionValues {
+  return {
+    id: item.id,
+    type: 'review',
+    user: {
+      name: item.user?.fullName || 'Học viên',
+      avatar: item.user?.avatar || '',
+      courseName: item.course?.title || '—'
+    },
+    content: item.comment || '(Không có nội dung)',
+    rating: item.rating,
+    reply: item.instructorReply || undefined,
+    status: item.instructorReply ? 'resolved' : 'unresolved',
+    createdAt: item.createdAt
+  }
+}
+
 function LoadingSkeleton() {
   return (
     <div className='space-y-4'>
@@ -38,12 +55,27 @@ function LoadingSkeleton() {
 
 export default function FeedbackListPage() {
   const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState<'all' | 'discussion'>('all')
+  const [filter, setFilter] = useState<'all' | 'discussion' | 'review'>('all')
   const [page, setPage] = useState(1)
 
-  const { data, isLoading } = useDiscussionsQuery(page, 15)
+  const discussions = useDiscussionsQuery(page, 15)
+  const reviews = useAllReviewsQuery(page, 15)
 
-  const allInteractions: InteractionValues[] = (data?.data || []).map(mapDiscussionToInteraction)
+  const isLoading = discussions.isLoading || reviews.isLoading
+
+  let allInteractions: InteractionValues[] = []
+
+  if (filter === 'all') {
+    const dList = (discussions.data?.data || []).map(mapDiscussionToInteraction)
+    const rList = (reviews.data?.data || []).map(mapReviewToInteraction)
+    allInteractions = [...dList, ...rList].sort(
+      (a, b) => new Date(b.createdAt as any).getTime() - new Date(a.createdAt as any).getTime()
+    )
+  } else if (filter === 'discussion') {
+    allInteractions = (discussions.data?.data || []).map(mapDiscussionToInteraction)
+  } else if (filter === 'review') {
+    allInteractions = (reviews.data?.data || []).map(mapReviewToInteraction)
+  }
 
   const filteredItems = allInteractions.filter((item) => {
     const matchesSearch =
@@ -51,10 +83,15 @@ export default function FeedbackListPage() {
       item.user.name.toLowerCase().includes(search.toLowerCase()) ||
       item.user.courseName.toLowerCase().includes(search.toLowerCase())
 
-    const matchesFilter = filter === 'all' || item.type === filter
-
-    return matchesSearch && matchesFilter
+    return matchesSearch
   })
+
+  const totalPages =
+    filter === 'review'
+      ? reviews.data?.totalPages
+      : filter === 'discussion'
+        ? discussions.data?.totalPages
+        : Math.max(discussions.data?.totalPages || 0, reviews.data?.totalPages || 0)
 
   return (
     <div className='space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500'>
@@ -62,9 +99,9 @@ export default function FeedbackListPage() {
       <header className='flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-border/50 pb-6'>
         <div>
           <p className='text-[11px] font-bold text-primary uppercase tracking-[0.2em] mb-2'>Engagement Hub</p>
-          <h1 className='text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground'>Phản hồi & Q&A</h1>
+          <h1 className='text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground'>Feedback & Tương tác</h1>
           <p className='text-muted-foreground font-medium mt-1 text-sm'>
-            Quản lý trải nghiệm và tương tác của học viên trên các khóa học của bạn
+            Quản lý đánh giá khóa học và các cuộc thảo luận Q&A từ học viên
           </p>
         </div>
 
@@ -94,18 +131,27 @@ export default function FeedbackListPage() {
         <Tabs
           defaultValue='all'
           className='w-full md:w-auto shrink-0'
-          onValueChange={(v) => setFilter(v as 'all' | 'discussion')}
+          onValueChange={(v) => {
+            setFilter(v as any)
+            setPage(1)
+          }}
         >
           <TabsList className='h-12 bg-background p-1 border border-border/40 rounded-xl w-full sm:w-auto shadow-sm'>
             <TabsTrigger
               value='all'
-              className='px-6 text-xs font-bold data-[state=active]:bg-muted data-[state=active]:text-foreground rounded-lg h-10 w-1/2 sm:w-auto transition-all'
+              className='px-6 text-xs font-bold data-[state=active]:bg-muted data-[state=active]:text-foreground rounded-lg h-10 w-1/3 sm:w-auto transition-all'
             >
               Tất cả
             </TabsTrigger>
             <TabsTrigger
+              value='review'
+              className='px-6 text-xs font-bold data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg h-10 w-1/3 sm:w-auto transition-all'
+            >
+              Đánh giá
+            </TabsTrigger>
+            <TabsTrigger
               value='discussion'
-              className='px-6 text-xs font-bold data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg h-10 w-1/2 sm:w-auto transition-all'
+              className='px-6 text-xs font-bold data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg h-10 w-1/3 sm:w-auto transition-all'
             >
               Thảo luận (Q&A)
             </TabsTrigger>
@@ -124,13 +170,13 @@ export default function FeedbackListPage() {
             </div>
             <h3 className='font-extrabold text-xl text-foreground'>Không tìm thấy dữ liệu</h3>
             <p className='text-sm text-muted-foreground mt-2 max-w-[300px] text-center'>
-              Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc để thấy được nhiều kết quả Q&A hơn.
+              Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc để thấy được nhiều kết quả hơn.
             </p>
           </div>
         ) : (
           <div className='space-y-5'>
             {filteredItems.map((item) => (
-              <InteractionItem key={item.id} data={item} />
+              <InteractionItem key={`${item.type}-${item.id}`} data={item} />
             ))}
           </div>
         )}
@@ -149,13 +195,13 @@ export default function FeedbackListPage() {
             Trang trước
           </Button>
           <span className='text-xs font-black text-foreground bg-muted/50 px-4 py-2 rounded-xl ring-1 ring-border/50'>
-            {page} / {data?.totalPages || 1}
+            {page} / {totalPages || 1}
           </span>
           <Button
             variant='outline'
             size='sm'
             className='rounded-xl px-6 font-bold text-xs h-10 hover:bg-muted transition-colors'
-            disabled={page >= (data?.totalPages || 1)}
+            disabled={page >= (totalPages || 1)}
             onClick={() => setPage((p) => p + 1)}
           >
             Trang sau

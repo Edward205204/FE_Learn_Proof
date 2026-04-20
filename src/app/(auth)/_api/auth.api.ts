@@ -28,6 +28,7 @@ const authApi = {
     bio?: string | null
     headline?: string | null
     website?: string | null
+    isOnboardingCompleted?: boolean
   }) => http.patch<User>('/auth/me', body)
 }
 

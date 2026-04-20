@@ -28,7 +28,14 @@ const learnerCourseApi = {
    * KÈM THEO trạng thái hoàn thành (progress) của Học Viên đang đăng nhập.
    * (Dùng để hiển thị danh sách bài học Sidebar bên trái trong phòng học)
    */
-  getCourseProgress: (courseId: string) => http.get<ChapterWithProgress[]>(`/courses/${courseId}/progress`)
+  getCourseProgress: (courseId: string) => http.get<ChapterWithProgress[]>(`/courses/${courseId}/progress`),
+  submitReview: (courseId: string, data: { rating: number; comment: string }) =>
+    http.post(`/courses/${courseId}/reviews`, data),
+
+  updateReview: (courseId: string, data: { rating: number; comment: string }) =>
+    http.patch(`/courses/${courseId}/reviews`, data),
+
+  deleteReview: (courseId: string) => http.delete(`/courses/${courseId}/reviews`)
 }
 
 export default learnerCourseApi

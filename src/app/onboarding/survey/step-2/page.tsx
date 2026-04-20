@@ -42,11 +42,11 @@ export default function OnboardingStep2() {
   const filteredTechs = TECHNOLOGIES.filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
 
   const goNext = () => {
-    router.push(`${PATH.ONBOARDING}/step3`)
+    router.push(`${PATH.ONBOARDING}/survey/step-3`)
   }
 
   const goBack = () => {
-    router.push(`${PATH.ONBOARDING}/step1`)
+    router.push(`${PATH.ONBOARDING}/survey/step-1`)
   }
 
   return (

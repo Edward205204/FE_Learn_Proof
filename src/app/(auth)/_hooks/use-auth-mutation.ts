@@ -34,19 +34,24 @@ export function useUpdateProfileMutation() {
 
 export function useLoginMutation() {
   const router = useRouter()
+  const { setAuth } = useAuthStore()
   return useMutation({
     mutationFn: authApi.login,
     onSuccess: (response) => {
+      const { user, tokens } = response.data
+      setAuth({ user, accessToken: tokens.accessToken, refreshToken: tokens.refreshToken })
+      
       toast.success('Đăng nhập thành công!')
       router.refresh()
 
-      const { user } = response.data
       if (user.role === 'CONTENT_MANAGER') {
         router.replace(PATH.STUDIO_COURSES)
       } else if (user.role === 'ADMIN') {
         router.replace(PATH.ADMIN)
-      } else {
+      } else if (!user.isOnboardingCompleted) {
         router.replace(`${PATH.ONBOARDING}/survey/step-1`)
+      } else {
+        router.replace(PATH.HOME)
       }
     }
   })
@@ -54,19 +59,24 @@ export function useLoginMutation() {
 
 export function useRegisterMutation() {
   const router = useRouter()
+  const { setAuth } = useAuthStore()
   return useMutation({
     mutationFn: authApi.register,
     onSuccess: (response) => {
+      const { user, tokens } = response.data
+      setAuth({ user, accessToken: tokens.accessToken, refreshToken: tokens.refreshToken })
+
       toast.success('Đăng ký thành công!')
       router.refresh()
 
-      const { user } = response.data
       if (user.role === 'CONTENT_MANAGER') {
         router.replace(PATH.STUDIO_COURSES)
       } else if (user.role === 'ADMIN') {
         router.replace(PATH.ADMIN)
-      } else {
+      } else if (!user.isOnboardingCompleted) {
         router.replace(`${PATH.ONBOARDING}/survey/step-1`)
+      } else {
+        router.replace(PATH.HOME)
       }
     }
   })

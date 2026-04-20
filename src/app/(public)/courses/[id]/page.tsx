@@ -37,6 +37,16 @@ import {
 } from '@/app/(learner)/_hooks/use-wishlist'
 import type { WishlistItem } from '@/app/(learner)/_api/wishlist.api'
 import { useAuthStore } from '@/store/auth.store'
+import { getCourseThumbnailUrl } from '@/utils/course'
+import { useGetLessonForLearnerQuery } from '@/app/(learner)/_hooks/use-lesson'
+import { VideoPlayer } from '@/app/(learner)/_components/video-player'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { CourseReviews } from '@/app/(public)/_components/course-reviews'
 
 export default function CourseDetailPage() {
   const params = useParams()
@@ -58,11 +68,22 @@ export default function CourseDetailPage() {
   const removeFromWishlistMutation = useRemoveFromWishlistMutation()
 
   const [expandedChapters, setExpandedChapters] = useState<string[]>([])
+  const [previewLessonId, setPreviewLessonId] = useState<string | null>(null)
+
+  const { data: lessonPreviewData, isLoading: isLoadingPreview } = useGetLessonForLearnerQuery(previewLessonId || '')
 
   const isWishlisted = useMemo(
     () => (wishlistData as WishlistItem[] | undefined)?.some((item) => item.courseId === courseData?.id) || false,
     [wishlistData, courseData?.id]
   )
+
+  const firstVideoLesson = useMemo(() => {
+    for (const chapter of courseData?.chapters || []) {
+      const videoLesson = chapter.lessons.find((l) => l.type === 'VIDEO')
+      if (videoLesson) return videoLesson
+    }
+    return null
+  }, [courseData?.chapters])
 
   const toggleWishlist = () => {
     if (!courseData) return
@@ -125,12 +146,12 @@ export default function CourseDetailPage() {
 
           <div className='max-w-[800px] space-y-6'>
             <h1 className='text-5xl md:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight'>
-              Làm chủ <span className='text-rose-600'>Ethereum</span> & <br />
-              Hợp đồng thông minh
+              {courseData.title}
             </h1>
-            <p className='text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-2xl'>
-              {courseData.shortDesc}
-            </p>
+            <div 
+              className='text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-2xl'
+              dangerouslySetInnerHTML={{ __html: courseData.shortDesc }}
+            />
 
             <div className='flex flex-wrap items-center gap-8 pt-4'>
               <div className='flex items-center gap-3'>
@@ -176,9 +197,10 @@ export default function CourseDetailPage() {
                 Mô tả khóa học
               </h2>
             </div>
-            <div className='prose prose-slate dark:prose-invert max-w-none text-slate-600 dark:text-slate-400 font-medium leading-[1.8] whitespace-pre-line'>
-              {courseData.fullDesc}
-            </div>
+            <div 
+              className='prose prose-slate dark:prose-invert max-w-none text-slate-600 dark:text-slate-400 font-medium leading-[1.8]'
+              dangerouslySetInnerHTML={{ __html: courseData.fullDesc }}
+            />
           </section>
 
           {/* Curriculum Section */}
@@ -215,10 +237,15 @@ export default function CourseDetailPage() {
                   {expandedChapters.includes(chapter.id) && (
                     <div className='px-5 pb-5 animate-in slide-in-from-top-2 duration-300'>
                       <div className='space-y-2'>
-                        {chapter.lessons.map((lesson) => (
+                         {chapter.lessons.map((lesson) => (
                           <div
                             key={lesson.id}
-                            className='flex items-center justify-between p-5 rounded-2xl bg-slate-50/50 dark:bg-white/5 hover:bg-white dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-700 group'
+                            onClick={() => {
+                              if (lesson.type === 'VIDEO') {
+                                setPreviewLessonId(lesson.id)
+                              }
+                            }}
+                            className='flex items-center justify-between p-5 rounded-2xl bg-slate-50/50 dark:bg-white/5 hover:bg-white dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-700 group cursor-pointer'
                           >
                             <div className='flex items-center gap-4'>
                               <div className='w-9 h-9 rounded-full bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center shrink-0'>
@@ -234,9 +261,16 @@ export default function CourseDetailPage() {
                                 {lesson.title}
                               </span>
                             </div>
-                            <span className='text-[10px] font-black text-slate-400 tracking-tighter tabular-nums'>
-                              {formatDuration(lesson.duration)}
-                            </span>
+                            <div className='flex items-center gap-3'>
+                              {lesson.type === 'VIDEO' && (
+                                <Badge variant='secondary' className='bg-rose-50 text-rose-500 border-none text-[9px] font-black uppercase tracking-tighter'>
+                                  Xem thử
+                                </Badge>
+                              )}
+                              <span className='text-[10px] font-black text-slate-400 tracking-tighter tabular-nums'>
+                                {formatDuration(lesson.duration)}
+                              </span>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -248,53 +282,14 @@ export default function CourseDetailPage() {
           </section>
 
           {/* Reviews Section */}
-          {courseData.reviews && courseData.reviews.length > 0 && (
-            <section>
-              <div className='flex items-center gap-3 mb-8'>
-                <div className='w-8 h-8 rounded-full bg-rose-500/10 flex items-center justify-center'>
-                  <Star size={16} className='text-rose-600' />
-                </div>
-                <h2 className='text-xl font-black text-slate-900 dark:text-white uppercase tracking-wider'>
-                  Đánh giá từ học viên
-                </h2>
-              </div>
-
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                {courseData.reviews.map((review) => (
-                  <div
-                    key={review.id}
-                    className='bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm'
-                  >
-                    <div className='flex items-center gap-3 mb-6'>
-                      <Avatar className='h-10 w-10'>
-                        <AvatarImage src={review.user.avatar || undefined} />
-                        <AvatarFallback>{review.user.fullName.substring(0, 2).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className='text-sm font-black text-slate-900 dark:text-white leading-none mb-1'>
-                          {review.user.fullName}
-                        </p>
-                        <div className='flex gap-0.5'>
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <Star
-                              key={s}
-                              size={10}
-                              fill={s <= review.rating ? 'currentColor' : 'none'}
-                              strokeWidth={s <= review.rating ? 0 : 1}
-                              className={s <= review.rating ? 'text-amber-400' : 'text-slate-300'}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <p className='text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic'>
-                      &ldquo;{review.comment}&rdquo;
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+          <CourseReviews 
+            courseId={courseData.id}
+            isEnrolled={!!courseData.isEnrolled}
+            userReview={courseData.userReview}
+            reviews={courseData.reviews}
+            instructorName={courseData.creator.fullName}
+            instructorAvatar={courseData.creator.avatar}
+          />
         </div>
 
         {/* Right Column */}
@@ -305,7 +300,7 @@ export default function CourseDetailPage() {
               <div className='relative aspect-video bg-slate-100 dark:bg-slate-800'>
                 {courseData.thumbnail ? (
                   <Image
-                    src={courseData.thumbnail}
+                    src={getCourseThumbnailUrl(courseData.thumbnail)}
                     alt={courseData.title}
                     fill
                     className='object-cover transition-transform duration-700 group-hover:scale-110'
@@ -316,7 +311,10 @@ export default function CourseDetailPage() {
                   </div>
                 )}
                 <div className='absolute inset-0 bg-slate-900/40 flex items-center justify-center'>
-                  <div className='w-16 h-16 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform cursor-pointer'>
+                  <div 
+                    onClick={() => firstVideoLesson && setPreviewLessonId(firstVideoLesson.id)}
+                    className='w-16 h-16 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform cursor-pointer'
+                  >
                     <Play size={24} fill='currentColor' className='ml-1' />
                   </div>
                 </div>
@@ -330,6 +328,11 @@ export default function CourseDetailPage() {
                   <span className='text-3xl font-black text-slate-900 dark:text-white'>
                     {courseData.isFree ? 'Miễn phí' : `${courseData.price.toLocaleString('vi-VN')} đ`}
                   </span>
+                  {courseData.isEnrolled && (
+                    <Badge className='bg-emerald-50 text-emerald-600 border-none font-black text-[10px] tracking-tight'>
+                      ĐÃ SỞ HỮU
+                    </Badge>
+                  )}
                   {courseData.originalPrice && courseData.originalPrice > courseData.price && (
                     <>
                       <span className='text-lg text-slate-400 line-through font-bold'>
@@ -350,7 +353,12 @@ export default function CourseDetailPage() {
                 )}
 
                 <Button
-                  className='w-full h-14 bg-rose-600 hover:bg-rose-700 text-white font-black text-base rounded-2xl shadow-xl shadow-rose-200 dark:shadow-rose-900/20 active:scale-[0.98] transition-all disabled:opacity-70'
+                  className={cn(
+                    'w-full h-14 font-black text-base rounded-2xl shadow-xl active:scale-[0.98] transition-all disabled:opacity-70',
+                    isLoggedIn && isEnrolled
+                      ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200 dark:shadow-emerald-900/20'
+                      : 'bg-rose-600 hover:bg-rose-700 shadow-rose-200 dark:shadow-rose-900/20'
+                  )}
                   disabled={addMutation.isPending || isEnrollmentLoading}
                   onClick={async () => {
                     if (isLoggedIn && isEnrolled) {
@@ -377,27 +385,28 @@ export default function CourseDetailPage() {
                     </Button>
                   ) : null}
 
-                  <button
-                    onClick={toggleWishlist}
-                    disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
-                    className={`h-12 w-12 shrink-0 rounded-2xl border-2 flex items-center justify-center transition-all active:scale-[0.92] disabled:opacity-50 ${
-                      isWishlisted
-                        ? 'border-rose-400 bg-rose-50 dark:bg-rose-500/10 text-rose-500'
-                        : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-rose-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10'
-                    }`}
-                    title={isWishlisted ? 'Bỏ yêu thích' : 'Yêu thích'}
-                  >
-                    {addToWishlistMutation.isPending || removeFromWishlistMutation.isPending ? (
-                      <Loader2 size={18} className='animate-spin' />
-                    ) : (
-                      <Heart
-                        size={18}
-                        className='transition-all duration-200'
-                        fill={isWishlisted ? 'currentColor' : 'none'}
-                      />
-                    )}
-                  </button>
-                </div>
+                    <button
+                      onClick={toggleWishlist}
+                      disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
+                      className={`h-12 w-12 shrink-0 rounded-2xl border-2 flex items-center justify-center transition-all active:scale-[0.92] disabled:opacity-50 ${
+                        isWishlisted
+                          ? 'border-rose-400 bg-rose-50 dark:bg-rose-500/10 text-rose-500'
+                          : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-rose-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10'
+                      }`}
+                      title={isWishlisted ? 'Bỏ yêu thích' : 'Yêu thích'}
+                    >
+                      {addToWishlistMutation.isPending || removeFromWishlistMutation.isPending ? (
+                        <Loader2 size={18} className='animate-spin' />
+                      ) : (
+                        <Heart
+                          size={18}
+                          className='transition-all duration-200'
+                          fill={isWishlisted ? 'currentColor' : 'none'}
+                        />
+                      )}
+                    </button>
+                  </div>
+                {isLoggedIn && isEnrolled && <div className='mb-8' />}
 
                 <div className='space-y-5'>
                   <p className='text-[11px] font-black text-slate-400 uppercase tracking-[0.15em]'>Khóa học bao gồm:</p>
@@ -435,6 +444,28 @@ export default function CourseDetailPage() {
           </div>
         </div>
       </div>
+      <Dialog open={!!previewLessonId} onOpenChange={(open) => !open && setPreviewLessonId(null)}>
+        <DialogContent className='max-w-4xl p-0 overflow-hidden bg-black border-none'>
+          <DialogHeader className='absolute top-4 left-6 z-50 pointer-events-none'>
+            <DialogTitle className='text-white font-black text-xl drop-shadow-md'>
+              Xem thử: {lessonPreviewData?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className='aspect-video w-full'>
+            {isLoadingPreview ? (
+              <div className='w-full h-full flex items-center justify-center bg-slate-900'>
+                <Loader2 className='w-10 h-10 animate-spin text-rose-500' />
+              </div>
+            ) : (
+              <VideoPlayer 
+                url={lessonPreviewData?.videoUrl || ''} 
+                lessonId={previewLessonId || ''} 
+                lastPosition={0} 
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -13,4 +13,5 @@ export interface User {
   headline: string | null
   website: string | null
   role: (typeof Role)[keyof typeof Role]
+  isOnboardingCompleted: boolean
 }

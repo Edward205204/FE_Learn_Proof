@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Star, Users } from 'lucide-react'
 import type { HomeCourseCard } from '@/schemas/course.schema'
 import Image from 'next/image'
+import { getCourseThumbnailUrl } from '@/utils/course'
 
 const LEVEL_LABEL: Record<string, string> = {
   BEGINNER: 'Cơ bản',
@@ -22,7 +23,9 @@ interface CourseCardProps {
 export default function CourseCard({ course }: CourseCardProps) {
   const rating = course.overallAnalytics?.avgRating ?? 0
   const totalStudents = course.overallAnalytics?.totalStudents ?? 0
-  const displayPrice = course.isFree ? 'Miễn phí' : `$${course.price.toFixed(2)}`
+  const displayPrice = course.isFree
+    ? 'Miễn phí'
+    : course.price.toLocaleString('vi-VN') + ' ₫'
   const hasDiscount = !course.isFree && course.originalPrice && course.originalPrice > course.price
 
   return (
@@ -33,21 +36,22 @@ export default function CourseCard({ course }: CourseCardProps) {
     >
       {/* Thumbnail */}
       <div className='relative aspect-video overflow-hidden bg-muted flex-shrink-0'>
-        {course.thumbnail ? (
-          <Image
-            fill
-            src={course.thumbnail}
-            alt={course.title}
-            className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105'
-          />
-        ) : (
-          <div className='absolute inset-0 bg-gradient-to-br from-muted to-muted-foreground/20' />
-        )}
+        <Image
+          fill
+          src={getCourseThumbnailUrl(course.thumbnail)}
+          alt={course.title}
+          className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105'
+        />
         <span
           className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[0.65rem] font-bold text-white uppercase tracking-wide ${LEVEL_CLASS[course.level]}`}
         >
           {LEVEL_LABEL[course.level]}
         </span>
+        {course.isEnrolled && (
+          <span className='absolute top-2 right-2 px-2 py-0.5 rounded text-[0.65rem] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 uppercase tracking-wide shadow-sm'>
+            Đã sở hữu
+          </span>
+        )}
       </div>
 
       {/* Body */}
@@ -59,14 +63,15 @@ export default function CourseCard({ course }: CourseCardProps) {
         <p className='text-xs text-muted-foreground'>{course.creator.fullName}</p>
 
         {/* Meta */}
-        <div className='flex items-center justify-between mt-auto pt-2'>
-          <div className='flex items-center gap-1.5'>
-            <Star size={12} className='fill-amber-400 text-amber-400' />
-            <span className='text-xs font-bold text-amber-500'>{rating > 0 ? rating.toFixed(1) : '—'}</span>
+        <div className='flex items-center justify-between mt-auto pt-3 border-t border-slate-50 dark:border-slate-800/50'>
+          <div className='flex items-center gap-2'>
+            <div className='flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-400/10 text-amber-500'>
+              <Star size={10} fill='currentColor' strokeWidth={0} />
+              <span className='text-[10px] font-black'>{rating > 0 ? rating.toFixed(1) : '0.0'}</span>
+            </div>
             {totalStudents > 0 && (
-              <span className='flex items-center gap-0.5 text-[0.68rem] text-muted-foreground ml-1'>
-                <Users size={11} />
-                {totalStudents.toLocaleString('vi-VN')}
+              <span className='text-[10px] font-bold text-slate-400'>
+                ({totalStudents.toLocaleString('vi-VN')})
               </span>
             )}
           </div>
@@ -76,7 +81,9 @@ export default function CourseCard({ course }: CourseCardProps) {
               {displayPrice}
             </span>
             {hasDiscount && (
-              <span className='text-xs text-muted-foreground line-through'>${course.originalPrice!.toFixed(2)}</span>
+              <span className='text-xs text-muted-foreground line-through'>
+                {course.originalPrice!.toLocaleString('vi-VN')} ₫
+              </span>
             )}
           </div>
         </div>

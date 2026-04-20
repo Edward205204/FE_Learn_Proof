@@ -6,7 +6,6 @@ import { CloudUpload, Loader2, Sparkles } from 'lucide-react'
 
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { SimpleEditor } from '@/components/common/simple-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
@@ -26,12 +25,15 @@ export function CourseStep1Fields({ form, categories, shortDescriptionLength, th
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [pickedFileName, setPickedFileName] = useState<string | null>(null)
   const thumbnailError = form.formState.errors.thumbnail?.message
+  const watchThumbnail = form.watch('thumbnail')
+  const displayThumbnailUrl = watchThumbnail || thumbnailUrl
 
   const { mutate: uploadImage, isPending: isUploading } = useUploadImageMutation({
     onUploaded: (url) => {
       const fullUrl = toMediaUrl(url) ?? url
       form.setValue('thumbnail', fullUrl, { shouldDirty: true, shouldTouch: true, shouldValidate: true })
       form.clearErrors('thumbnail')
+      if (fileInputRef.current) fileInputRef.current.value = ''
     }
   })
 
@@ -151,40 +153,14 @@ export function CourseStep1Fields({ form, categories, shortDescriptionLength, th
         )}
       />
 
-      <div className='bg-primary/5 border border-primary/20 rounded-xl p-6 space-y-4'>
-        <div className='flex items-center gap-2 text-primary font-semibold'>
-          <Sparkles className='w-4 h-4 text-primary fill-primary/20' />
-          <span className='text-sm'>Ngữ cảnh cho AI Assistant</span>
-        </div>
-        <p className='text-sm text-primary/80 leading-relaxed'>
-          Dán đề cương, ghi chú hoặc ý tưởng chi tiết vào đây. AI sẽ dùng thông tin này để tự động tạo nội dung chương
-          học, mô tả bài học và câu hỏi quiz ở các bước tiếp theo.
-        </p>
-        <FormField
-          control={form.control}
-          name='fullDesc'
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Textarea
-                  placeholder='Ví dụ: Tuần 1: Giới thiệu khái niệm. Tuần 2: Thực hành chuyên sâu... Bao gồm mục tiêu học tập và kiến thức trọng tâm.'
-                  className='min-h-[150px] bg-background border-primary/20 focus-visible:ring-primary/30'
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
 
       <div className='space-y-3'>
         <label className='text-sm font-semibold'>Ảnh bìa khóa học</label>
 
-        {thumbnailUrl ? (
+        {displayThumbnailUrl ? (
           <div className='rounded-xl overflow-hidden ring-1 ring-border/50 bg-muted'>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={thumbnailUrl} alt='Thumbnail hiện tại' className='w-full max-h-[220px] object-cover' />
+            <img src={displayThumbnailUrl} alt='Thumbnail hiện tại' className='w-full max-h-[220px] object-cover' />
           </div>
         ) : null}
 

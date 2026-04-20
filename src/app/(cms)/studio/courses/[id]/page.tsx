@@ -28,7 +28,8 @@ import {
   useGetManagerCourseDetailQuery,
   useCompleteCourseMutation,
   useRenameChapterMutation,
-  useUpdateCourseChaptersFrameMutation
+  useUpdateCourseChaptersFrameMutation,
+  useDeleteChapterMutation
 } from '@/app/(cms)/_hooks/use-course-mutation'
 import { useDeleteLessonMutation } from '@/app/(cms)/_hooks/use-lesson'
 import { useReorderQueue } from '@/app/(cms)/_hooks/use-reorder'
@@ -89,12 +90,14 @@ export default function ChaptersPage() {
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null)
   const [previewLessonId, setPreviewLessonId] = useState<string | null>(null)
   const [lessonToDelete, setLessonToDelete] = useState<LessonItem | null>(null)
+  const [chapterToDelete, setChapterToDelete] = useState<ChapterItem | null>(null)
 
   const [isEditBaseInfoOpen, setIsEditBaseInfoOpen] = useState(false)
   const [isEditStatusOpen, setIsEditStatusOpen] = useState(false)
   const [isCompleteCourseOpen, setIsCompleteCourseOpen] = useState(false)
 
   const deleteLessonMutation = useDeleteLessonMutation(courseId)
+  const deleteChapterMutation = useDeleteChapterMutation(courseId)
 
   const { data: previewLesson, isFetching: isFetchingPreview } = useQuery({
     queryKey: ['lesson-preview', previewLessonId],
@@ -482,7 +485,13 @@ export default function ChaptersPage() {
                             variant='ghost'
                             size='icon'
                             className='h-8 w-8 text-destructive'
-                            onClick={() => setChapters(chapters.filter((ch) => ch.id !== chapter.id))}
+                            onClick={() => {
+                              if (chapter.id.startsWith('ch-')) {
+                                setChapters(chapters.filter((ch) => ch.id !== chapter.id))
+                              } else {
+                                setChapterToDelete(chapter)
+                              }
+                            }}
                           >
                             <Trash2 className='w-4 h-4' />
                           </Button>
@@ -742,6 +751,42 @@ export default function ChaptersPage() {
               disabled={deleteLessonMutation.isPending}
             >
               {deleteLessonMutation.isPending ? 'Đang xóa...' : 'Xóa'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Chapter Confirmation Dialog */}
+      <Dialog open={!!chapterToDelete} onOpenChange={(open) => !open && setChapterToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa chương</DialogTitle>
+          </DialogHeader>
+          <div className='py-4'>
+            Bạn có chắc chắn muốn xóa chương <span className='font-bold'>{chapterToDelete?.title}</span> không? Hành
+            động này không thể hoàn tác.
+          </div>
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setChapterToDelete(null)} disabled={deleteChapterMutation.isPending}>
+              Hủy
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={() => {
+                if (chapterToDelete) {
+                  deleteChapterMutation.mutate(chapterToDelete.id, {
+                    onSuccess: () => {
+                      setChapters(
+                        chapters.filter((ch) => ch.id !== chapterToDelete.id)
+                      )
+                      setChapterToDelete(null)
+                    }
+                  })
+                }
+              }}
+              disabled={deleteChapterMutation.isPending}
+            >
+              {deleteChapterMutation.isPending ? 'Đang xóa...' : 'Xóa'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -48,7 +48,7 @@ export default function OnboardingStep1() {
   }
 
   const goNext = () => {
-    router.push(`${PATH.ONBOARDING}/step2`)
+    router.push(`${PATH.ONBOARDING}/survey/step-2`)
   }
 
   return (
