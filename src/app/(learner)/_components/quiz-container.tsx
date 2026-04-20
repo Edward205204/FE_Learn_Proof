@@ -1,22 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import { ClipboardList, Trophy, MessageSquare, Send } from 'lucide-react'
+import { ClipboardList, Trophy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Textarea } from '@/components/ui/textarea'
 import type { QuizLesson } from '../_utils/lesson-types'
+import { LessonDiscussion } from './lesson-discussion'
 
 interface QuizContainerProps {
+  courseId: string
   lesson: QuizLesson
-  onSubmit?: (answers: Record<string, string>, score: number) => void
+  onSubmit?: (
+    answers: Record<string, string>
+  ) => Promise<{ correctCount: number; totalQuestions: number; score: number } | void>
 }
 
-export function QuizContainer({ lesson, onSubmit }: QuizContainerProps) {
+export function QuizContainer({ courseId, lesson, onSubmit }: QuizContainerProps) {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState(0)
-  const [discussion, setDiscussion] = useState('')
+  const [resultTotal, setResultTotal] = useState(0)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const answeredCount = Object.keys(answers).length
   const totalQuestions = lesson.questions.length
@@ -26,11 +29,25 @@ export function QuizContainer({ lesson, onSubmit }: QuizContainerProps) {
     setAnswers((prev) => ({ ...prev, [questionId]: optionId }))
   }
 
-  const handleSubmit = () => {
-    const correct = lesson.questions.filter((q) => answers[q.id] === q.correctOptionId).length
-    setScore(correct)
-    setSubmitted(true)
-    onSubmit?.(answers, correct)
+  const handleSubmit = async () => {
+    setIsSubmitting(true)
+    try {
+      const hasClientAnswerKey = lesson.questions.every((q) => Boolean(q.correctOptionId))
+      if (hasClientAnswerKey) {
+        const correct = lesson.questions.filter((q) => answers[q.id] === q.correctOptionId).length
+        setScore(correct)
+        setResultTotal(totalQuestions)
+      } else {
+        const result = await onSubmit?.(answers)
+        const correct = result?.correctCount ?? 0
+        const total = result?.totalQuestions ?? totalQuestions
+        setScore(correct)
+        setResultTotal(total)
+      }
+      setSubmitted(true)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -55,24 +72,26 @@ export function QuizContainer({ lesson, onSubmit }: QuizContainerProps) {
       {submitted && (
         <div
           className={`rounded-xl p-8 text-center border ${
-            score / totalQuestions >= 0.8
+            score / (resultTotal || totalQuestions) >= 0.8
               ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
               : 'bg-primary/10 border-primary/20'
           }`}
         >
           <Trophy
             size={40}
-            className={`mx-auto mb-3 ${score / totalQuestions >= 0.8 ? 'text-emerald-500' : 'text-primary'}`}
+            className={`mx-auto mb-3 ${score / (resultTotal || totalQuestions) >= 0.8 ? 'text-emerald-500' : 'text-primary'}`}
           />
           <p className='text-2xl font-bold text-foreground'>
-            {score}/{totalQuestions} câu đúng
+            {score}/{resultTotal || totalQuestions} câu đúng
           </p>
           <p
             className={`text-[15px] font-medium mt-1 ${
-              score / totalQuestions >= 0.8 ? 'text-emerald-600' : 'text-primary'
+              score / (resultTotal || totalQuestions) >= 0.8 ? 'text-emerald-600' : 'text-primary'
             }`}
           >
-            {score / totalQuestions >= 0.8 ? '🎉 Xuất sắc! Bạn đã đạt yêu cầu.' : 'Cố gắng hơn nhé! Bạn chưa đạt 80%.'}
+            {score / (resultTotal || totalQuestions) >= 0.8
+              ? '🎉 Xuất sắc! Bạn đã đạt yêu cầu.'
+              : 'Cố gắng hơn nhé! Bạn chưa đạt 80%.'}
           </p>
         </div>
       )}
@@ -87,7 +106,7 @@ export function QuizContainer({ lesson, onSubmit }: QuizContainerProps) {
               {/* Tiêu đề câu hỏi */}
               <div className='px-7 pt-7 pb-4'>
                 <div className='flex gap-3 items-start'>
-                  <span className='flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center border border-primary/20'>
+                  <span className='shrink-0 h-7 w-7 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center border border-primary/20'>
                     {idx + 1}
                   </span>
                   <p className='text-[16px] font-semibold text-foreground leading-snug pt-0.5'>{q.text}</p>
@@ -153,47 +172,16 @@ export function QuizContainer({ lesson, onSubmit }: QuizContainerProps) {
             </p>
             <Button
               onClick={handleSubmit}
-              disabled={answeredCount < totalQuestions}
+              disabled={answeredCount < totalQuestions || isSubmitting}
               className='bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-8 h-11 font-semibold text-[15px] disabled:opacity-50 transition-all'
             >
-              Nộp bài kiểm tra
+              {isSubmitting ? 'Đang nộp...' : 'Nộp bài kiểm tra'}
             </Button>
           </div>
         </div>
       )}
 
-      {/* ---- THẢO LUẬN BÊN DƯỚI (theo ảnh mẫu) ---- */}
-      <div className='bg-background rounded-xl border border-border shadow-sm p-8 space-y-6 mt-12'>
-        <div className='flex items-center gap-2'>
-          <MessageSquare size={18} className='text-primary' />
-          <h3 className='font-bold text-foreground text-lg'>Thảo luận bài kiểm tra</h3>
-        </div>
-
-        {/* Form gửi thảo luận */}
-        <div className='flex gap-4 items-start'>
-          <Avatar className='h-10 w-10 shrink-0'>
-            <AvatarImage src='/user-avatar.jpg' />
-            <AvatarFallback className='bg-muted text-muted-foreground font-bold text-sm'>U</AvatarFallback>
-          </Avatar>
-          <div className='flex-1 space-y-3'>
-            <Textarea
-              value={discussion}
-              onChange={(e) => setDiscussion(e.target.value)}
-              placeholder='Đặt câu hỏi về bài kiểm tra hoặc thảo luận với các học viên khác...'
-              className='min-h-[100px] rounded-xl border-input bg-background focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary p-4 text-[15px] resize-none'
-            />
-            <div className='flex justify-end'>
-              <Button
-                onClick={() => setDiscussion('')}
-                className='bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-6 h-10 font-medium text-sm transition-colors'
-              >
-                <Send size={16} className='mr-2' />
-                Gửi thảo luận
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <LessonDiscussion courseId={courseId} lessonId={lesson.id} />
     </div>
   )
 }

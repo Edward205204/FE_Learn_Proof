@@ -321,7 +321,7 @@ function CourseCard({ enroll }: { enroll: EnrollmentCourse }) {
             asChild
             className='w-full h-11 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground font-bold text-sm border-none transition-all duration-300 drop-shadow-sm active:scale-95'
           >
-            <Link href={`/courses/${course.slug}`}>
+            <Link href={`/courses/${course.id}/lessons/start`}>
               <PlayCircle size={16} className='mr-2' />
               {enroll.progressPercent === 100 ? 'Xem lại khoá học' : 'Tiếp tục học tập'}
             </Link>

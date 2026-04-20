@@ -1,30 +1,46 @@
 import http from '@/utils/http'
 
-export type LessonLearnerResponse = {
+type LearnerQuiz = {
   id: string
-  title: string
-  shortDesc: string | null
-  type: 'VIDEO' | 'TEXT' | 'QUIZ'
-  order: number
-  chapterId: string
-  // Video fields
-  videoUrl?: string
-  duration?: number | null
-  // Text fields
-  textContent?: string
-  // Quiz fields
-  quiz?: {
+  lessonId: string
+  questions: {
     id: string
-    questions: {
-      id: string
-      content: string
-      answers: { id: string; content: string }[]
-    }[]
-  } | null
-}
+    content: string
+    answers: { id: string; content: string }[]
+  }[]
+} | null
 
+export type LearnerLessonDetail =
+  | {
+      id: string
+      title: string
+      shortDesc: string | null
+      type: 'VIDEO'
+      order: number
+      chapterId: string
+      duration: number | null
+      videoUrl: string
+    }
+  | {
+      id: string
+      title: string
+      shortDesc: string | null
+      type: 'TEXT'
+      order: number
+      chapterId: string
+      textContent: string
+    }
+  | {
+      id: string
+      title: string
+      shortDesc: string | null
+      type: 'QUIZ'
+      order: number
+      chapterId: string
+      quiz: LearnerQuiz
+    }
 const lessonApi = {
-  getLessonForLearner: (lessonId: string) => http.get<LessonLearnerResponse>(`/lesson/${lessonId}/learn`),
+  getLessonForLearner: (lessonId: string) => http.get<LearnerLessonDetail>(`/lesson/${lessonId}/learn`),
 
   markLessonComplete: (lessonId: string, courseId: string) =>
     http.post(`/lesson/${lessonId}/complete`, { courseId })

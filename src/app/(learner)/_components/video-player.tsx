@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useRef, useState, useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 
 type ReactPlayerInstance = {
@@ -32,68 +32,33 @@ import { getVideoUrl } from '@/utils/course'
 
 interface VideoPlayerProps {
   url: string
-  lastPosition: number // Tính bằng giây (s)
+  lastPosition: number
   lessonId: string
   onEnded?: () => void
 }
 
 export function VideoPlayer({ url, lastPosition, lessonId, onEnded }: VideoPlayerProps) {
+  void lessonId
   const formattedUrl = getVideoUrl(url)
   const playerRef = useRef<ReactPlayerInstance | null>(null)
-  const [hasJumped, setHasJumped] = useState(false)
+  const hasJumpedRef = useRef(false)
 
-  // Dùng ref để heartbeat luôn đọc được giá trị mới nhất mà không reset interval
-  const playedSecondsRef = useRef(0)
-  // Lưu vị trí đã gửi lần cuối — tránh gửi heartbeat khi video đang pause
-  const lastSentRef = useRef(0)
+  useEffect(() => {
+    hasJumpedRef.current = false
+  }, [formattedUrl])
 
-  // 1. Tự động nhảy đến vị trí cũ khi video sẵn sàng
   const handleReady = () => {
-    if (!hasJumped && lastPosition > 0) {
-      playerRef.current?.seekTo(lastPosition, 'seconds')
-      setHasJumped(true)
+    if (!hasJumpedRef.current && lastPosition > 0 && playerRef.current) {
+      playerRef.current.seekTo(lastPosition, 'seconds')
+      hasJumpedRef.current = true
     }
   }
 
-  // 2. Cập nhật vị trí hiện tại (progressInterval = 5000ms để giảm overhead)
   const handleProgress = ({ playedSeconds }: { playedSeconds: number }) => {
-    playedSecondsRef.current = playedSeconds
-  }
-
-  // 3. Logic Heartbeat: Gửi dữ liệu về server mỗi 30 giây
-  useEffect(() => {
-    const heartbeatInterval = setInterval(() => {
-      const currentPos = Math.floor(playedSecondsRef.current)
-      // Chỉ gửi khi video đang chạy (position thay đổi so với lần gửi trước)
-      if (currentPos > 0 && currentPos !== lastSentRef.current) {
-        lastSentRef.current = currentPos
-        console.log(`[Heartbeat] Lesson: ${lessonId}, At: ${currentPos}s`)
-        // Gọi hàm API của bạn ở đây:
-        // saveProgress({ lessonId, position: currentPos })
-      }
-    }, 30000)
-
-    return () => clearInterval(heartbeatInterval)
-  }, [lessonId])
-
-  const isYoutube = formattedUrl.includes('youtube.com') || formattedUrl.includes('youtu.be')
-
-  if (isYoutube) {
-    const embedUrl = formattedUrl
-      .replace('watch?v=', 'embed/')
-      .replace('youtu.be/', 'youtube.com/embed/')
-
-    return (
-      <div className='relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl border border-white/10'>
-        <iframe
-          className='w-full h-full'
-          src={embedUrl}
-          title='YouTube video player'
-          allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
-          allowFullScreen
-        />
-      </div>
-    )
+    if (!hasJumpedRef.current && playedSeconds > 1 && lastPosition > 0 && playerRef.current) {
+      playerRef.current.seekTo(lastPosition, 'seconds')
+      hasJumpedRef.current = true
+    }
   }
 
   return (

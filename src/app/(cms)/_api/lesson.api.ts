@@ -1,7 +1,5 @@
 import http from '@/utils/http'
 
-// ─── Response Types (ánh xạ từ BE lesson.response.ts) ────────────────────────
-
 /** Kết quả trả về khi tạo/cập nhật bài giảng */
 export type LessonCreatedResponse = {
   id: string
@@ -54,13 +52,15 @@ export type QuizLessonDetail = {
   } | null
 }
 
-/** Union type cho mọi loại bài giảng */
 export type LessonDetail = VideoLessonDetail | TextLessonDetail | QuizLessonDetail
 
-// ─── Request Body Types (ánh xạ từ BE lesson.model.ts) ───────────────────────
+export type QuizQuestionPayload = {
+  content: string
+  answers: { content: string; isCorrect: boolean }[]
+}
 
+export type QuizDataPayload = QuizQuestionPayload[]
 
-/** Body tạo bài giảng Video */
 export type CreateVideoLessonBody = {
   type: 'VIDEO'
   title: string
@@ -69,9 +69,9 @@ export type CreateVideoLessonBody = {
   shortDesc?: string
   fullDesc?: string
   duration?: number
+  quizData?: QuizDataPayload
 }
 
-/** Body tạo bài giảng Text */
 export type CreateTextLessonBody = {
   type: 'TEXT'
   title: string
@@ -79,24 +79,20 @@ export type CreateTextLessonBody = {
   textContent: string
   shortDesc?: string
   fullDesc?: string
+  quizData?: QuizDataPayload
 }
 
-/** Body tạo bài giảng Quiz */
 export type CreateQuizLessonBody = {
   type: 'QUIZ'
   title: string
   chapterId: string
   shortDesc?: string
   fullDesc?: string
-  quizData: {
-    content: string
-    answers: { content: string; isCorrect?: boolean }[]
-  }[]
+  quizData: QuizDataPayload
 }
 
 export type CreateLessonBody = CreateVideoLessonBody | CreateTextLessonBody | CreateQuizLessonBody
 
-/** Body cập nhật bài giảng (mọi trường đều optional, nhưng phải gửi kèm type) */
 export type UpdateLessonBody = {
   type: 'VIDEO' | 'TEXT' | 'QUIZ'
   title?: string
@@ -106,20 +102,14 @@ export type UpdateLessonBody = {
   textContent?: string
 }
 
-// ─── API Object ────────────────────────────────────────────────────────────────
-
 const lessonApi = {
-  /** POST /lesson — Tạo bài giảng mới (VIDEO, TEXT, hoặc QUIZ) */
   createLesson: (body: CreateLessonBody) => http.post<LessonCreatedResponse>('/lesson', body),
 
-  /** GET /lesson/:lessonId — Lấy chi tiết bài giảng (CMS view, có isCorrect) */
   getLessonDetail: (lessonId: string) => http.get<LessonDetail>(`/lesson/${lessonId}`),
 
-  /** PATCH /lesson/:lessonId — Cập nhật nội dung bài giảng */
   updateLesson: (lessonId: string, body: UpdateLessonBody) =>
     http.patch<LessonCreatedResponse>(`/lesson/${lessonId}`, body),
 
-  /** DELETE /lesson/:lessonId — Xóa bài giảng */
   deleteLesson: (lessonId: string) => http.delete(`/lesson/${lessonId}`)
 }
 

@@ -2,8 +2,7 @@
 
 import { useId, useRef, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import { CloudUpload, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
+import { CloudUpload, Loader2, Sparkles } from 'lucide-react'
 
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -12,8 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import { LEVEL_OPTIONS } from '@/app/(cms)/_constants/course-workflow'
 import type { Categories, CreateCourseStep1 } from '@/app/(cms)/_utils/zod'
-import mediaApi from '@/app/(cms)/_api/media.api'
-import { config } from '@/constants/config'
+import { toMediaUrl, useUploadImageMutation } from '@/app/(cms)/_hooks/use-media'
 
 type Props = {
   form: UseFormReturn<CreateCourseStep1>
@@ -25,39 +23,37 @@ type Props = {
 export function CourseStep1Fields({ form, categories, shortDescriptionLength, thumbnailUrl }: Props) {
   const inputId = useId()
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const [hasPickedFile, setHasPickedFile] = useState(false)
-  const [isUploading, setIsUploading] = useState(false)
-
-  // Dùng form.watch để trigger re-render khi giá trị thay đổi
+  const [pickedFileName, setPickedFileName] = useState<string | null>(null)
+  const thumbnailError = form.formState.errors.thumbnail?.message
   const watchThumbnail = form.watch('thumbnail')
   const displayThumbnailUrl = watchThumbnail || thumbnailUrl
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { mutate: uploadImage, isPending: isUploading } = useUploadImageMutation({
+    onUploaded: (url) => {
+      const fullUrl = toMediaUrl(url) ?? url
+      form.setValue('thumbnail', fullUrl, { shouldDirty: true, shouldTouch: true, shouldValidate: true })
+      form.clearErrors('thumbnail')
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  })
+
+  const handlePickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    try {
-      setIsUploading(true)
-      const res = await mediaApi.uploadImage(file)
-      // res.data.url hoặc res.url tuỳ theo axios config response interceptor
-      const url = res.data?.url || (res as unknown as { url: string }).url || ''
-      if (url) {
-        // Lắp config.BE_URL nếu là đường dẫn tương đối để pass Zod schema "url()"
-        const fullUrl = url.startsWith('http') ? url : `${config.BE_URL}${url}`
-        form.setValue('thumbnail', fullUrl, { shouldValidate: true })
-        setHasPickedFile(true)
-        toast.success('Upload ảnh bìa thành công')
-      }
-    } catch (error) {
-      console.error('Upload lỗi:', error)
-      toast.error('Upload ảnh thất bại, vui lòng thử lại!')
-    } finally {
-      setIsUploading(false)
-      // reset input value to allow selecting the same file again
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
+    if (!file.type.startsWith('image/')) {
+      form.setError('thumbnail', { type: 'manual', message: 'Vui lòng chọn file ảnh hợp lệ.' })
+      return
     }
+
+    if (file.size > 5 * 1024 * 1024) {
+      form.setError('thumbnail', { type: 'manual', message: 'Ảnh vượt quá 5MB, vui lòng chọn ảnh nhỏ hơn.' })
+      return
+    }
+
+    setPickedFileName(file.name)
+    form.clearErrors('thumbnail')
+    uploadImage(file)
   }
 
   return (
@@ -174,19 +170,19 @@ export function CourseStep1Fields({ form, categories, shortDescriptionLength, th
           type='file'
           accept='image/*'
           className='hidden'
-          onChange={handleFileChange}
           disabled={isUploading}
+          onChange={handlePickFile}
         />
 
         <div
-          className={`border-2 border-dashed border-muted-foreground/20 rounded-xl p-10 flex flex-col items-center justify-center bg-secondary/10 hover:bg-secondary/20 transition-colors ${
-            isUploading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer group'
-          }`}
-          onClick={() => !isUploading && fileInputRef.current?.click()}
+          className='border-2 border-dashed border-muted-foreground/20 rounded-xl p-10 flex flex-col items-center justify-center bg-secondary/10 hover:bg-secondary/20 transition-colors cursor-pointer group disabled:pointer-events-none disabled:opacity-70'
+          onClick={() => {
+            if (!isUploading) fileInputRef.current?.click()
+          }}
           role='button'
           tabIndex={0}
           onKeyDown={(e) => {
-            if (!isUploading && (e.key === 'Enter' || e.key === ' ')) fileInputRef.current?.click()
+            if ((e.key === 'Enter' || e.key === ' ') && !isUploading) fileInputRef.current?.click()
           }}
         >
           <div className='h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform'>
@@ -198,18 +194,30 @@ export function CourseStep1Fields({ form, categories, shortDescriptionLength, th
           </div>
           <p className='text-sm font-medium'>
             {isUploading ? (
-              <span>Đang tải lên...</span>
+              <span className='text-primary'>Đang tải ảnh lên...</span>
             ) : (
-              <span>
+              <>
                 <span className='text-primary hover:underline'>Nhấn để tải lên</span> hoặc kéo thả vào đây
-              </span>
+              </>
             )}
           </p>
           <p className='text-xs text-muted-foreground mt-1'>Khuyến nghị: 1280x720px. Tối đa 5MB (JPG, PNG).</p>
-          {hasPickedFile && displayThumbnailUrl && !isUploading ? (
-            <p className='text-xs text-green-600 mt-2 font-medium'>Đã upload ảnh thành công.</p>
+          {pickedFileName ? (
+            <p className='text-xs text-muted-foreground mt-2 truncate max-w-full'>Đã chọn: {pickedFileName}</p>
           ) : null}
         </div>
+        {thumbnailUrl ? (
+          <button
+            type='button'
+            className='text-xs text-muted-foreground hover:text-foreground underline underline-offset-2'
+            onClick={() =>
+              form.setValue('thumbnail', null, { shouldDirty: true, shouldTouch: true, shouldValidate: true })
+            }
+          >
+            Xóa ảnh bìa hiện tại
+          </button>
+        ) : null}
+        {thumbnailError ? <p className='text-sm text-destructive'>{thumbnailError}</p> : null}
       </div>
     </>
   )

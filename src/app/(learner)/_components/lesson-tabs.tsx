@@ -2,17 +2,15 @@
 
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Send, FileText, Download, Bot } from 'lucide-react'
+import { Send, FileText, Download, Bot, Lock } from 'lucide-react'
 
 import { useAuthStore } from '@/store/auth.store'
 import { LessonComments } from './lesson-comments'
 
 interface LessonTabsProps {
-  lessonId: string
   courseId: string
+  lessonId: string
   description: string
   materials: { title: string; size: string; url: string }[]
   isEnrolled?: boolean
@@ -62,13 +60,14 @@ export function LessonTabs({ lessonId, courseId, description, materials, isEnrol
       </TabsList>
 
       {/* --- PHẦN MÔ TẢ --- */}
-      <TabsContent value='description' className='mt-6'>
-        <div className='text-foreground/90 leading-relaxed text-[15px] whitespace-pre-line'>{description}</div>
+      <TabsContent value='description' className='mt-6 w-full min-w-0'>
+        <div className='w-full min-w-0 text-foreground/90 leading-relaxed text-[15px] whitespace-pre-line break-all'>
+          {description}
+        </div>
       </TabsContent>
 
       {/* --- PHẦN HỎI ĐÁP AI --- */}
-      {/* ... (AI content unchanged) ... */}
-      <TabsContent value='ai' className='mt-6'>
+      <TabsContent value='ai' className='mt-6 w-full min-w-0'>
         <div className='bg-muted/30 rounded-2xl p-6 min-h-[400px] flex flex-col justify-between border border-border'>
           {/* Luồng tin nhắn */}
           <div className='space-y-6'>
@@ -77,8 +76,9 @@ export function LessonTabs({ lessonId, courseId, description, materials, isEnrol
                 <Bot size={20} />
               </div>
               <div className='bg-background p-4 rounded-2xl rounded-tl-none shadow-sm text-[15px] text-foreground max-w-[85%] border border-border leading-relaxed'>
-                Chào mừng bạn đến với trợ lý AI của LearnProof! Tôi đã nắm vững nội dung bài học. Bạn có
-                bất kỳ thắc mắc nào về lý thuyết hay cách áp dụng thực tế không?
+                {
+                  'Chào mừng bạn đến với trợ lý AI của LearnProof! Tôi đã nắm vững nội dung bài học. Bạn có bất kỳ thắc mắc nào về lý thuyết hay cách áp dụng thực tế không?'
+                }
               </div>
             </div>
           </div>
@@ -114,12 +114,12 @@ export function LessonTabs({ lessonId, courseId, description, materials, isEnrol
       </TabsContent>
 
       {/* --- PHẦN THẢO LUẬN --- */}
-      <TabsContent value='discussion' className='mt-6 outline-none'>
+      <TabsContent value='discussion' className='mt-6 w-full min-w-0'>
         <LessonComments courseId={courseId} lessonId={lessonId} isEnrolled={isEnrolled} />
       </TabsContent>
 
       {/* --- PHẦN TÀI LIỆU --- */}
-      <TabsContent value='materials' className='mt-6 space-y-3'>
+      <TabsContent value='materials' className='mt-6 w-full min-w-0 space-y-3'>
         {materials.length > 0 ? (
           materials.map((file, idx) => (
             <a

@@ -92,6 +92,8 @@ export function useUpdateCourseBaseInfoMutation(courseId: string) {
     onSuccess: () => {
       toast.success('Đã cập nhật thông tin cơ bản.')
       queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.detail(courseId) })
+      queryClient.invalidateQueries({ queryKey: [...COURSE_QUERY_KEYS.detail(courseId), 'base-info'] as const })
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.detailManager(courseId) })
       queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.all })
     },
     onError: () => {
@@ -101,10 +103,13 @@ export function useUpdateCourseBaseInfoMutation(courseId: string) {
 }
 
 export function useUpdateCourseChaptersFrameMutation(courseId: string) {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (body: UpdateCourseChaptersFrameBody) => courseApi.updateCourseChaptersFrame(courseId, body),
     onSuccess: () => {
       toast.success('Đã lưu cấu trúc chương.')
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.detailManager(courseId) })
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.detail(courseId) })
     },
     onError: () => {
       toast.error('Có lỗi xảy ra khi lưu cấu trúc chương.')
@@ -131,6 +136,22 @@ export function usePublishCourseMutation(courseId: string) {
     },
     onError: () => {
       toast.error('Có lỗi xảy ra khi xuất bản khóa học.')
+    }
+  })
+}
+
+export function useCompleteCourseMutation(courseId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => courseApi.completeCourse(courseId),
+    onSuccess: () => {
+      toast.success('Đã hoàn thiện khóa học.')
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.all })
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.detail(courseId) })
+      queryClient.invalidateQueries({ queryKey: COURSE_QUERY_KEYS.detailManager(courseId) })
+    },
+    onError: () => {
+      toast.error('Có lỗi xảy ra khi hoàn thiện khóa học.')
     }
   })
 }
