@@ -67,7 +67,6 @@ export type CreateVideoLessonBody = {
   chapterId: string
   videoId: string
   shortDesc?: string
-  fullDesc?: string
   duration?: number
   quizData?: QuizDataPayload
 }
@@ -78,7 +77,6 @@ export type CreateTextLessonBody = {
   chapterId: string
   textContent: string
   shortDesc?: string
-  fullDesc?: string
   quizData?: QuizDataPayload
 }
 
@@ -87,7 +85,6 @@ export type CreateQuizLessonBody = {
   title: string
   chapterId: string
   shortDesc?: string
-  fullDesc?: string
   quizData: QuizDataPayload
 }
 
@@ -97,7 +94,6 @@ export type UpdateLessonBody = {
   type: 'VIDEO' | 'TEXT' | 'QUIZ'
   title?: string
   shortDesc?: string
-  fullDesc?: string
   duration?: number
   textContent?: string
 }

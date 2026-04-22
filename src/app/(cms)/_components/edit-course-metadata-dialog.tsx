@@ -24,7 +24,7 @@ import {
   updateCourseBaseInfoSchema,
   type UpdateCourseBaseInfo,
   type CreateCourseStep1,
-  type Categories
+  type Category
 } from '@/app/(cms)/_utils/zod'
 import {
   useGetCourseBaseInfoQuery,
@@ -51,7 +51,6 @@ export function EditCourseMetadataDialog({ courseId, open, onOpenChange }: Props
       categoryId: '',
       level: 'BEGINNER',
       shortDesc: '',
-      fullDesc: '',
       thumbnail: null,
       isFree: true,
       price: 0,
@@ -67,7 +66,6 @@ export function EditCourseMetadataDialog({ courseId, open, onOpenChange }: Props
       categoryId: baseInfo.categoryId,
       level: baseInfo.level,
       shortDesc: baseInfo.shortDesc,
-      fullDesc: baseInfo.fullDesc,
       thumbnail: baseInfo.thumbnail ?? null,
       isFree: baseInfo.isFree ?? true,
       price: baseInfo.price ?? 0,

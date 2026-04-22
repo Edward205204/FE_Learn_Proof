@@ -23,7 +23,6 @@ export const createCourseStep1Schema = z.object({
   categoryId: z.string().min(1, 'Vui lòng chọn danh mục'),
   level: CourseLevelEnum,
   shortDesc: z.string().min(1, 'Mô tả ngắn là bắt buộc').max(250, 'Mô tả ngắn không được vượt quá 250 ký tự'),
-  fullDesc: z.string(),
   thumbnail: z.string().url('Thumbnail phải là URL hợp lệ').nullable().optional()
 })
 
@@ -41,7 +40,6 @@ export const CreateCourseSt1ResponseSchema = z.object({
   categoryId: z.string(),
   level: CourseLevelEnum,
   shortDesc: z.string(),
-  fullDesc: z.string(),
   thumbnail: z.string().nullable(),
   expectedDays: z.number().int().nullable(),
   status: CourseStatusEnum,
@@ -151,7 +149,6 @@ export const CourseBaseInfoSchema = z.object({
   categoryId: z.string(),
   level: CourseLevelEnum,
   shortDesc: z.string(),
-  fullDesc: z.string(),
   thumbnail: z.string().nullable(),
   expectedDays: z.number().int().nullable(),
   status: CourseStatusEnum,
@@ -190,7 +187,6 @@ export const ManagerCourseDetailSchema = z.object({
   title: z.string(),
   slug: z.string(),
   shortDesc: z.string(),
-  fullDesc: z.string(),
   thumbnail: z.string().nullable(),
   level: CourseLevelEnum,
   status: CourseStatusEnum,

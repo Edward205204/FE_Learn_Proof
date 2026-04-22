@@ -161,7 +161,6 @@ export default function LessonEditorPage() {
         title: data.title,
         chapterId,
         shortDesc: data.shortDescription,
-        fullDesc: data.content,
         videoId: data.videoUrl || '',
         ...(data.supplementalQuiz.length > 0 ? { quizData: mapBlocksToQuizData(data.supplementalQuiz) } : {})
       }

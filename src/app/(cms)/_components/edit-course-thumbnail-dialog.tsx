@@ -98,7 +98,6 @@ export function EditCourseThumbnailDialog({
       categoryId: baseInfo.categoryId,
       level: baseInfo.level,
       shortDesc: baseInfo.shortDesc,
-      fullDesc: baseInfo.fullDesc,
       thumbnail: previewThumbnail
     }
 

@@ -39,12 +39,7 @@ import { useAuthStore } from '@/store/auth.store'
 import { getCourseThumbnailUrl } from '@/utils/course'
 import { useGetLessonForLearnerQuery } from '@/app/(learner)/_hooks/use-lesson'
 import { VideoPlayer } from '@/app/(learner)/_components/video-player'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { CourseReviews } from '@/app/(public)/_components/course-reviews'
 
 export default function CourseDetailPage() {
@@ -148,7 +143,7 @@ export default function CourseDetailPage() {
             <h1 className='text-5xl md:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight'>
               {courseData.title}
             </h1>
-            <div 
+            <div
               className='text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-2xl'
               dangerouslySetInnerHTML={{ __html: courseData.shortDesc }}
             />
@@ -187,22 +182,6 @@ export default function CourseDetailPage() {
       <div className='max-w-[1240px] mx-auto px-6 mt-10 grid grid-cols-1 lg:grid-cols-3 gap-12'>
         {/* Left Column */}
         <div className='lg:col-span-2 space-y-12'>
-          {/* Description Section */}
-          <section className='bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 shadow-sm border border-slate-100 dark:border-slate-800'>
-            <div className='flex items-center gap-3 mb-8'>
-              <div className='w-8 h-8 rounded-full bg-rose-500/10 flex items-center justify-center'>
-                <Zap size={16} className='text-rose-600' />
-              </div>
-              <h2 className='text-xl font-black text-slate-900 dark:text-white uppercase tracking-wider'>
-                Mô tả khóa học
-              </h2>
-            </div>
-            <div 
-              className='prose prose-slate dark:prose-invert max-w-none text-slate-600 dark:text-slate-400 font-medium leading-[1.8]'
-              dangerouslySetInnerHTML={{ __html: courseData.fullDesc }}
-            />
-          </section>
-
           {/* Curriculum Section */}
           <section>
             <div className='flex items-center gap-3 mb-8'>
@@ -237,7 +216,7 @@ export default function CourseDetailPage() {
                   {expandedChapters.includes(chapter.id) && (
                     <div className='px-5 pb-5 animate-in slide-in-from-top-2 duration-300'>
                       <div className='space-y-2'>
-                         {chapter.lessons.map((lesson) => (
+                        {chapter.lessons.map((lesson) => (
                           <div
                             key={lesson.id}
                             onClick={() => {
@@ -263,7 +242,10 @@ export default function CourseDetailPage() {
                             </div>
                             <div className='flex items-center gap-3'>
                               {lesson.type === 'VIDEO' && (
-                                <Badge variant='secondary' className='bg-rose-50 text-rose-500 border-none text-[9px] font-black uppercase tracking-tighter'>
+                                <Badge
+                                  variant='secondary'
+                                  className='bg-rose-50 text-rose-500 border-none text-[9px] font-black uppercase tracking-tighter'
+                                >
                                   Xem thử
                                 </Badge>
                               )}
@@ -282,7 +264,7 @@ export default function CourseDetailPage() {
           </section>
 
           {/* Reviews Section */}
-          <CourseReviews 
+          <CourseReviews
             courseId={courseData.id}
             isEnrolled={!!courseData.isEnrolled}
             userReview={courseData.userReview}
@@ -311,7 +293,7 @@ export default function CourseDetailPage() {
                   </div>
                 )}
                 <div className='absolute inset-0 bg-slate-900/40 flex items-center justify-center'>
-                  <div 
+                  <div
                     onClick={() => firstVideoLesson && setPreviewLessonId(firstVideoLesson.id)}
                     className='w-16 h-16 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform cursor-pointer'
                   >
@@ -390,31 +372,35 @@ export default function CourseDetailPage() {
                       disabled={addMutation.isPending || isEnrollmentLoading}
                     >
                       <ShoppingCart size={16} />
-                      {isEnrollmentLoading ? 'Đang kiểm tra...' : addMutation.isPending ? 'Đang thêm...' : 'Thêm giỏ hàng'}
+                      {isEnrollmentLoading
+                        ? 'Đang kiểm tra...'
+                        : addMutation.isPending
+                          ? 'Đang thêm...'
+                          : 'Thêm giỏ hàng'}
                     </Button>
                   ) : null}
 
-                    <button
-                      onClick={toggleWishlist}
-                      disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
-                      className={`h-12 w-12 shrink-0 rounded-2xl border-2 flex items-center justify-center transition-all active:scale-[0.92] disabled:opacity-50 ${
-                        isWishlisted
-                          ? 'border-rose-400 bg-rose-50 dark:bg-rose-500/10 text-rose-500'
-                          : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-rose-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10'
-                      }`}
-                      title={isWishlisted ? 'Bỏ yêu thích' : 'Yêu thích'}
-                    >
-                      {addToWishlistMutation.isPending || removeFromWishlistMutation.isPending ? (
-                        <Loader2 size={18} className='animate-spin' />
-                      ) : (
-                        <Heart
-                          size={18}
-                          className='transition-all duration-200'
-                          fill={isWishlisted ? 'currentColor' : 'none'}
-                        />
-                      )}
-                    </button>
-                  </div>
+                  <button
+                    onClick={toggleWishlist}
+                    disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
+                    className={`h-12 w-12 shrink-0 rounded-2xl border-2 flex items-center justify-center transition-all active:scale-[0.92] disabled:opacity-50 ${
+                      isWishlisted
+                        ? 'border-rose-400 bg-rose-50 dark:bg-rose-500/10 text-rose-500'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-rose-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10'
+                    }`}
+                    title={isWishlisted ? 'Bỏ yêu thích' : 'Yêu thích'}
+                  >
+                    {addToWishlistMutation.isPending || removeFromWishlistMutation.isPending ? (
+                      <Loader2 size={18} className='animate-spin' />
+                    ) : (
+                      <Heart
+                        size={18}
+                        className='transition-all duration-200'
+                        fill={isWishlisted ? 'currentColor' : 'none'}
+                      />
+                    )}
+                  </button>
+                </div>
                 {isLoggedIn && isEnrolled && <div className='mb-8' />}
 
                 <div className='space-y-5'>
@@ -465,12 +451,12 @@ export default function CourseDetailPage() {
               <div className='w-full h-full flex items-center justify-center bg-slate-900'>
                 <Loader2 className='w-10 h-10 animate-spin text-rose-500' />
               </div>
+            ) : lessonPreviewData?.type === 'VIDEO' ? (
+              <VideoPlayer url={lessonPreviewData.videoUrl || ''} lessonId={previewLessonId || ''} lastPosition={0} />
             ) : (
-              <VideoPlayer 
-                url={lessonPreviewData?.videoUrl || ''} 
-                lessonId={previewLessonId || ''} 
-                lastPosition={0} 
-              />
+              <div className='w-full h-full flex items-center justify-center bg-slate-900 text-white'>
+                Bài học không hỗ trợ xem thử.
+              </div>
             )}
           </div>
         </DialogContent>

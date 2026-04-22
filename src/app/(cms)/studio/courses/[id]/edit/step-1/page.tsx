@@ -33,7 +33,6 @@ export default function EditCourseStep1Page() {
       categoryId: '',
       level: 'BEGINNER',
       shortDesc: '',
-      fullDesc: '',
       thumbnail: null
     }
   })
@@ -45,7 +44,6 @@ export default function EditCourseStep1Page() {
       categoryId: baseInfo.categoryId,
       level: baseInfo.level,
       shortDesc: baseInfo.shortDesc,
-      fullDesc: baseInfo.fullDesc,
       thumbnail: baseInfo.thumbnail ? baseInfo.thumbnail : null
     })
   }, [baseInfo, form])

@@ -25,7 +25,6 @@ export default function CreateCourseStep1Page() {
       categoryId: '',
       level: 'BEGINNER',
       shortDesc: '',
-      fullDesc: '',
       thumbnail: null
       // expectedDays: 0 // tạm thời chưa có
     }

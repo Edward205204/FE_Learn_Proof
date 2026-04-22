@@ -94,7 +94,6 @@ export const CourseDetailResponseSchema = z.object({
   title: z.string(),
   slug: z.string(),
   shortDesc: z.string(),
-  fullDesc: z.string(),
   thumbnail: z.string().nullable(),
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
