@@ -33,5 +33,10 @@ export const PATH = {
   FEEDBACK_LIST: '/studio/feedbacks',
 
   // ADMIN only
-  ADMIN: '/admin'
+  ADMIN: '/admin',
+  ADMIN_DASHBOARD: '/admin/dashboard',
+  ADMIN_USERS: '/admin/users',
+  ADMIN_COURSES: '/admin/courses',
+  ADMIN_LOGS: '/admin/audit-logs',
+  ADMIN_SETTINGS: '/admin/settings'
 }
