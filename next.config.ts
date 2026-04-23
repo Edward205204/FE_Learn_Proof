@@ -26,7 +26,27 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'cdn.jsdelivr.net'
+      },
+      {
+        protocol: 'https',
+        hostname: 'svgl.app'
+      },
+      {
+        protocol: 'https',
+        hostname: 'skillicons.dev'
+      },
+      {
+        protocol: 'https',
         hostname: 'encrypted-tbn0.gstatic.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc'
+      },
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com'
       },
       {
         protocol: 'http',

@@ -10,7 +10,6 @@ import {
   BookOpen,
   History as HistoryIcon,
   LayoutDashboard,
-  Map as MapIcon,
   ShoppingCart
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -419,16 +418,6 @@ export default function Header() {
                           <BookOpen size={16} />
                           Khóa học của tôi
                         </Link>
-                        {user.role === Role.LEARNER && (
-                          <Link
-                            href={PATH.ROADMAP}
-                            className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors text-rose-500 font-bold'
-                            onClick={closeMenu}
-                          >
-                            <MapIcon size={16} />
-                            Lộ trình học
-                          </Link>
-                        )}
                         <Link
                           href={PATH.PAYMENT_HISTORY || '/payment-history'}
                           className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors'

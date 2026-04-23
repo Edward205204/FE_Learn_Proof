@@ -189,7 +189,7 @@ export default function CourseDetailPage() {
                 <Layers size={16} className='text-rose-600' />
               </div>
               <h2 className='text-xl font-black text-slate-900 dark:text-white uppercase tracking-wider'>
-                Lộ trình học tập
+                Nội dung khóa học
               </h2>
             </div>
 
