@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ShieldCheck, LogOut, Settings, User as UserIcon, Home } from 'lucide-react'
+import { ShieldCheck, LogOut, Settings, User as UserIcon } from 'lucide-react'
 
 import { PATH } from '@/constants/path'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -68,19 +68,7 @@ export function AdminHeader() {
             <p className='text-[10px] text-muted-foreground truncate uppercase tracking-tighter'>Hệ thống quản trị tối cao</p>
           </div>
         </div>
-
         <div className='flex items-center gap-2 ml-auto'>
-          <Link
-            href={PATH.HOME}
-            className='hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium
-              border border-border text-foreground
-              hover:bg-muted hover:scale-105
-              transition-all duration-200'
-          >
-            <Home size={15} />
-            Về trang chủ
-          </Link>
-
           <div className='relative' ref={menuRef} onMouseEnter={openMenu} onMouseLeave={handleMouseLeave}>
             {isLoggedIn && user ? (
               <>
