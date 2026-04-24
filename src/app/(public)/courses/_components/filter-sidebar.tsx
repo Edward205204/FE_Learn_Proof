@@ -14,7 +14,14 @@ interface FilterSidebarProps {
 
 export default function FilterSidebar({ categories }: FilterSidebarProps) {
   return (
-    <Suspense fallback={<div className='animate-pulse space-y-4'><div className='h-8 bg-slate-100 rounded w-1/2'></div><div className='h-64 bg-slate-50 rounded'></div></div>}>
+    <Suspense
+      fallback={
+        <div className='animate-pulse space-y-4'>
+          <div className='h-8 bg-slate-100 rounded w-1/2'></div>
+          <div className='h-64 bg-slate-50 rounded'></div>
+        </div>
+      }
+    >
       <FilterContent categories={categories} />
     </Suspense>
   )
@@ -43,8 +50,8 @@ function FilterContent({ categories }: { categories: CategoryWithCount[] }) {
     <div className='flex flex-col gap-8 pr-4' suppressHydrationWarning>
       <div className='flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md py-2 z-10'>
         <h2 className='text-2xl font-black text-slate-900 tracking-tight'>Bộ lọc</h2>
-        <button 
-          onClick={clearFilters} 
+        <button
+          onClick={clearFilters}
           className='text-sm font-bold text-primary hover:text-primary/80 transition-colors bg-primary/5 px-3 py-1.5 rounded-full'
         >
           Xóa tất cả
@@ -55,7 +62,9 @@ function FilterContent({ categories }: { categories: CategoryWithCount[] }) {
         {/* Danh mục */}
         <AccordionItem value='category' className='border-b border-slate-100 py-3'>
           <AccordionTrigger className='hover:no-underline py-2 px-0 group'>
-            <span className='font-black text-[17px] text-slate-800 group-hover:text-primary transition-colors'>Danh mục</span>
+            <span className='font-black text-[17px] text-slate-800 group-hover:text-primary transition-colors'>
+              Danh mục
+            </span>
           </AccordionTrigger>
           <AccordionContent className='pt-2 pb-5'>
             <div className='flex flex-col gap-4'>
@@ -74,9 +83,7 @@ function FilterContent({ categories }: { categories: CategoryWithCount[] }) {
                     className='text-sm font-bold text-slate-600 group-hover:text-slate-900 leading-none cursor-pointer flex justify-between w-full transition-colors'
                   >
                     <span>{cat.name}</span>
-                    <span className='text-slate-400 font-medium bg-slate-50 px-2 rounded-md'>
-                      {cat._count.courses}
-                    </span>
+                    <span className='text-slate-400 font-medium bg-slate-50 px-2 rounded-md'>{cat._count.courses}</span>
                   </Label>
                 </div>
               ))}
@@ -87,7 +94,9 @@ function FilterContent({ categories }: { categories: CategoryWithCount[] }) {
         {/* Xếp hạng */}
         <AccordionItem value='rating' className='border-b border-slate-100 py-3'>
           <AccordionTrigger className='hover:no-underline py-2 px-0 group'>
-            <span className='font-black text-[17px] text-slate-800 group-hover:text-primary transition-colors'>Xếp hạng</span>
+            <span className='font-black text-[17px] text-slate-800 group-hover:text-primary transition-colors'>
+              Xếp hạng
+            </span>
           </AccordionTrigger>
           <AccordionContent className='pt-2 pb-5'>
             <div className='flex flex-col gap-4'>
@@ -127,7 +136,9 @@ function FilterContent({ categories }: { categories: CategoryWithCount[] }) {
         {/* Tính năng */}
         <AccordionItem value='feature' className='border-b border-slate-100 py-3'>
           <AccordionTrigger className='hover:no-underline py-2 px-0 group'>
-            <span className='font-black text-[17px] text-slate-800 group-hover:text-primary transition-colors'>Tính năng</span>
+            <span className='font-black text-[17px] text-slate-800 group-hover:text-primary transition-colors'>
+              Tính năng
+            </span>
           </AccordionTrigger>
           <AccordionContent className='pt-2 pb-5'>
             <div className='flex flex-col gap-4'>
@@ -159,7 +170,9 @@ function FilterContent({ categories }: { categories: CategoryWithCount[] }) {
         {/* Trình độ */}
         <AccordionItem value='level' className='border-b border-slate-100 py-3'>
           <AccordionTrigger className='hover:no-underline py-2 px-0 group'>
-            <span className='font-black text-[17px] text-slate-800 group-hover:text-primary transition-colors'>Trình độ</span>
+            <span className='font-black text-[17px] text-slate-800 group-hover:text-primary transition-colors'>
+              Trình độ
+            </span>
           </AccordionTrigger>
           <AccordionContent className='pt-2 pb-5'>
             <div className='flex flex-col gap-4'>
@@ -177,8 +190,8 @@ function FilterContent({ categories }: { categories: CategoryWithCount[] }) {
                       updateFilters('level', checked ? lvl.value : null)
                     }}
                   />
-                  <Label 
-                    htmlFor={lvl.value} 
+                  <Label
+                    htmlFor={lvl.value}
                     className='text-sm font-bold text-slate-600 group-hover:text-slate-900 leading-none cursor-pointer transition-colors'
                   >
                     {lvl.label}
