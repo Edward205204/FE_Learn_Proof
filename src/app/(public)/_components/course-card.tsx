@@ -21,8 +21,8 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
-  const rating = course.overallAnalytics?.avgRating ?? 0
-  const totalStudents = course.overallAnalytics?.totalStudents ?? 0
+  const rating = course.avgRating
+  const totalReviews = course.totalReviews
   const displayPrice = course.isFree
     ? 'Miễn phí'
     : course.price.toLocaleString('vi-VN') + ' ₫'
@@ -69,9 +69,9 @@ export default function CourseCard({ course }: CourseCardProps) {
               <Star size={10} fill='currentColor' strokeWidth={0} />
               <span className='text-[10px] font-black'>{rating > 0 ? rating.toFixed(1) : '0.0'}</span>
             </div>
-            {totalStudents > 0 && (
+            {totalReviews > 0 && (
               <span className='text-[10px] font-bold text-slate-400'>
-                ({totalStudents.toLocaleString('vi-VN')})
+                ({totalReviews.toLocaleString('vi-VN')})
               </span>
             )}
           </div>

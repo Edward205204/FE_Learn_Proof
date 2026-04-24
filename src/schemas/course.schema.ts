@@ -8,8 +8,10 @@ export const GetCoursesQuery = z
     level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).optional(),
     price: z.enum(['true', 'false']).optional(),
     rating: z.coerce.number().optional(),
+    language: z.enum(['VIETNAMESE', 'ENGLISH', 'JAPANESE', 'KOREAN']).optional(),
+    feature: z.enum(['QUIZ', 'CODING', 'PRACTICE', 'ROLE_PLAY']).optional(),
     search: z.string().optional(),
-    sort: z.enum(['newest', 'popular', 'rating', 'price-asc', 'price-desc']).optional()
+    sort: z.enum(['newest', 'popular', 'rating_desc', 'relevant', 'price-asc', 'price-desc']).optional()
   })
   .strict()
 
@@ -60,8 +62,8 @@ export const CurriculumLessonSchema = z.object({
   id: z.string(),
   title: z.string(),
   order: z.number(),
-  type: z.enum(['VIDEO', 'TEXT', 'QUIZ']),
-  duration: z.number().int()
+  type: z.enum(['VIDEO', 'TEXT', 'QUIZ', 'CODING', 'PRACTICE', 'ROLE_PLAY']),
+  duration: z.number().int().nullable()
 })
 
 export const CurriculumChapterSchema = z.object({
@@ -138,18 +140,14 @@ export const HomeCourseCardSchema = z.object({
   originalPrice: z.number().nullable(),
   isFree: z.boolean(),
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
+  language: z.enum(['VIETNAMESE', 'ENGLISH', 'JAPANESE', 'KOREAN']),
+  avgRating: z.number(),
+  totalReviews: z.number(),
   shortDesc: z.string(),
   createdAt: z.coerce.date(),
   isEnrolled: z.boolean().optional().default(false),
   category: z.object({ name: z.string(), slug: z.string() }),
-  creator: z.object({ fullName: z.string(), avatar: z.string().nullable() }),
-  overallAnalytics: z
-    .object({
-      avgRating: z.number(),
-      totalStudents: z.number(),
-      avgInterestScore: z.number()
-    })
-    .nullable()
+  creator: z.object({ fullName: z.string(), avatar: z.string().nullable() })
 })
 
 export const HomeSectionsResponseSchema = z.object({

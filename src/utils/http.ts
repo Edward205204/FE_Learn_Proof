@@ -47,11 +47,15 @@ class Http {
             message = Array.isArray(data.message) ? data.message.map((e) => e.message).join(', ') : data.message
           }
 
-          toast.error(message)
+          if (typeof window !== 'undefined') {
+            toast.error(message)
+          }
 
           if (error.response?.status === HttpStatusCode.Unauthorized) {
             useAuthStore.getState().clearAuth() // clearAuth đã tự xóa cookie role
-            window.location.href = PATH.LOGIN
+            if (typeof window !== 'undefined') {
+              window.location.href = PATH.LOGIN
+            }
           }
         }
         return Promise.reject(error)
