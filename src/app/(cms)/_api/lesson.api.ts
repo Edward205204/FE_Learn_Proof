@@ -19,6 +19,7 @@ export type VideoLessonDetail = {
   chapterId: string
   duration: number | null
   videoUrl: string
+  videoKey: string | null
 }
 
 /** Dataset đầy đủ của Bài giảng Text (CMS view) */
@@ -66,6 +67,7 @@ export type CreateVideoLessonBody = {
   title: string
   chapterId: string
   videoId: string
+  videoKey?: string
   shortDesc?: string
   duration?: number
   quizData?: QuizDataPayload
