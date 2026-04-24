@@ -55,7 +55,7 @@ export default function CatalogContent({ courses, meta, isLoading }: CatalogCont
     <div className='w-full'>
       <div className='flex items-center justify-between mb-6'>
         <p className='text-sm font-medium text-slate-500'>
-          Hiển thị <span className='font-bold text-foreground'>{courses.length}</span> kết quả
+          Hiển thị <span className='font-bold text-foreground'>{meta?.total ?? courses.length}</span> kết quả
         </p>
       </div>
 

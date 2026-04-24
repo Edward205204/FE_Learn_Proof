@@ -4,6 +4,7 @@ import { z } from 'zod'
 export const RoleEnum = z.enum(['LEARNER', 'CONTENT_MANAGER', 'ADMIN'])
 export const CourseStatusEnum = z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED'])
 export const CourseLevelEnum = z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED'])
+export const AuthProviderEnum = z.enum(['LOCAL', 'GOOGLE'])
 
 export type AdminRole = z.infer<typeof RoleEnum>
 export type AdminCourseStatus = z.infer<typeof CourseStatusEnum>
@@ -16,6 +17,7 @@ export const AdminUserItemSchema = z.object({
   fullName: z.string(),
   avatar: z.string().nullable(),
   role: RoleEnum,
+  provider: AuthProviderEnum,
   createdAt: z.string(),
   _count: z.object({
     coursesCreated: z.number().int(),
@@ -151,3 +153,14 @@ export const AdminGetAuditLogsQuerySchema = z.object({
 })
 
 export type AdminGetAuditLogsQuery = z.infer<typeof AdminGetAuditLogsQuerySchema>
+// --- Dashboard ---
+export const AdminDashboardOverviewSchema = z.object({
+  totalUsers: z.number(),
+  totalCourses: z.number(),
+  totalPublishedCourses: z.number(),
+  totalEnrollments: z.number(),
+  totalTransactions: z.number(),
+  totalRevenue: z.number()
+})
+
+export type AdminDashboardOverview = z.infer<typeof AdminDashboardOverviewSchema>

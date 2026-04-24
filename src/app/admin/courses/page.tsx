@@ -37,7 +37,7 @@ export default function AdminCoursesPage() {
 
   const { data, isLoading, refetch } = useAdminCoursesQuery({
     page,
-    limit: 10,
+    limit: 20,
     search: search || undefined,
     status: status as AdminCourseStatus | undefined
   })

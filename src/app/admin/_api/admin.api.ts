@@ -7,7 +7,8 @@ import type {
   AdminGetCoursesResponse,
   AdminGetAuditLogsQuery,
   AdminGetAuditLogsResponse,
-  SystemSetting
+  SystemSetting,
+  AdminDashboardOverview
 } from '@/app/admin/_utils/zod'
 
 const adminApi = {
@@ -32,7 +33,10 @@ const adminApi = {
   // Settings
   getSettings: () => http.get<SystemSetting[]>('/admin/settings'),
 
-  updateSetting: (key: string, value: unknown) => http.patch('/admin/settings', { key, value })
+  updateSetting: (key: string, value: unknown) => http.patch('/admin/settings', { key, value }),
+
+  // Dashboard
+  getDashboardOverview: () => http.get<AdminDashboardOverview>('/dashboard/overview')
 }
 
 export default adminApi

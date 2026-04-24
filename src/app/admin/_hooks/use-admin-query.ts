@@ -7,7 +7,8 @@ export const ADMIN_QUERY_KEYS = {
   users: (params: AdminGetUsersQuery) => ['admin', 'users', params] as const,
   courses: (params: AdminGetCoursesQuery) => ['admin', 'courses', params] as const,
   logs: (params: AdminGetAuditLogsQuery) => ['admin', 'logs', params] as const,
-  settings: ['admin', 'settings'] as const
+  settings: ['admin', 'settings'] as const,
+  dashboardOverview: ['admin', 'dashboard', 'overview'] as const
 }
 
 export function useAdminUsersQuery(params: AdminGetUsersQuery) {
@@ -71,5 +72,12 @@ export function useAdminUpdateSettingMutation() {
       toast.success('Cập nhật cài đặt hệ thống thành công')
       queryClient.invalidateQueries({ queryKey: ADMIN_QUERY_KEYS.settings })
     }
+  })
+}
+
+export function useAdminDashboardOverviewQuery() {
+  return useQuery({
+    queryKey: ADMIN_QUERY_KEYS.dashboardOverview,
+    queryFn: () => adminApi.getDashboardOverview().then((res) => res.data)
   })
 }
