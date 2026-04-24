@@ -1,42 +1,54 @@
-// src/app/(learner)/payment/history/page.tsx
+'use client'
 
-import { Search, Filter, HelpCircle } from 'lucide-react'
+import { Search, Filter, HelpCircle, Loader2 } from 'lucide-react'
 import { TransactionTable } from '../_components/transaction-table'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-
-// Mock data bám sát thiết kế
-const MOCK_TRANSACTIONS = [
-  {
-    id: '1',
-    orderCode: '#LP-9921',
-    courseName: 'React Native Masterclass',
-    amount: 1200000,
-    paymentDate: '15 Th10, 2023',
-    paymentMethod: 'MoMo',
-    status: 'SUCCESS'
-  },
-  {
-    id: '2',
-    orderCode: '#LP-8842',
-    courseName: 'UI/UX Design Fundamentals',
-    amount: 850000,
-    paymentDate: '10 Th10, 2023',
-    paymentMethod: 'Thẻ ngân hàng',
-    status: 'SUCCESS'
-  },
-  {
-    id: '3',
-    orderCode: '#LP-7731',
-    courseName: 'Advanced Python Scripting',
-    amount: 2100000,
-    paymentDate: '05 Th10, 2023',
-    paymentMethod: 'Crypto',
-    status: 'PENDING'
-  }
-]
+import { useEffect, useState } from 'react'
+import { paymentApi, Transaction as ApiTransaction } from '../_api/payment.api'
+import { Transaction as UiTransaction } from '../_utils/zod'
+import { format } from 'date-fns'
+import { vi } from 'date-fns/locale'
 
 export default function PaymentHistoryPage() {
+  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<UiTransaction[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await paymentApi.getHistory()
+
+        // Map API data to UI model
+        const mappedData: UiTransaction[] = response.data.map((item: ApiTransaction) => ({
+          id: item.id,
+          orderCode: item.txnRef.startsWith('LP-') ? item.txnRef : `#${item.txnRef.slice(-6).toUpperCase()}`,
+          courseName: item.course.title,
+          amount: item.amount,
+          paymentDate: format(new Date(item.payDate || item.createdAt), 'dd MMM, yyyy', { locale: vi }),
+          paymentMethod: item.provider === 'VNPAY' ? 'VNPay' : item.provider,
+          status: item.status === 'COMPLETED' ? 'SUCCESS' : item.status === 'PENDING' ? 'PENDING' : 'FAILED'
+        }))
+
+        setData(mappedData)
+      } catch (error) {
+        console.error('Failed to fetch payment history:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // Filter data based on search term
+  const filteredData = data.filter(
+    (item) =>
+      item.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.orderCode.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
     <div className='max-w-7xl mx-auto p-6 md:p-10 space-y-8'>
       {/* Header Section */}
@@ -55,6 +67,8 @@ export default function PaymentHistoryPage() {
             />
             <input
               placeholder='Tìm kiếm giao dịch...'
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className='pl-11 pr-4 py-3 bg-white border border-slate-100 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/10 w-[280px] transition-all shadow-sm'
             />
           </div>
@@ -68,27 +82,40 @@ export default function PaymentHistoryPage() {
       </div>
 
       {/* Main Table Content */}
-      <TransactionTable data={MOCK_TRANSACTIONS as any} />
+      {loading ? (
+        <div className='flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-slate-50 shadow-sm gap-4'>
+          <Loader2 className='animate-spin text-primary' size={40} />
+          <p className='text-slate-400 font-bold animate-pulse uppercase tracking-widest text-xs'>
+            Đang tải dữ liệu giao dịch...
+          </p>
+        </div>
+      ) : filteredData.length > 0 ? (
+        <TransactionTable data={filteredData} />
+      ) : (
+        <div className='flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-slate-50 shadow-sm text-center px-6'>
+          <div className='w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-200 mb-6'>
+            <Search size={40} />
+          </div>
+          <h3 className='text-xl font-bold text-slate-900 mb-2'>Không tìm thấy giao dịch nào</h3>
+          <p className='text-slate-500 max-w-sm mx-auto'>
+            Bạn chưa thực hiện giao dịch nào hoặc không có giao dịch phù hợp với tìm kiếm của bạn.
+          </p>
+        </div>
+      )}
 
       {/* Pagination & Summary */}
-      <div className='flex flex-col md:flex-row items-center justify-between gap-4 pt-4'>
-        <p className='text-xs font-bold text-slate-400 uppercase tracking-widest'>Hiển thị 1-4 của 24 giao dịch</p>
-        <div className='flex gap-2'>
-          {[1, 2, 3, '...', 9].map((p, i) => (
-            <button
-              key={i}
-              className={cn(
-                'w-10 h-10 rounded-full flex items-center justify-center text-sm font-black transition-all',
-                p === 1
-                  ? 'bg-primary text-white shadow-lg shadow-rose-200'
-                  : 'bg-white text-slate-500 hover:bg-slate-50'
-              )}
-            >
-              {p}
+      {!loading && filteredData.length > 0 && (
+        <div className='flex flex-col md:flex-row items-center justify-between gap-4 pt-4'>
+          <p className='text-xs font-bold text-slate-400 uppercase tracking-widest'>
+            Hiển thị 1-{filteredData.length} của {filteredData.length} giao dịch
+          </p>
+          <div className='flex gap-2'>
+            <button className='w-10 h-10 rounded-full flex items-center justify-center text-sm font-black bg-primary text-white shadow-lg shadow-rose-200'>
+              1
             </button>
-          ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Footer Info Box */}
       <div className='bg-slate-50/50 rounded-3xl p-6 border border-slate-100 flex items-start gap-4'>
