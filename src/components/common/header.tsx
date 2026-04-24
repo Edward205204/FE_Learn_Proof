@@ -22,12 +22,7 @@ import { Role } from '@/@types/user'
 import { useRef, useEffect, useState } from 'react'
 import { useNotificationStore } from '@/store/notification.store'
 import { useCartQuery } from '@/app/(learner)/_hooks/use-cart'
-import { useTransition } from 'react'
-import { getSearchSuggestionsAction } from '@/actions/course-search'
-import { useDebounce } from '../../hooks/use-debounce'
-import { SearchSuggestion } from '@/app/(public)/_api/course.api'
-
-
+import SearchInput from './search-input'
 
 export default function Header() {
   const router = useRouter()
@@ -45,48 +40,6 @@ export default function Header() {
   const unreadCount = notifications.filter((n) => n.unread).length
   const { data: cartData } = useCartQuery(isLoggedIn)
   const cartCount = cartData?.items?.length || 0
-
-  // Search logic
-  const [isPending, startTransition] = useTransition()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
-  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false)
-  const searchRef = useRef<HTMLDivElement>(null)
-
-  const debouncedSearchQuery = useDebounce(searchQuery, 300)
-
-  // Trigger search when debounced value changes
-  useEffect(() => {
-    if (debouncedSearchQuery.trim().length >= 2) {
-      startTransition(async () => {
-        const result = await getSearchSuggestionsAction(debouncedSearchQuery)
-        if (result.success) {
-          setSuggestions(result.data)
-          setIsSuggestionsOpen(true)
-        }
-      })
-    } else {
-      startTransition(() => {
-        setSuggestions([])
-        setIsSuggestionsOpen(false)
-      })
-    }
-  }, [debouncedSearchQuery])
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
-  }
-
-  // Close search suggestions when clicking outside
-  useEffect(() => {
-    const handleClickOutsideSearch = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsSuggestionsOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutsideSearch)
-    return () => document.removeEventListener('mousedown', handleClickOutsideSearch)
-  }, [])
 
   // Close notif when clicking outside
   useEffect(() => {
@@ -161,76 +114,8 @@ export default function Header() {
             </Link>
           </div>
 
-          <div className='hidden md:flex items-center relative' ref={searchRef}>
-            <Label className='relative flex h-10 w-64 items-center overflow-hidden bg-[oklch(0.92_0.004_286.32)] dark:bg-[oklch(0.21_0.006_285.885)] rounded-[calc(0.5rem-2px)]'>
-              <div className='flex items-center justify-center pl-4 text-[oklch(0.552_0.016_285.938)]'>
-                {isPending ? (
-                  <div className='h-4 w-4 animate-spin rounded-full border-2 border-[oklch(0.577_0.245_27.325)] border-t-transparent' />
-                ) : (
-                  <Search size={18} />
-                )}
-              </div>
-              <Input
-                className='w-full border-none bg-transparent px-3 text-sm focus-visible:ring-2 focus-visible:ring-[oklch(0.577_0.245_27.325)] placeholder:text-[oklch(0.552_0.016_285.938)]'
-                placeholder='Search courses...'
-                type='text'
-                aria-label='Search courses'
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onFocus={() => searchQuery.length >= 2 && setIsSuggestionsOpen(true)}
-              />
-            </Label>
-
-            {/* Suggestions Dropdown */}
-            {isSuggestionsOpen && searchQuery.length >= 2 && (
-              <div className='absolute top-full left-0 mt-2 w-[400px] bg-white dark:bg-[oklch(0.141_0.005_285.823)] border dark:border-[oklch(0.274_0.006_286.033)] rounded-xl shadow-2xl z-[60] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200'>
-                <div className='p-2'>
-                  {suggestions.length > 0 ? (
-                    suggestions.map((course) => (
-                      <Link
-                        key={course.slug}
-                        href={`/courses/${course.slug}`}
-                        className='flex items-center gap-3 p-2 hover:bg-[oklch(0.967_0.001_0)] dark:hover:bg-[oklch(0.21_0.006_285.885)] rounded-lg transition-colors group'
-                        onClick={() => setIsSuggestionsOpen(false)}
-                      >
-                        <div className='relative h-12 w-20 flex-shrink-0 overflow-hidden rounded-md'>
-                          <Image
-                            fill
-                            src={
-                              course.thumbnail ||
-                              'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80'
-                            }
-                            alt={course.title}
-                            className='object-cover'
-                          />
-                        </div>
-                        <div className='flex flex-col min-w-0'>
-                          <p className='text-sm font-semibold truncate group-hover:text-[oklch(0.577_0.245_27.325)] transition-colors'>
-                            {course.title}
-                          </p>
-                          <p className='text-xs text-[oklch(0.552_0.016_285.938)]'>Khóa học phổ biến</p>
-                        </div>
-                      </Link>
-                    ))
-                  ) : (
-                    <div className='p-4 text-center text-sm text-[oklch(0.552_0.016_285.938)]'>
-                      Không tìm thấy kết quả nào cho &quot;{searchQuery}&quot;
-                    </div>
-                  )}
-                </div>
-                {suggestions.length > 0 && (
-                  <div className='bg-gray-50/50 dark:bg-transparent p-2 border-t dark:border-[oklch(0.274_0.006_286.033)]'>
-                    <Link
-                      href={`/courses?search=${encodeURIComponent(searchQuery)}`}
-                      className='block text-center text-xs font-bold text-[oklch(0.577_0.245_27.325)] hover:underline py-1'
-                      onClick={() => setIsSuggestionsOpen(false)}
-                    >
-                      Xem tất cả kết quả
-                    </Link>
-                  </div>
-                )}
-              </div>
-            )}
+          <div className='hidden md:flex items-center'>
+            <SearchInput />
           </div>
         </div>
 
