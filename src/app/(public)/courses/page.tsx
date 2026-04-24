@@ -3,8 +3,8 @@ import homeApi from '../_api/home.api'
 import { courseApi, Meta } from '../_api/course.api'
 import ExploreLayout from './_components/explore-layout'
 import CatalogContent from './_components/catalog-content'
-import HeroBanner from '../_components/hero-banner'
-import { HomeCourseCard, CategoryWithCount } from '@/schemas/course.schema'
+import CourseSliderBanner from './_components/course-slider-banner'
+import { HomeCourseCard, CategoryWithCount, HomeSectionsResponse } from '@/schemas/course.schema'
 
 interface CoursesPageProps {
   searchParams: Promise<{
@@ -31,6 +31,20 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
     console.error('Failed to fetch categories:', error)
   }
 
+  // Lấy dữ liệu cho banner (Popular & Newest)
+  let trendingCourses: HomeCourseCard[] = []
+  let newestCourses: HomeCourseCard[] = []
+  try {
+    const sectionRes = await homeApi.getHomeSections()
+    if (sectionRes.ok) {
+      const homeSections: HomeSectionsResponse = await sectionRes.json()
+      trendingCourses = homeSections.trending || []
+      newestCourses = homeSections.newest || []
+    }
+  } catch (error) {
+    console.error('Failed to fetch home sections for banner:', error)
+  }
+
   // Lấy danh sách khóa học theo filter
   let courses: HomeCourseCard[] = []
   let meta: Meta | null = null
@@ -44,8 +58,8 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
   }
 
   return (
-    <main className='bg-white dark:bg-slate-950 min-h-screen'>
-      <HeroBanner />
+    <main className='bg-white dark:bg-slate-950 min-h-screen pb-20'>
+      <CourseSliderBanner trendingCourses={trendingCourses} newestCourses={newestCourses} />
 
       <ExploreLayout categories={categories}>
         <Suspense fallback={<CatalogContent courses={[]} isLoading={true} />}>
