@@ -12,7 +12,7 @@ import {
   LayoutDashboard,
   ShoppingCart
 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { PATH } from '@/constants/path'
@@ -38,7 +38,10 @@ export default function Header() {
   const { notifications, markAsRead } = useNotificationStore()
   const displayedNotifs = showAllNotifs ? notifications : notifications.slice(0, 5)
   const unreadCount = notifications.filter((n) => n.unread).length
-  const { data: cartData } = useCartQuery(isLoggedIn)
+  const pathname = usePathname()
+  const isAuthPage = [PATH.LOGIN, PATH.REGISTER].includes(pathname)
+
+  const { data: cartData } = useCartQuery(isLoggedIn && !isAuthPage)
   const cartCount = cartData?.items?.length || 0
 
   // Close notif when clicking outside

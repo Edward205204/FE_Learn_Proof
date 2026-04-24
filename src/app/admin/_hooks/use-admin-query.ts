@@ -29,17 +29,6 @@ export function useAdminUpdateUserRoleMutation() {
   })
 }
 
-export function useAdminUpdateUserBanMutation() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, isBanned }: { id: string; isBanned: boolean }) => adminApi.updateUserBanStatus(id, isBanned),
-    onSuccess: () => {
-      toast.success('Cập nhật trạng thái khóa người dùng thành công')
-      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
-    }
-  })
-}
-
 export function useAdminCoursesQuery(params: AdminGetCoursesQuery) {
   return useQuery({
     queryKey: ADMIN_QUERY_KEYS.courses(params),
@@ -54,17 +43,6 @@ export function useAdminUpdateCourseStatusMutation() {
     mutationFn: ({ id, status }: { id: string; status: string }) => adminApi.updateCourseStatus(id, status),
     onSuccess: () => {
       toast.success('Cập nhật trạng thái khóa học thành công')
-      queryClient.invalidateQueries({ queryKey: ['admin', 'courses'] })
-    }
-  })
-}
-
-export function useAdminUpdateCourseBanMutation() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, isBanned }: { id: string; isBanned: boolean }) => adminApi.updateCourseBanStatus(id, isBanned),
-    onSuccess: () => {
-      toast.success('Cập nhật trạng thái cấm khóa học thành công')
       queryClient.invalidateQueries({ queryKey: ['admin', 'courses'] })
     }
   })

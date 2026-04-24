@@ -29,7 +29,9 @@ const authApi = {
     headline?: string | null
     website?: string | null
     isOnboardingCompleted?: boolean
-  }) => http.patch<User>('/auth/me', body)
+  }) => http.patch<User>('/auth/me', body),
+
+  getMaintenanceStatus: () => http.get<{ isMaintenance: boolean }>('/auth/maintenance-status')
 }
 
 export default authApi

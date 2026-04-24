@@ -13,7 +13,7 @@ import {
   Users
 } from 'lucide-react'
 
-import { useAdminCoursesQuery, useAdminUpdateCourseStatusMutation, useAdminUpdateCourseBanMutation } from '@/app/admin/_hooks/use-admin-query'
+import { useAdminCoursesQuery, useAdminUpdateCourseStatusMutation } from '@/app/admin/_hooks/use-admin-query'
 import { AdminCourseStatus } from '@/app/admin/_utils/zod'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -43,7 +43,6 @@ export default function AdminCoursesPage() {
   })
 
   const updateCourseStatus = useAdminUpdateCourseStatusMutation()
-  const updateCourseBan = useAdminUpdateCourseBanMutation()
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value)
@@ -154,14 +153,12 @@ export default function AdminCoursesPage() {
                     </td>
                     <td className='px-6 py-4'>
                       <div className='flex flex-col gap-1'>
-                        {course.isBanned ? (
-                          <Badge variant='destructive' className='w-fit'>BỊ CẤM</Badge>
-                        ) : course.status === 'PUBLISHED' ? (
+                        {course.status === 'PUBLISHED' ? (
                           <Badge variant='secondary' className='w-fit bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none'>ĐANG BÁN</Badge>
                         ) : course.status === 'ARCHIVED' ? (
-                          <Badge variant='secondary' className='w-fit'>LƯU TRỮ</Badge>
+                          <Badge variant='secondary' className='w-fit bg-slate-100 text-slate-600 hover:bg-slate-100 border-none'>GỠ XUỐNG</Badge>
                         ) : (
-                          <Badge variant='secondary' className='w-fit bg-amber-100 text-amber-700 hover:bg-amber-100 border-none'>BẢN NHÁP</Badge>
+                          <Badge variant='secondary' className='w-fit bg-amber-100 text-amber-700 hover:bg-amber-100 border-none'>ĐỢI DUYỆT</Badge>
                         )}
                       </div>
                     </td>
@@ -183,23 +180,24 @@ export default function AdminCoursesPage() {
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuLabel className='text-[10px] uppercase text-muted-foreground text-center'>Cập nhật trạng thái</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => updateCourseStatus.mutate({ id: course.id, status: 'PUBLISHED' })}>
-                            Phê duyệt (Publish)
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => updateCourseStatus.mutate({ id: course.id, status: 'ARCHIVED' })}>
-                            Gỡ xuống (Archive)
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            onClick={() => updateCourseBan.mutate({ id: course.id, isBanned: !course.isBanned })}
-                            className={course.isBanned ? 'text-green-600' : 'text-destructive'}
-                          >
-                            {course.isBanned ? (
-                              <><CheckCircle className='mr-2 h-4 w-4' /> Bỏ cấm khóa học</>
-                            ) : (
-                              <><Ban className='mr-2 h-4 w-4' /> Cấm khóa học</>
-                            )}
-                          </DropdownMenuItem>
+                          {course.status !== 'PUBLISHED' && (
+                            <DropdownMenuItem onClick={() => updateCourseStatus.mutate({ id: course.id, status: 'PUBLISHED' })}>
+                              <CheckCircle className='mr-2 h-4 w-4 text-emerald-500' />
+                              Phê duyệt (Publish)
+                            </DropdownMenuItem>
+                          )}
+                          {course.status !== 'ARCHIVED' && (
+                            <DropdownMenuItem onClick={() => updateCourseStatus.mutate({ id: course.id, status: 'ARCHIVED' })}>
+                              <Ban className='mr-2 h-4 w-4 text-slate-400' />
+                              Gỡ xuống (Archive)
+                            </DropdownMenuItem>
+                          )}
+                          {course.status === 'ARCHIVED' && (
+                            <DropdownMenuItem onClick={() => updateCourseStatus.mutate({ id: course.id, status: 'PUBLISHED' })}>
+                              <RefreshCw className='mr-2 h-4 w-4 text-blue-500' />
+                              Mở lại khóa học
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>

@@ -16,7 +16,6 @@ export const AdminUserItemSchema = z.object({
   fullName: z.string(),
   avatar: z.string().nullable(),
   role: RoleEnum,
-  isBanned: z.boolean(),
   createdAt: z.string(),
   _count: z.object({
     coursesCreated: z.number().int(),
@@ -46,7 +45,6 @@ export const AdminUserDetailResponseSchema = z.object({
   headline: z.string().nullable(),
   website: z.string().nullable(),
   role: RoleEnum,
-  isBanned: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string()
 })
@@ -60,7 +58,6 @@ export const AdminCourseItemSchema = z.object({
   slug: z.string(),
   thumbnail: z.string().nullable(),
   status: CourseStatusEnum,
-  isBanned: z.boolean(),
   price: z.number(),
   isFree: z.boolean(),
   level: CourseLevelEnum,
@@ -131,7 +128,6 @@ export const AdminGetUsersQuerySchema = z.object({
   page: z.number().optional(),
   limit: z.number().optional(),
   role: RoleEnum.optional(),
-  isBanned: z.boolean().optional(),
   search: z.string().optional()
 })
 
@@ -141,7 +137,6 @@ export const AdminGetCoursesQuerySchema = z.object({
   page: z.number().optional(),
   limit: z.number().optional(),
   status: CourseStatusEnum.optional(),
-  isBanned: z.boolean().optional(),
   search: z.string().optional()
 })
 

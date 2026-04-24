@@ -47,7 +47,7 @@ class Http {
             message = Array.isArray(data.message) ? data.message.map((e) => e.message).join(', ') : data.message
           }
 
-          if (typeof window !== 'undefined') {
+          if (typeof window !== 'undefined' && !message.toLowerCase().includes('bảo trì')) {
             toast.error(message)
           }
 
@@ -55,6 +55,14 @@ class Http {
             useAuthStore.getState().clearAuth() // clearAuth đã tự xóa cookie role
             if (typeof window !== 'undefined') {
               window.location.href = PATH.LOGIN
+            }
+          }
+
+          if (error.response?.status === HttpStatusCode.Forbidden) {
+            if (message.toLowerCase().includes('bảo trì')) {
+              if (typeof window !== 'undefined' && window.location.pathname !== PATH.MAINTENANCE) {
+                window.location.href = PATH.MAINTENANCE
+              }
             }
           }
         }

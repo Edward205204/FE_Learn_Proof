@@ -3,13 +3,26 @@
 import CourseCard from '../../_components/course-card'
 import { HomeCourseCard } from '@/schemas/course.schema'
 import { Search } from 'lucide-react'
+import { Meta } from '../../_api/course.api'
+import Pagination from '@/components/common/pagination'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface CatalogContentProps {
   courses: HomeCourseCard[]
+  meta?: Meta | null
   isLoading?: boolean
 }
 
-export default function CatalogContent({ courses, isLoading }: CatalogContentProps) {
+export default function CatalogContent({ courses, meta, isLoading }: CatalogContentProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', page.toString())
+    router.push(`?${params.toString()}`, { scroll: true })
+  }
+
   if (isLoading) {
     return (
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full'>
@@ -51,6 +64,16 @@ export default function CatalogContent({ courses, isLoading }: CatalogContentPro
           <CourseCard key={course.id} course={course} />
         ))}
       </div>
+
+      {meta && meta.totalPages > 1 && (
+        <div className='mt-16 flex justify-center'>
+          <Pagination
+            currentPage={meta.page}
+            totalPages={meta.totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   )
 }

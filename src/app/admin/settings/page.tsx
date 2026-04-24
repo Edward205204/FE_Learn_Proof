@@ -82,38 +82,6 @@ export default function AdminSettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className='border-none shadow-sm'>
-          <CardHeader>
-            <div className='flex items-center gap-2'>
-              <Lock className='h-5 w-5 text-amber-500' />
-              <CardTitle>Bảo mật & Đăng ký</CardTitle>
-            </div>
-            <CardDescription>Quản lý quyền truy cập và đăng ký tài khoản.</CardDescription>
-          </CardHeader>
-          <CardContent className='space-y-4'>
-            <div className='flex items-center justify-between'>
-              <div className='space-y-0.5'>
-                <Label>Cho phép đăng ký mới</Label>
-                <p className='text-xs text-muted-foreground'>Mở hoặc đóng đăng ký thành viên mới.</p>
-              </div>
-              <Switch 
-                checked={localSettings['ALLOW_REGISTRATION'] !== false} 
-                onCheckedChange={(val) => handleToggle('ALLOW_REGISTRATION', val)}
-              />
-            </div>
-            <div className='flex items-center justify-between'>
-              <div className='space-y-0.5'>
-                <Label>Bắt buộc Email Verification</Label>
-                <p className='text-xs text-muted-foreground'>Yêu cầu người dùng xác thực email để sử dụng.</p>
-              </div>
-              <Switch 
-                checked={localSettings['REQUIRE_EMAIL_VERIFICATION'] === true} 
-                onCheckedChange={(val) => handleToggle('REQUIRE_EMAIL_VERIFICATION', val)}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
         <Card className='border-none shadow-sm md:col-span-2 bg-red-50/50 border-red-100 dark:bg-red-950/10 dark:border-red-900/20'>
           <CardHeader>
             <div className='flex items-center gap-2'>

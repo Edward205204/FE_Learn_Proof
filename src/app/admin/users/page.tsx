@@ -1,17 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { 
-  Users, 
-  Search, 
-  MoreHorizontal, 
-  ShieldCheck, 
-  Ban, 
-  UserCog,
-  RefreshCw
-} from 'lucide-react'
+import { Users, Search, MoreHorizontal, ShieldCheck, Ban, UserCog, RefreshCw } from 'lucide-react'
 
-import { useAdminUsersQuery, useAdminUpdateUserRoleMutation, useAdminUpdateUserBanMutation } from '@/app/admin/_hooks/use-admin-query'
+import { useAdminUsersQuery, useAdminUpdateUserRoleMutation } from '@/app/admin/_hooks/use-admin-query'
 import { AdminRole } from '@/app/admin/_utils/zod'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -23,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -41,7 +33,6 @@ export default function AdminUsersPage() {
   })
 
   const updateUserRole = useAdminUpdateUserRoleMutation()
-  const updateUserBan = useAdminUpdateUserBanMutation()
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value)
@@ -58,7 +49,9 @@ export default function AdminUsersPage() {
       <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
         <div>
           <h1 className='text-3xl font-bold tracking-tight'>Quản lý người dùng</h1>
-          <p className='text-muted-foreground'>Quản lý tất cả người dùng, phân quyền và trạng thái hoạt động trên hệ thống.</p>
+          <p className='text-muted-foreground'>
+            Quản lý tất cả người dùng, phân quyền và trạng thái hoạt động trên hệ thống.
+          </p>
         </div>
         <Button onClick={() => refetch()} variant='outline' size='icon' className='shrink-0 rounded-full'>
           <RefreshCw className='h-4 w-4' />
@@ -68,8 +61,8 @@ export default function AdminUsersPage() {
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center'>
         <div className='relative flex-1'>
           <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-          <Input 
-            placeholder='Tìm kiếm người dùng theo tên hoặc email...' 
+          <Input
+            placeholder='Tìm kiếm người dùng theo tên hoặc email...'
             className='pl-10'
             value={search}
             onChange={handleSearchChange}
@@ -96,7 +89,6 @@ export default function AdminUsersPage() {
                 <th className='px-6 py-4 font-semibold'>Người dùng</th>
                 <th className='px-6 py-4 font-semibold'>Vai trò</th>
                 <th className='px-6 py-4 font-semibold'>Thống kê</th>
-                <th className='px-6 py-4 font-semibold'>Trạng thái</th>
                 <th className='px-6 py-4 font-semibold'>Ngày tham gia</th>
                 <th className='px-6 py-4 font-semibold text-right'>Thao tác</th>
               </tr>
@@ -105,12 +97,16 @@ export default function AdminUsersPage() {
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className='animate-pulse'>
-                    <td colSpan={6} className='px-6 py-8 text-center text-muted-foreground'>Đang tải dữ liệu...</td>
+                    <td colSpan={6} className='px-6 py-8 text-center text-muted-foreground'>
+                      Đang tải dữ liệu...
+                    </td>
                   </tr>
                 ))
               ) : data?.items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className='px-6 py-12 text-center text-muted-foreground'>Không tìm thấy người dùng nào.</td>
+                  <td colSpan={6} className='px-6 py-12 text-center text-muted-foreground'>
+                    Không tìm thấy người dùng nào.
+                  </td>
                 </tr>
               ) : (
                 data?.items.map((user) => (
@@ -120,7 +116,11 @@ export default function AdminUsersPage() {
                         <Avatar className='h-9 w-9 border'>
                           <AvatarImage src={user.avatar || ''} />
                           <AvatarFallback className='bg-primary/10 text-primary text-xs'>
-                            {user.fullName.split(' ').map(n=>n[0]).join('').slice(0,2)}
+                            {user.fullName
+                              .split(' ')
+                              .map((n) => n[0])
+                              .join('')
+                              .slice(0, 2)}
                           </AvatarFallback>
                         </Avatar>
                         <div className='flex flex-col'>
@@ -131,11 +131,23 @@ export default function AdminUsersPage() {
                     </td>
                     <td className='px-6 py-4'>
                       {user.role === 'ADMIN' ? (
-                        <Badge variant='secondary' className='bg-purple-100 text-purple-700 hover:bg-purple-100 border-none'>ADMIN</Badge>
+                        <Badge
+                          variant='secondary'
+                          className='bg-purple-100 text-purple-700 hover:bg-purple-100 border-none'
+                        >
+                          ADMIN
+                        </Badge>
                       ) : user.role === 'CONTENT_MANAGER' ? (
-                        <Badge variant='secondary' className='bg-blue-100 text-blue-700 hover:bg-blue-100 border-none'>MANAGER</Badge>
+                        <Badge variant='secondary' className='bg-blue-100 text-blue-700 hover:bg-blue-100 border-none'>
+                          MANAGER
+                        </Badge>
                       ) : (
-                        <Badge variant='secondary' className='bg-slate-100 text-slate-600 hover:bg-slate-100 border-none'>LEARNER</Badge>
+                        <Badge
+                          variant='secondary'
+                          className='bg-slate-100 text-slate-600 hover:bg-slate-100 border-none'
+                        >
+                          LEARNER
+                        </Badge>
                       )}
                     </td>
                     <td className='px-6 py-4'>
@@ -143,13 +155,6 @@ export default function AdminUsersPage() {
                         <span>Khóa học: {user._count.coursesCreated}</span>
                         <span>Đã mua: {user._count.enrollments}</span>
                       </div>
-                    </td>
-                    <td className='px-6 py-4'>
-                      {user.isBanned ? (
-                        <Badge variant='destructive' className='font-normal'>Bao vây / Bị chặn</Badge>
-                      ) : (
-                        <Badge variant='outline' className='text-green-600 border-green-200 bg-green-50 font-normal'>Đang hoạt động</Badge>
-                      )}
                     </td>
                     <td className='px-6 py-4 text-muted-foreground'>
                       {new Date(user.createdAt).toLocaleDateString('vi-VN')}
@@ -168,26 +173,19 @@ export default function AdminUsersPage() {
                             Xem chi tiết
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuLabel className='text-[10px] uppercase text-muted-foreground'>Thay đổi quyền</DropdownMenuLabel>
+                          <DropdownMenuLabel className='text-[10px] uppercase text-muted-foreground'>
+                            Thay đổi quyền
+                          </DropdownMenuLabel>
                           <DropdownMenuItem onClick={() => updateUserRole.mutate({ id: user.id, role: 'LEARNER' })}>
                             Chuyển thành Learner
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => updateUserRole.mutate({ id: user.id, role: 'CONTENT_MANAGER' })}>
+                          <DropdownMenuItem
+                            onClick={() => updateUserRole.mutate({ id: user.id, role: 'CONTENT_MANAGER' })}
+                          >
                             Chuyển thành Manager
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => updateUserRole.mutate({ id: user.id, role: 'ADMIN' })}>
                             Chuyển thành Admin
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            onClick={() => updateUserBan.mutate({ id: user.id, isBanned: !user.isBanned })}
-                            className={user.isBanned ? 'text-green-600' : 'text-destructive'}
-                          >
-                            {user.isBanned ? (
-                              <><RefreshCw className='mr-2 h-4 w-4' /> Bỏ cấm</>
-                            ) : (
-                              <><Ban className='mr-2 h-4 w-4' /> Cấm người dùng</>
-                            )}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -198,26 +196,21 @@ export default function AdminUsersPage() {
             </tbody>
           </table>
         </div>
-        
+
         {data && data.meta.totalPages > 1 && (
           <div className='flex items-center justify-between px-6 py-4 bg-muted/20 border-t'>
             <div className='text-xs text-muted-foreground'>
               Hiển thị trang {data.meta.page} / {data.meta.totalPages} ({data.meta.total} người dùng)
             </div>
             <div className='flex gap-2'>
-              <Button 
-                variant='outline' 
-                size='sm' 
-                disabled={page === 1}
-                onClick={() => setPage(p => p - 1)}
-              >
+              <Button variant='outline' size='sm' disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
                 Trước
               </Button>
-              <Button 
-                variant='outline' 
-                size='sm' 
+              <Button
+                variant='outline'
+                size='sm'
                 disabled={page === data.meta.totalPages}
-                onClick={() => setPage(p => p + 1)}
+                onClick={() => setPage((p) => p + 1)}
               >
                 Sau
               </Button>

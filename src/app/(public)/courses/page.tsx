@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import homeApi from '../_api/home.api'
-import { courseApi } from '../_api/course.api'
+import { courseApi, Meta } from '../_api/course.api'
 import ExploreLayout from './_components/explore-layout'
 import CatalogContent from './_components/catalog-content'
 import HeroBanner from '../_components/hero-banner'
@@ -33,10 +33,12 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
 
   // Lấy danh sách khóa học theo filter
   let courses: HomeCourseCard[] = []
+  let meta: Meta | null = null
   try {
     const courseRes = await courseApi.getCourses(params)
     // Backend trả về { items: [], meta: {} }
     courses = courseRes.data.items || []
+    meta = courseRes.data.meta
   } catch (error) {
     console.error('Failed to fetch courses:', error)
   }
@@ -47,7 +49,7 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
 
       <ExploreLayout categories={categories}>
         <Suspense fallback={<CatalogContent courses={[]} isLoading={true} />}>
-          <CatalogContent courses={courses} />
+          <CatalogContent courses={courses} meta={meta} />
         </Suspense>
       </ExploreLayout>
     </main>
