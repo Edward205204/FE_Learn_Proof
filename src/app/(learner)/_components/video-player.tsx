@@ -395,7 +395,13 @@ export function VideoPlayer({ url, lastPosition, lessonId }: VideoPlayerProps) {
         />
       )}
       {!isYoutube && !isBunnyEmbed && (
-        <video controls className='w-full h-full object-contain' src={normalizedUrl} preload='metadata' />
+        <video
+          controls
+          playsInline
+          className='w-full h-full object-contain'
+          src={normalizedUrl}
+          preload='metadata'
+        />
       )}
     </div>
   )

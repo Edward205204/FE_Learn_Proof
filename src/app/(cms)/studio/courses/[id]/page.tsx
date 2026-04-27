@@ -42,6 +42,7 @@ import { EditCourseThumbnailDialog } from '@/app/(cms)/_components/edit-course-t
 import { useQuery } from '@tanstack/react-query'
 import lessonApi from '@/app/(cms)/_api/lesson.api'
 import { PlayCircle } from 'lucide-react'
+import { VideoPlayer } from '@/app/(learner)/_components/video-player'
 
 interface LessonItem {
   id: string
@@ -689,26 +690,7 @@ export default function ChaptersPage() {
               </div>
             ) : !!previewLessonId && previewLesson?.type === 'VIDEO' && previewLesson.videoUrl ? (
               <div className='w-full h-full relative group'>
-                {/* Auto convert 'watch?v=' to '/embed/' if needed for YouTube */}
-                {previewLesson.videoUrl.includes('youtube.com') || previewLesson.videoUrl.includes('youtu.be') ? (
-                  <iframe
-                    className='absolute top-0 left-0 w-full h-full rounded-b-2xl sm:rounded-2xl'
-                    src={previewLesson.videoUrl
-                      .replace('watch?v=', 'embed/')
-                      .replace('youtu.be/', 'youtube.com/embed/')}
-                    title='YouTube video player'
-                    frameBorder='0'
-                    allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
-                    allowFullScreen
-                  />
-                ) : (
-                  <video
-                    controls
-                    className='w-full h-full object-contain rounded-b-2xl sm:rounded-2xl'
-                    src={previewLesson.videoUrl}
-                    autoPlay
-                  />
-                )}
+                <VideoPlayer url={previewLesson.videoUrl} lessonId={previewLesson.id} lastPosition={0} />
               </div>
             ) : (
               <div className='text-muted-foreground font-medium'>Không tìm thấy video hoặc bản xem trước đã đóng.</div>
