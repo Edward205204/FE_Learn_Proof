@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -16,6 +16,7 @@ import { QuestionCard } from '../../../../../_components/question-card'
 import { useCreateLessonMutation } from '@/app/(cms)/_hooks/use-lesson'
 import { toast } from 'sonner'
 import type { CreateLessonBody, QuizDataPayload } from '@/app/(cms)/_api/lesson.api'
+import { useUploadVideoMutation } from '@/app/(cms)/_hooks/use-video'
 
 const answerRowSchema = z.object({
   text: z.string().min(1, 'Nhập đáp án'),
@@ -45,7 +46,9 @@ const lessonSchema = z
     type: z.enum(['video', 'text', 'quiz'], {
       message: 'Loại bài học không hợp lệ'
     }),
+    videoSource: z.enum(['url', 'cloudflare']),
     videoUrl: z.string().optional(),
+    videoKey: z.string().optional(),
     content: z.string().optional(),
     /** Bài trắc nghiệm thuần (type QUIZ) — map → POST /lesson `quizData` */
     questions: z.array(questionBlockSchema),
@@ -56,7 +59,7 @@ const lessonSchema = z
     if (data.type === 'video' && (!data.videoUrl || data.videoUrl.trim() === '')) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Vui lòng nhập đường dẫn Video',
+        message: 'Vui lòng nhập đường dẫn video hoặc upload lên Cloudflare',
         path: ['videoUrl']
       })
     }
@@ -108,8 +111,10 @@ export default function LessonEditorPage() {
   const chapterId = searchParams.get('chapterId')
 
   const { mutate: createLesson, isPending } = useCreateLessonMutation(courseId)
+  const uploadInputRef = useRef<HTMLInputElement | null>(null)
 
   const [step, setStep] = useState<1 | 2>(1)
+  const [uploadedFileName, setUploadedFileName] = useState<string>('')
 
   const form = useForm<LessonForm>({
     resolver: zodResolver(lessonSchema),
@@ -117,12 +122,21 @@ export default function LessonEditorPage() {
       title: '',
       shortDescription: '',
       type: 'video',
+      videoSource: 'url',
       questions: [],
       supplementalQuiz: []
     }
   })
 
   const lessonType = form.watch('type')
+  const videoSource = form.watch('videoSource')
+
+  const { mutate: uploadVideo, isPending: isUploadingVideo } = useUploadVideoMutation({
+    onUploaded: ({ url, key }) => {
+      form.setValue('videoUrl', url, { shouldValidate: true, shouldDirty: true })
+      form.setValue('videoKey', key, { shouldDirty: true })
+    }
+  })
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -162,6 +176,7 @@ export default function LessonEditorPage() {
         chapterId,
         shortDesc: data.shortDescription,
         videoId: data.videoUrl || '',
+        ...(data.videoSource === 'cloudflare' && data.videoKey ? { videoKey: data.videoKey } : {}),
         ...(data.supplementalQuiz.length > 0 ? { quizData: mapBlocksToQuizData(data.supplementalQuiz) } : {})
       }
     } else if (data.type === 'text') {
@@ -374,14 +389,82 @@ export default function LessonEditorPage() {
                 <CardContent className='p-6 sm:p-8 space-y-8'>
                   <div className='space-y-2'>
                     <label className='text-xs font-bold text-muted-foreground uppercase tracking-wider'>
-                      Đường dẫn Video (URL)
+                      Nguồn Video
                     </label>
-                    <Input
-                      placeholder='https://youtube.com/... hoặc Vimeo URL'
-                      {...form.register('videoUrl')}
-                      className='h-14 font-medium rounded-2xl bg-background border-border/50 focus-visible:ring-primary/20 transition-all font-sans'
-                    />
+                    <Select
+                      value={videoSource}
+                      onValueChange={(value) => form.setValue('videoSource', value as 'url' | 'cloudflare')}
+                    >
+                      <SelectTrigger className='h-14 rounded-2xl bg-background border-border/50 focus-visible:ring-primary/20 px-4 text-base font-semibold'>
+                        <SelectValue placeholder='Chọn nguồn video' />
+                      </SelectTrigger>
+                      <SelectContent className='rounded-2xl border-border/50 shadow-xl overflow-hidden'>
+                        <SelectItem value='url' className='font-medium py-3 rounded-xl cursor-pointer mx-1 my-1'>
+                          URL
+                        </SelectItem>
+                        <SelectItem value='cloudflare' className='font-medium py-3 rounded-xl cursor-pointer mx-1 my-1'>
+                          Upload file lên Cloudflare
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
+
+                  {videoSource === 'url' ? (
+                    <div className='space-y-2'>
+                      <label className='text-xs font-bold text-muted-foreground uppercase tracking-wider'>
+                        Đường dẫn Video (URL)
+                      </label>
+                      <Input
+                        placeholder='https://youtube.com/... hoặc URL Cloudflare'
+                        {...form.register('videoUrl')}
+                        className='h-14 font-medium rounded-2xl bg-background border-border/50 focus-visible:ring-primary/20 transition-all font-sans'
+                      />
+                    </div>
+                  ) : (
+                    <div className='space-y-3'>
+                      <label className='text-xs font-bold text-muted-foreground uppercase tracking-wider'>
+                        Upload video lên Cloudflare
+                      </label>
+                      <input
+                        ref={uploadInputRef}
+                        type='file'
+                        accept='video/*'
+                        className='hidden'
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          setUploadedFileName(file.name)
+                          uploadVideo(file)
+                        }}
+                      />
+                      <div className='flex flex-col sm:flex-row gap-3'>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          onClick={() => uploadInputRef.current?.click()}
+                          disabled={isUploadingVideo}
+                          className='h-12 rounded-2xl'
+                        >
+                          {isUploadingVideo ? 'Đang upload...' : 'Chọn file video'}
+                        </Button>
+                        <Input
+                          readOnly
+                          value={form.watch('videoUrl') || uploadedFileName}
+                          placeholder='Chưa có video nào được upload'
+                          className='h-12 rounded-2xl bg-background'
+                        />
+                      </div>
+                      {form.watch('videoKey') && (
+                        <p className='text-xs text-muted-foreground break-all'>Video key: {form.watch('videoKey')}</p>
+                      )}
+                    </div>
+                  )}
+                  {form.formState.errors.videoUrl && (
+                    <p className='text-sm text-destructive font-medium flex items-center gap-1.5 mt-2'>
+                      <span className='w-1.5 h-1.5 rounded-full bg-destructive inline-block'></span>
+                      {form.formState.errors.videoUrl.message}
+                    </p>
+                  )}
 
                   <div className='space-y-2'>
                     <label className='text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center justify-between'>
