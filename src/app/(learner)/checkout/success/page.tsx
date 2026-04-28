@@ -61,9 +61,7 @@ export default function CheckoutSuccessPage() {
                 <p className='text-[10px] uppercase tracking-widest font-black text-[oklch(0.552_0.016_285.938)] mb-1.5'>
                   Mã giao dịch
                 </p>
-                <p className='font-bold text-gray-900 dark:text-white'>
-                  {txnRef || 'N/A'}
-                </p>
+                <p className='font-bold text-gray-900 dark:text-white'>{txnRef || 'N/A'}</p>
               </div>
               <div>
                 <p className='text-[10px] uppercase tracking-widest font-black text-[oklch(0.552_0.016_285.938)] mb-1.5'>

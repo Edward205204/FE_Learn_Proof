@@ -65,7 +65,9 @@ export function AdminHeader() {
           </div>
           <div className='min-w-0'>
             <p className='text-sm font-bold truncate leading-none mb-1'>{title}</p>
-            <p className='text-[10px] text-muted-foreground truncate uppercase tracking-tighter'>Hệ thống quản trị tối cao</p>
+            <p className='text-[10px] text-muted-foreground truncate uppercase tracking-tighter'>
+              Hệ thống quản trị tối cao
+            </p>
           </div>
         </div>
         <div className='flex items-center gap-2 ml-auto'>

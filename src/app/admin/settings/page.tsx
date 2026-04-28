@@ -1,15 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { 
-  Settings, 
-  Save, 
-  RefreshCw,
-  Globe,
-  Lock,
-  Wrench,
-  AlertTriangle
-} from 'lucide-react'
+import { Settings, Save, RefreshCw, Globe, Lock, Wrench, AlertTriangle } from 'lucide-react'
 
 import { useAdminSettingsQuery, useAdminUpdateSettingMutation } from '@/app/admin/_hooks/use-admin-query'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
@@ -32,7 +24,7 @@ export default function AdminSettingsPage() {
   }, [settings])
 
   const handleToggle = (key: string, val: boolean) => {
-    setLocalSettings(prev => ({ ...prev, [key]: val }))
+    setLocalSettings((prev) => ({ ...prev, [key]: val }))
     updateSetting.mutate({ key, value: val })
   }
 
@@ -40,7 +32,12 @@ export default function AdminSettingsPage() {
     updateSetting.mutate({ key, value: localSettings[key] })
   }
 
-  if (isLoading) return <div className='flex items-center justify-center h-64'><RefreshCw className='animate-spin h-8 w-8 text-primary' /></div>
+  if (isLoading)
+    return (
+      <div className='flex items-center justify-center h-64'>
+        <RefreshCw className='animate-spin h-8 w-8 text-primary' />
+      </div>
+    )
 
   return (
     <div className='space-y-6'>
@@ -64,19 +61,21 @@ export default function AdminSettingsPage() {
                 <Label>Bảo trì hệ thống</Label>
                 <p className='text-xs text-muted-foreground'>Chặn mọi truy cập của người dùng để bảo trì.</p>
               </div>
-              <Switch 
-                checked={localSettings['MAINTENANCE_MODE'] === true} 
+              <Switch
+                checked={localSettings['MAINTENANCE_MODE'] === true}
                 onCheckedChange={(val) => handleToggle('MAINTENANCE_MODE', val)}
               />
             </div>
             <div className='space-y-1.5'>
               <Label>Tên ứng dụng hiển thị</Label>
               <div className='flex gap-2'>
-                <Input 
-                  value={(localSettings['APP_NAME'] as string) || 'LearnProof'} 
-                  onChange={(e) => setLocalSettings(prev => ({ ...prev, APP_NAME: e.target.value }))}
+                <Input
+                  value={(localSettings['APP_NAME'] as string) || 'LearnProof'}
+                  onChange={(e) => setLocalSettings((prev) => ({ ...prev, APP_NAME: e.target.value }))}
                 />
-                <Button size='sm' onClick={() => handleSave('APP_NAME')}>Lưu</Button>
+                <Button size='sm' onClick={() => handleSave('APP_NAME')}>
+                  Lưu
+                </Button>
               </div>
             </div>
           </CardContent>
@@ -96,7 +95,9 @@ export default function AdminSettingsPage() {
                 <p className='font-bold text-sm'>Dọn dẹp Audit Logs cũ</p>
                 <p className='text-xs text-muted-foreground'>Xóa tất cả nhật ký hệ thống đã hơn 90 ngày tuổi.</p>
               </div>
-              <Button variant='destructive' size='sm'>Thực thi ngay</Button>
+              <Button variant='destructive' size='sm'>
+                Thực thi ngay
+              </Button>
             </div>
           </CardContent>
         </Card>

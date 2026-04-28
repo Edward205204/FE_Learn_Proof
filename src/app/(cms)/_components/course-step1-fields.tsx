@@ -153,7 +153,6 @@ export function CourseStep1Fields({ form, categories, shortDescriptionLength, th
         )}
       />
 
-
       <div className='space-y-3'>
         <label className='text-sm font-semibold'>Ảnh bìa khóa học</label>
 

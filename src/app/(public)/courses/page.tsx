@@ -24,7 +24,8 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
   const params = await searchParams
 
   // Kiểm tra xem có đang dùng bộ lọc/tìm kiếm hay không
-  const isLanding = !params.category && !params.level && !params.price && !params.rating && !params.search && !params.sort
+  const isLanding =
+    !params.category && !params.level && !params.price && !params.rating && !params.search && !params.sort
 
   // Lấy danh sách category cho sidebar
   let categories: CategoryWithCount[] = []
@@ -69,9 +70,9 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
       <ExploreLayout categories={categories}>
         <Suspense fallback={<CatalogContent courses={[]} isLoading={true} />}>
           {isLanding ? (
-            <ExploreSections 
-              trendingCourses={trendingCourses} 
-              newestCourses={newestCourses} 
+            <ExploreSections
+              trendingCourses={trendingCourses}
+              newestCourses={newestCourses}
               topSellingCourses={topSellingCourses}
               categories={categories}
             />

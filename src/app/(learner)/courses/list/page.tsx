@@ -293,7 +293,9 @@ function CourseCard({ enroll }: { enroll: EnrollmentCourse }) {
             {/* Rating Sync */}
             <div className='flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-400/10 text-amber-500 ml-auto'>
               <Star size={10} fill='currentColor' strokeWidth={0} />
-              <span className='text-[10px] font-black'>{(course as any).overallAnalytics?.avgRating?.toFixed(1) || '0.0'}</span>
+              <span className='text-[10px] font-black'>
+                {(course as any).overallAnalytics?.avgRating?.toFixed(1) || '0.0'}
+              </span>
             </div>
           </div>
         </div>

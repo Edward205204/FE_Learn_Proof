@@ -62,19 +62,19 @@ const courses = [
 
 const features = [
   {
-    icon: <Terminal className="w-6 h-6 text-rose-500" />,
-    title: "Project-Based Learning",
-    desc: "Không chỉ học lý thuyết, bạn xây dựng các dự án thực tế như E-commerce, SaaS, và Social Media ngay trong khóa học."
+    icon: <Terminal className='w-6 h-6 text-rose-500' />,
+    title: 'Project-Based Learning',
+    desc: 'Không chỉ học lý thuyết, bạn xây dựng các dự án thực tế như E-commerce, SaaS, và Social Media ngay trong khóa học.'
   },
   {
-    icon: <Github className="w-6 h-6 text-rose-500" />,
-    title: "Code Review 1:1",
-    desc: "Mọi dòng code bạn viết đều được các Senior Developer review chi tiết qua Pull Request trên GitHub."
+    icon: <Github className='w-6 h-6 text-rose-500' />,
+    title: 'Code Review 1:1',
+    desc: 'Mọi dòng code bạn viết đều được các Senior Developer review chi tiết qua Pull Request trên GitHub.'
   },
   {
-    icon: <Briefcase className="w-6 h-6 text-rose-500" />,
-    title: "Job Guarantee",
-    desc: "Hỗ trợ tối ưu CV, Portfolio và kết nối trực tiếp với mạng lưới đối tác tuyển dụng của LearnProof."
+    icon: <Briefcase className='w-6 h-6 text-rose-500' />,
+    title: 'Job Guarantee',
+    desc: 'Hỗ trợ tối ưu CV, Portfolio và kết nối trực tiếp với mạng lưới đối tác tuyển dụng của LearnProof.'
   }
 ]
 
@@ -174,10 +174,7 @@ export default function Home() {
                 <div className='flex items-center gap-6'>
                   <div className='flex -space-x-3'>
                     {[1, 2, 3, 4].map((i) => (
-                      <div
-                        key={i}
-                        className='h-12 w-12 rounded-full border-4 border-background bg-muted relative'
-                      >
+                      <div key={i} className='h-12 w-12 rounded-full border-4 border-background bg-muted relative'>
                         <Image
                           fill
                           src={`https://i.pravatar.cc/100?u=${i + 10}`}
@@ -193,7 +190,9 @@ export default function Home() {
                   <div className='h-10 w-[1px] bg-border' />
                   <div>
                     <p className='text-sm font-black text-foreground'>98% Học viên có việc</p>
-                    <p className='text-xs text-muted-foreground uppercase font-bold tracking-tighter'>Mức lương TB $1,200+</p>
+                    <p className='text-xs text-muted-foreground uppercase font-bold tracking-tighter'>
+                      Mức lương TB $1,200+
+                    </p>
                   </div>
                 </div>
               </div>
@@ -238,7 +237,9 @@ export default function Home() {
                     <p className='text-primary'>&#125;;</p>
                     <div className='mt-8 pt-8 border-t border-border flex items-center gap-4 animate-pulse'>
                       <div className='w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]'></div>
-                      <span className='text-emerald-500 text-xs font-bold'>Compiling Success: Future.exe is ready!</span>
+                      <span className='text-emerald-500 text-xs font-bold'>
+                        Compiling Success: Future.exe is ready!
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -275,23 +276,21 @@ export default function Home() {
 
           <div className='relative flex'>
             {/* Gradient Overlays for Fade Effect */}
-            <div className="absolute left-0 top-0 bottom-0 w-40 z-10 bg-gradient-to-r from-background to-transparent pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-40 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+            <div className='absolute left-0 top-0 bottom-0 w-40 z-10 bg-gradient-to-r from-background to-transparent pointer-events-none' />
+            <div className='absolute right-0 top-0 bottom-0 w-40 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none' />
 
             <div className='animate-marquee flex gap-10 md:gap-16 items-center py-4'>
               {/* Double the items for seamless loop */}
               {[...techStack, ...techStack].map((tech, idx) => (
-                <div 
-                  key={`${tech.name}-${idx}`} 
+                <div
+                  key={`${tech.name}-${idx}`}
                   className='group flex items-center gap-4 bg-card px-8 py-5 rounded-[2rem] border border-border shadow-xl shadow-foreground/5 transition-all cursor-default hover:border-primary/50'
                 >
                   <div className='relative w-8 h-8 md:w-10 md:h-10 flex items-center justify-center'>
                     <img src={tech.logo} alt={tech.name} className='w-full h-full object-contain' />
                   </div>
-                  <div className="flex flex-col">
-                    <span className='text-sm font-black text-foreground tracking-tight'>
-                      {tech.name}
-                    </span>
+                  <div className='flex flex-col'>
+                    <span className='text-sm font-black text-foreground tracking-tight'>{tech.name}</span>
                     <span className='text-[10px] font-bold text-primary uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity'>
                       Mastered
                     </span>
@@ -303,28 +302,50 @@ export default function Home() {
         </section>
 
         {/* 3. STATS SECTION (Premium Upgrade) */}
-        <section className="py-20 relative">
-          <div className="mx-auto max-w-[1200px] px-6">
-            <div className="bg-card rounded-[3.5rem] p-12 md:p-20 border border-border shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] dark:shadow-none relative overflow-hidden group">
+        <section className='py-20 relative'>
+          <div className='mx-auto max-w-[1200px] px-6'>
+            <div className='bg-card rounded-[3.5rem] p-12 md:p-20 border border-border shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] dark:shadow-none relative overflow-hidden group'>
               {/* Background Glow */}
-              <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors duration-1000" />
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 relative z-10">
+              <div className='absolute top-0 right-0 w-[300px] h-[300px] bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors duration-1000' />
+
+              <div className='grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8 relative z-10'>
                 {[
-                  { label: "Khóa học thực chiến", val: "500+", icon: <PlayCircle className="w-6 h-6" />, color: "from-primary to-orange-500" },
-                  { label: "Giảng viên Senior", val: "120+", icon: <Users className="w-6 h-6" />, color: "from-blue-500 to-indigo-500" },
-                  { label: "Học viên hài lòng", val: "20k+", icon: <Star className="w-6 h-6" />, color: "from-amber-400 to-orange-500" },
-                  { label: "Tỷ lệ có việc làm", val: "94%", icon: <Award className="w-6 h-6" />, color: "from-emerald-500 to-teal-500" }
+                  {
+                    label: 'Khóa học thực chiến',
+                    val: '500+',
+                    icon: <PlayCircle className='w-6 h-6' />,
+                    color: 'from-primary to-orange-500'
+                  },
+                  {
+                    label: 'Giảng viên Senior',
+                    val: '120+',
+                    icon: <Users className='w-6 h-6' />,
+                    color: 'from-blue-500 to-indigo-500'
+                  },
+                  {
+                    label: 'Học viên hài lòng',
+                    val: '20k+',
+                    icon: <Star className='w-6 h-6' />,
+                    color: 'from-amber-400 to-orange-500'
+                  },
+                  {
+                    label: 'Tỷ lệ có việc làm',
+                    val: '94%',
+                    icon: <Award className='w-6 h-6' />,
+                    color: 'from-emerald-500 to-teal-500'
+                  }
                 ].map((stat, i) => (
-                  <div key={i} className="flex flex-col items-center md:items-start gap-6 group/item">
-                    <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center text-foreground group-hover/item:bg-primary group-hover/item:text-white transition-all duration-500 shadow-sm">
+                  <div key={i} className='flex flex-col items-center md:items-start gap-6 group/item'>
+                    <div className='w-14 h-14 rounded-2xl bg-muted flex items-center justify-center text-foreground group-hover/item:bg-primary group-hover/item:text-white transition-all duration-500 shadow-sm'>
                       {stat.icon}
                     </div>
-                    <div className="space-y-1 text-center md:text-left">
-                      <p className={`text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-br ${stat.color}`}>
+                    <div className='space-y-1 text-center md:text-left'>
+                      <p
+                        className={`text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-br ${stat.color}`}
+                      >
                         {stat.val}
                       </p>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover/item:text-primary transition-colors">
+                      <p className='text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground group-hover/item:text-primary transition-colors'>
                         {stat.label}
                       </p>
                     </div>
@@ -341,37 +362,49 @@ export default function Home() {
             <div className='grid lg:grid-cols-2 gap-20 items-center'>
               <div className='space-y-8'>
                 <div className='space-y-4'>
-                  <h2 className='text-sm font-black uppercase tracking-[0.4em] text-primary'>Tại sao chọn LearnProof?</h2>
+                  <h2 className='text-sm font-black uppercase tracking-[0.4em] text-primary'>
+                    Tại sao chọn LearnProof?
+                  </h2>
                   <h3 className='text-5xl md:text-6xl font-black text-foreground tracking-tight leading-[1.1]'>
-                    Học chuẩn <span className="text-primary">doanh nghiệp</span> <br /> Thay đổi vị thế.
+                    Học chuẩn <span className='text-primary'>doanh nghiệp</span> <br /> Thay đổi vị thế.
                   </h3>
                 </div>
                 <p className='text-xl text-muted-foreground font-medium max-w-lg'>
-                  Chúng tôi không chỉ dạy lập trình. Chúng tôi xây dựng bệ phóng vững chắc để bạn bước vào những tập đoàn công nghệ hàng đầu thế giới.
+                  Chúng tôi không chỉ dạy lập trình. Chúng tôi xây dựng bệ phóng vững chắc để bạn bước vào những tập
+                  đoàn công nghệ hàng đầu thế giới.
                 </p>
-                <div className="pt-4 flex flex-col gap-6">
-                  <div className="flex items-center gap-4 group">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-black">01</div>
-                    <p className="font-bold text-foreground/80">Lộ trình được thiết kế bởi các Tech Lead từ Silicon Valley</p>
+                <div className='pt-4 flex flex-col gap-6'>
+                  <div className='flex items-center gap-4 group'>
+                    <div className='w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-black'>
+                      01
+                    </div>
+                    <p className='font-bold text-foreground/80'>
+                      Lộ trình được thiết kế bởi các Tech Lead từ Silicon Valley
+                    </p>
                   </div>
-                  <div className="flex items-center gap-4 group">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center font-black">02</div>
-                    <p className="font-bold text-foreground/80">Hỗ trợ kết nối việc làm với hơn 200+ đối tác chiến lược</p>
+                  <div className='flex items-center gap-4 group'>
+                    <div className='w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center font-black'>
+                      02
+                    </div>
+                    <p className='font-bold text-foreground/80'>
+                      Hỗ trợ kết nối việc làm với hơn 200+ đối tác chiến lược
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className='grid gap-8'>
                 {features.map((f, i) => (
-                  <div key={i} className="group p-8 flex gap-8 bg-card rounded-[3rem] border border-border hover:border-primary/20 hover:bg-accent transition-all duration-500 shadow-xl shadow-transparent hover:shadow-primary/5">
-                    <div className="flex-shrink-0 w-16 h-16 rounded-[1.5rem] bg-background shadow-lg flex items-center justify-center text-primary group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                  <div
+                    key={i}
+                    className='group p-8 flex gap-8 bg-card rounded-[3rem] border border-border hover:border-primary/20 hover:bg-accent transition-all duration-500 shadow-xl shadow-transparent hover:shadow-primary/5'
+                  >
+                    <div className='flex-shrink-0 w-16 h-16 rounded-[1.5rem] bg-background shadow-lg flex items-center justify-center text-primary group-hover:scale-110 group-hover:rotate-6 transition-all duration-500'>
                       {f.icon}
                     </div>
-                    <div className="space-y-2">
-                      <h3 className="text-2xl font-black text-foreground">{f.title}</h3>
-                      <p className="text-muted-foreground leading-relaxed font-medium">
-                        {f.desc}
-                      </p>
+                    <div className='space-y-2'>
+                      <h3 className='text-2xl font-black text-foreground'>{f.title}</h3>
+                      <p className='text-muted-foreground leading-relaxed font-medium'>{f.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -381,47 +414,61 @@ export default function Home() {
         </section>
 
         {/* 5. ROADMAP SECTION (Unique for Coding) */}
-        <section className="py-24 px-6 bg-[#0B0F1A] dark:bg-black/40 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-20 pointer-events-none">
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary rounded-full blur-[150px]"></div>
+        <section className='py-24 px-6 bg-[#0B0F1A] dark:bg-black/40 relative overflow-hidden'>
+          <div className='absolute inset-0 opacity-20 pointer-events-none'>
+            <div className='absolute top-0 right-0 w-[500px] h-[500px] bg-primary rounded-full blur-[150px]'></div>
           </div>
-          <div className="max-w-[1200px] mx-auto relative z-10">
-            <div className="grid lg:grid-cols-2 gap-20 items-center">
-              <div className="space-y-8">
-                <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">Lộ trình đào tạo <br /> chuẩn CMU</h2>
-                <p className="text-slate-400 text-lg">Chúng tôi áp dụng mô hình đào tạo từ Đại học Carnegie Mellon, tập trung vào tư duy hệ thống và kỹ thuật phần mềm hiện đại.</p>
-                <div className="space-y-4">
-                  {["Phân tích thiết kế hệ thống", "Làm chủ ngôn ngữ & Framework", "Deploy & Cloud Computing", "Soft-skills & Interview"].map((item, i) => (
-                    <div key={i} className="flex items-center gap-4 text-white font-bold">
-                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs">{i + 1}</div>
+          <div className='max-w-[1200px] mx-auto relative z-10'>
+            <div className='grid lg:grid-cols-2 gap-20 items-center'>
+              <div className='space-y-8'>
+                <h2 className='text-4xl md:text-5xl font-black text-white tracking-tight'>
+                  Lộ trình đào tạo <br /> chuẩn CMU
+                </h2>
+                <p className='text-slate-400 text-lg'>
+                  Chúng tôi áp dụng mô hình đào tạo từ Đại học Carnegie Mellon, tập trung vào tư duy hệ thống và kỹ
+                  thuật phần mềm hiện đại.
+                </p>
+                <div className='space-y-4'>
+                  {[
+                    'Phân tích thiết kế hệ thống',
+                    'Làm chủ ngôn ngữ & Framework',
+                    'Deploy & Cloud Computing',
+                    'Soft-skills & Interview'
+                  ].map((item, i) => (
+                    <div key={i} className='flex items-center gap-4 text-white font-bold'>
+                      <div className='w-8 h-8 rounded-full bg-primary flex items-center justify-center text-xs'>
+                        {i + 1}
+                      </div>
                       {item}
                     </div>
                   ))}
                 </div>
-                <Button className="h-14 px-8 bg-primary rounded-xl font-black hover:bg-primary/90 transition-all text-white">Nhận tư vấn lộ trình 1-1</Button>
+                <Button className='h-14 px-8 bg-primary rounded-xl font-black hover:bg-primary/90 transition-all text-white'>
+                  Nhận tư vấn lộ trình 1-1
+                </Button>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <div className="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-md">
-                    <Brain className="text-primary mb-4" />
-                    <h4 className="text-white font-black">AI Integrated</h4>
-                    <p className="text-xs text-slate-500 mt-2">Học cách ứng dụng AI vào quy trình code.</p>
+              <div className='grid grid-cols-2 gap-4'>
+                <div className='space-y-4'>
+                  <div className='bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-md'>
+                    <Brain className='text-primary mb-4' />
+                    <h4 className='text-white font-black'>AI Integrated</h4>
+                    <p className='text-xs text-slate-500 mt-2'>Học cách ứng dụng AI vào quy trình code.</p>
                   </div>
-                  <div className="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-md">
-                    <MonitorSmartphone className="text-blue-500 mb-4" />
-                    <h4 className="text-white font-black">Multi-Platform</h4>
-                    <p className="text-xs text-slate-500 mt-2">Web, Mobile và Desktop App.</p>
+                  <div className='bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-md'>
+                    <MonitorSmartphone className='text-blue-500 mb-4' />
+                    <h4 className='text-white font-black'>Multi-Platform</h4>
+                    <p className='text-xs text-slate-500 mt-2'>Web, Mobile và Desktop App.</p>
                   </div>
                 </div>
-                <div className="space-y-4 mt-8">
-                  <div className="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-md">
-                    <Globe className="text-emerald-500 mb-4" />
-                    <h4 className="text-white font-black">Global Ready</h4>
-                    <p className="text-xs text-slate-500 mt-2">Tiếng Anh chuyên ngành IT.</p>
+                <div className='space-y-4 mt-8'>
+                  <div className='bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-md'>
+                    <Globe className='text-emerald-500 mb-4' />
+                    <h4 className='text-white font-black'>Global Ready</h4>
+                    <p className='text-xs text-slate-500 mt-2'>Tiếng Anh chuyên ngành IT.</p>
                   </div>
-                  <div className="bg-primary p-8 rounded-3xl shadow-2xl shadow-primary/20">
-                    <Award className="text-white mb-4" />
-                    <h4 className="text-white font-black italic text-xl leading-tight">Chứng chỉ uy tín toàn cầu</h4>
+                  <div className='bg-primary p-8 rounded-3xl shadow-2xl shadow-primary/20'>
+                    <Award className='text-white mb-4' />
+                    <h4 className='text-white font-black italic text-xl leading-tight'>Chứng chỉ uy tín toàn cầu</h4>
                   </div>
                 </div>
               </div>
@@ -433,45 +480,54 @@ export default function Home() {
         <section className='px-6 py-32 relative'>
           <div className='mx-auto max-w-[1200px]'>
             <div className='flex flex-col md:flex-row items-end justify-between gap-8 mb-20'>
-              <div className="space-y-4">
+              <div className='space-y-4'>
                 <h2 className='text-sm font-black uppercase tracking-[0.4em] text-primary'>Learning Paths</h2>
-                <p className='text-4xl md:text-5xl font-black text-foreground tracking-tight'>
-                  Khóa học tiêu biểu
-                </p>
+                <p className='text-4xl md:text-5xl font-black text-foreground tracking-tight'>Khóa học tiêu biểu</p>
               </div>
-              <Link className='group flex items-center gap-3 px-8 py-4 rounded-2xl bg-muted text-sm font-black text-foreground hover:bg-primary hover:text-white transition-all shadow-sm' href='/courses'>
+              <Link
+                className='group flex items-center gap-3 px-8 py-4 rounded-2xl bg-muted text-sm font-black text-foreground hover:bg-primary hover:text-white transition-all shadow-sm'
+                href='/courses'
+              >
                 Xem tất cả khóa học <ArrowRight size={18} className='transition-transform group-hover:translate-x-1' />
               </Link>
             </div>
 
             <div className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4'>
               {courses.map((course, idx) => (
-                <div key={idx} className='group flex flex-col gap-6 rounded-[3rem] bg-card p-5 shadow-2xl shadow-foreground/5 border border-border hover:border-primary/30 transition-all duration-500 hover:-translate-y-3'>
+                <div
+                  key={idx}
+                  className='group flex flex-col gap-6 rounded-[3rem] bg-card p-5 shadow-2xl shadow-foreground/5 border border-border hover:border-primary/30 transition-all duration-500 hover:-translate-y-3'
+                >
                   <div className='relative aspect-square w-full overflow-hidden rounded-[2.2rem] shadow-inner'>
-                    <Image fill className='h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110' src={course.img} alt={course.title} />
-                    <div className="absolute top-4 left-4">
-                      <Badge className="bg-background/95 backdrop-blur-md text-foreground border-none font-black text-[10px] px-3 py-1 uppercase">
+                    <Image
+                      fill
+                      className='h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110'
+                      src={course.img}
+                      alt={course.title}
+                    />
+                    <div className='absolute top-4 left-4'>
+                      <Badge className='bg-background/95 backdrop-blur-md text-foreground border-none font-black text-[10px] px-3 py-1 uppercase'>
                         {course.category}
                       </Badge>
                     </div>
                   </div>
                   <div className='flex flex-col gap-4 px-2'>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-amber-400">
-                        <Star size={14} fill="currentColor" />
-                        <span className="text-xs font-black text-foreground">{course.rating}</span>
+                    <div className='flex items-center justify-between'>
+                      <div className='flex items-center gap-1.5 text-amber-400'>
+                        <Star size={14} fill='currentColor' />
+                        <span className='text-xs font-black text-foreground'>{course.rating}</span>
                       </div>
-                      <span className="text-sm font-black text-primary">{course.price}</span>
+                      <span className='text-sm font-black text-primary'>{course.price}</span>
                     </div>
                     <h3 className='text-xl font-black leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2 min-h-[3.5rem]'>
                       {course.title}
                     </h3>
                     <div className='flex items-center justify-between pt-4 border-t border-border'>
                       <div className='flex items-center gap-2 text-[10px] font-black uppercase text-muted-foreground'>
-                        <Clock size={12} className="text-primary" /> {course.time}
+                        <Clock size={12} className='text-primary' /> {course.time}
                       </div>
                       <div className='flex items-center gap-2 text-[10px] font-black uppercase text-muted-foreground'>
-                        <Users size={12} className="text-primary" /> {course.students}
+                        <Users size={12} className='text-primary' /> {course.students}
                       </div>
                     </div>
                   </div>
@@ -513,9 +569,7 @@ export default function Home() {
                         <Star key={i} size={16} className='text-amber-400 fill-amber-400' />
                       ))}
                     </div>
-                    <p className='text-lg font-medium text-muted-foreground italic leading-relaxed'>
-                      "{item.content}"
-                    </p>
+                    <p className='text-lg font-medium text-muted-foreground italic leading-relaxed'>"{item.content}"</p>
                     <div>
                       <h4 className='font-black text-foreground'>{item.name}</h4>
                       <p className='text-sm font-bold text-primary uppercase tracking-tighter'>{item.role}</p>
@@ -531,23 +585,27 @@ export default function Home() {
         <section className='px-6 py-32'>
           <div className='mx-auto max-w-[1200px] bg-primary rounded-[4rem] p-12 md:p-24 relative overflow-hidden shadow-[0_40px_80px_-15px_rgba(244,63,94,0.3)]'>
             {/* Abstract Decorative Shapes */}
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white opacity-10 rounded-full -mr-40 -mt-40 blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-orange-300 opacity-20 rounded-full -ml-20 -mb-20 blur-2xl" />
+            <div className='absolute top-0 right-0 w-[400px] h-[400px] bg-white opacity-10 rounded-full -mr-40 -mt-40 blur-3xl' />
+            <div className='absolute bottom-0 left-0 w-[300px] h-[300px] bg-orange-300 opacity-20 rounded-full -ml-20 -mb-20 blur-2xl' />
 
             <div className='relative z-10 flex flex-col items-center text-center space-y-12'>
-              <div className="space-y-6 max-w-3xl">
+              <div className='space-y-6 max-w-3xl'>
                 <h2 className='text-5xl md:text-7xl font-black text-white leading-[1.1] tracking-tighter'>
                   Bắt đầu hành trình <br /> Dev chuyên nghiệp
                 </h2>
                 <p className='text-lg md:text-xl font-medium text-white/90'>
-                  Đừng để sự trì hoãn ngăn cản bạn trở thành lập trình viên giỏi. Gia nhập cộng đồng 12,000+ học viên LearnProof ngay hôm nay.
+                  Đừng để sự trì hoãn ngăn cản bạn trở thành lập trình viên giỏi. Gia nhập cộng đồng 12,000+ học viên
+                  LearnProof ngay hôm nay.
                 </p>
               </div>
               <div className='flex flex-wrap justify-center gap-6'>
                 <Button className='h-20 px-14 text-lg font-black bg-white text-primary hover:bg-rose-50 rounded-[2rem] transition-all hover:scale-[1.05] active:scale-[0.98] shadow-2xl'>
                   Đăng ký tư vấn miễn phí
                 </Button>
-                <Button variant='outline' className='h-20 px-14 text-lg font-black border-2 border-white/40 text-white hover:bg-white/10 rounded-[2rem] transition-all'>
+                <Button
+                  variant='outline'
+                  className='h-20 px-14 text-lg font-black border-2 border-white/40 text-white hover:bg-white/10 rounded-[2rem] transition-all'
+                >
                   Gia nhập Discord cộng đồng
                 </Button>
               </div>

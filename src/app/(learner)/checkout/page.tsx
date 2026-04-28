@@ -237,10 +237,10 @@ export default function CheckoutPage() {
               {/* Checkout Button */}
               <Button
                 onClick={handleCheckout}
-                  disabled={createPaymentMutation.isPending || cartItems.length === 0}
+                disabled={createPaymentMutation.isPending || cartItems.length === 0}
                 className='w-full h-16 bg-[oklch(0.577_0.245_27.325)] hover:bg-[oklch(0.477_0.245_27.325)] text-white gap-2 rounded-3xl font-black text-lg shadow-lg shadow-[oklch(0.577_0.245_27.325)]/20 transition-all active:scale-[0.98]'
               >
-                  {createPaymentMutation.isPending ? (
+                {createPaymentMutation.isPending ? (
                   <Loader2 className='animate-spin' />
                 ) : (
                   <>

@@ -2,15 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { 
-  BarChart3, 
-  Users, 
-  BookOpen, 
-  History, 
-  Settings, 
-  LayoutDashboard,
-  ShieldAlert
-} from 'lucide-react'
+import { BarChart3, Users, BookOpen, History, Settings, LayoutDashboard, ShieldAlert } from 'lucide-react'
 
 import { PATH } from '@/constants/path'
 import { cn } from '@/lib/utils'
@@ -102,21 +94,24 @@ export function AdminSidebar({ variant = 'desktop' }: Props) {
               href={item.href}
               className={cn(
                 'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 group',
-                active 
-                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 shrink-0' 
+                active
+                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 shrink-0'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
               )}
             >
-              <Icon className={cn('h-4 w-4 transition-transform duration-300', active ? 'scale-110' : 'group-hover:scale-110')} />
+              <Icon
+                className={cn(
+                  'h-4 w-4 transition-transform duration-300',
+                  active ? 'scale-110' : 'group-hover:scale-110'
+                )}
+              />
               <span className='truncate'>{item.label}</span>
-              {active && (
-                <div className='ml-auto h-1.5 w-1.5 rounded-full bg-primary-foreground/50' />
-              )}
+              {active && <div className='ml-auto h-1.5 w-1.5 rounded-full bg-primary-foreground/50' />}
             </Link>
           )
         })}
       </nav>
-      
+
       <div className='mt-auto p-4 mb-4'>
         <div className='rounded-2xl bg-amber-50 p-4 border border-amber-100 dark:bg-amber-950/20 dark:border-amber-900/30'>
           <div className='flex items-center gap-2 mb-2'>

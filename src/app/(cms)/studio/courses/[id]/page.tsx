@@ -158,10 +158,13 @@ export default function ChaptersPage() {
     } else {
       updateCourseChaptersFrameMutation.mutate(
         {
-          chapterList: [...chapters.map((ch, index) => ({ title: ch.title, order: index + 1 })), {
-            title: chapterTitle,
-            order: chapters.length + 1
-          }]
+          chapterList: [
+            ...chapters.map((ch, index) => ({ title: ch.title, order: index + 1 })),
+            {
+              title: chapterTitle,
+              order: chapters.length + 1
+            }
+          ]
         },
         {
           onSuccess: () => {
@@ -749,7 +752,11 @@ export default function ChaptersPage() {
             động này không thể hoàn tác.
           </div>
           <DialogFooter>
-            <Button variant='outline' onClick={() => setChapterToDelete(null)} disabled={deleteChapterMutation.isPending}>
+            <Button
+              variant='outline'
+              onClick={() => setChapterToDelete(null)}
+              disabled={deleteChapterMutation.isPending}
+            >
               Hủy
             </Button>
             <Button
@@ -758,9 +765,7 @@ export default function ChaptersPage() {
                 if (chapterToDelete) {
                   deleteChapterMutation.mutate(chapterToDelete.id, {
                     onSuccess: () => {
-                      setChapters(
-                        chapters.filter((ch) => ch.id !== chapterToDelete.id)
-                      )
+                      setChapters(chapters.filter((ch) => ch.id !== chapterToDelete.id))
                       setChapterToDelete(null)
                     }
                   })

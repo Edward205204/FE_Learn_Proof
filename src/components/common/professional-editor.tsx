@@ -59,7 +59,12 @@ interface ProfessionalEditorProps {
   minHeight?: string
 }
 
-export function ProfessionalEditor({ value, onChange, onHeadingsChange, minHeight = '450px' }: ProfessionalEditorProps) {
+export function ProfessionalEditor({
+  value,
+  onChange,
+  onHeadingsChange,
+  minHeight = '450px'
+}: ProfessionalEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [

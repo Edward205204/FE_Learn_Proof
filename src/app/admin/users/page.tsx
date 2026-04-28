@@ -125,7 +125,9 @@ export default function AdminUsersPage() {
                         </Avatar>
                         <div className='flex flex-col'>
                           <div className='flex items-center gap-1.5'>
-                            <span className='font-semibold text-foreground truncate max-w-[150px]'>{user.fullName}</span>
+                            <span className='font-semibold text-foreground truncate max-w-[150px]'>
+                              {user.fullName}
+                            </span>
                             {user.provider === 'GOOGLE' && (
                               <div
                                 className='flex items-center justify-center w-3.5 h-3.5 rounded-full bg-white shadow-sm border border-muted shrink-0'

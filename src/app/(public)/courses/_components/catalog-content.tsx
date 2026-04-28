@@ -67,11 +67,7 @@ export default function CatalogContent({ courses, meta, isLoading }: CatalogCont
 
       {meta && meta.totalPages > 1 && (
         <div className='mt-16 flex justify-center'>
-          <Pagination
-            currentPage={meta.page}
-            totalPages={meta.totalPages}
-            onPageChange={handlePageChange}
-          />
+          <Pagination currentPage={meta.page} totalPages={meta.totalPages} onPageChange={handlePageChange} />
         </div>
       )}
     </div>

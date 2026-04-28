@@ -27,7 +27,7 @@ export default function LessonsRedirectPage() {
     return (
       <div className='flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center px-4'>
         <p className='text-rose-500 font-bold'>Lỗi: Khóa học này chưa có nội dung bài học.</p>
-        <button 
+        <button
           onClick={() => router.back()}
           className='text-sm font-bold text-slate-500 hover:text-rose-600 transition-colors'
         >

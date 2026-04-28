@@ -56,12 +56,12 @@ export function useCheckoutMutation() {
 
 export function useCreatePaymentFromCartMutation() {
   return useMutation({
-    mutationFn: paymentApi.createPaymentFromCart,
+    mutationFn: paymentApi.createPaymentFromCart
   })
 }
 
 export function useCreatePaymentMutation() {
   return useMutation({
-    mutationFn: paymentApi.createPayment,
+    mutationFn: paymentApi.createPayment
   })
 }

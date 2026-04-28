@@ -103,10 +103,10 @@ export default function WishlistPage() {
                     </span>
                     <div className='flex text-[oklch(0.577_0.245_27.325)]'>
                       {[1, 2, 3, 4, 5].map((s) => (
-                        <Star 
-                          key={s} 
-                          size={14} 
-                          fill={s <= Math.round(item.course.overallAnalytics?.avgRating || 0) ? 'currentColor' : 'none'} 
+                        <Star
+                          key={s}
+                          size={14}
+                          fill={s <= Math.round(item.course.overallAnalytics?.avgRating || 0) ? 'currentColor' : 'none'}
                           strokeWidth={s <= Math.round(item.course.overallAnalytics?.avgRating || 0) ? 0 : 2}
                         />
                       ))}

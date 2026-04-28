@@ -59,9 +59,7 @@ function TocNodeItem({
           node.heading.level === 1 && 'font-semibold',
           node.heading.level === 2 && 'pl-4 text-[13px]',
           node.heading.level === 3 && 'pl-7 text-[12px] text-muted-foreground',
-          isActive
-            ? 'bg-primary/10 text-primary'
-            : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+          isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
         )}
       >
         {node.heading.level === 1 && (
@@ -84,7 +82,10 @@ function TocNodeItem({
 // ─── Word Counter ─────────────────────────────────────────────────────────────
 
 function countWords(html: string): number {
-  const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+  const text = html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
   if (!text) return 0
   return text.split(' ').length
 }

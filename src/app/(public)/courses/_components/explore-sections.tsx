@@ -62,7 +62,7 @@ export default function ExploreSections({
 }: ExploreSectionsProps) {
   return (
     <div className='w-full py-4'>
-      <CourseSection 
+      <CourseSection
         title='Khóa học xu hướng'
         subtitle='Những khóa học được quan tâm nhất hiện nay'
         courses={trendingCourses}

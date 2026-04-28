@@ -16,10 +16,7 @@ export default function ExploreLayout({ categories, children }: ExploreLayoutPro
   return (
     <div className='max-w-[1400px] mx-auto px-6 py-8'>
       {/* Top Toolbar */}
-      <FilterToolbar 
-        showSidebar={showSidebar} 
-        onToggleSidebar={() => setShowSidebar(!showSidebar)} 
-      />
+      <FilterToolbar showSidebar={showSidebar} onToggleSidebar={() => setShowSidebar(!showSidebar)} />
 
       <div className='flex flex-col md:flex-row gap-10'>
         {/* Sidebar */}
@@ -30,9 +27,7 @@ export default function ExploreLayout({ categories, children }: ExploreLayoutPro
         )}
 
         {/* Results Area */}
-        <section className='flex-1 min-w-0 transition-all duration-300'>
-          {children}
-        </section>
+        <section className='flex-1 min-w-0 transition-all duration-300'>{children}</section>
       </div>
     </div>
   )

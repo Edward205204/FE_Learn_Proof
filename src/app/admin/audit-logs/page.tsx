@@ -1,15 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { 
-  History, 
-  Search, 
-  RefreshCw,
-  Info,
-  Calendar,
-  Shield,
-  Activity
-} from 'lucide-react'
+import { History, Search, RefreshCw, Info, Calendar, Shield, Activity } from 'lucide-react'
 
 import { useAdminAuditLogsQuery } from '@/app/admin/_hooks/use-admin-query'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -22,7 +14,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from '@/components/ui/dialog'
 
 export default function AdminAuditLogsPage() {
@@ -34,7 +26,9 @@ export default function AdminAuditLogsPage() {
       <div className='flex items-center justify-between'>
         <div>
           <h1 className='text-3xl font-bold tracking-tight'>Audit Logs</h1>
-          <p className='text-muted-foreground'>Nhật ký ghi lại mọi hành động nhạy cảm của các quản trị viên trên hệ thống.</p>
+          <p className='text-muted-foreground'>
+            Nhật ký ghi lại mọi hành động nhạy cảm của các quản trị viên trên hệ thống.
+          </p>
         </div>
         <Button onClick={() => refetch()} variant='outline' size='icon' className='rounded-full'>
           <RefreshCw className='h-4 w-4' />
@@ -58,12 +52,16 @@ export default function AdminAuditLogsPage() {
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className='animate-pulse'>
-                    <td colSpan={6} className='px-6 py-8 text-center text-muted-foreground'>Đang tải nhật ký...</td>
+                    <td colSpan={6} className='px-6 py-8 text-center text-muted-foreground'>
+                      Đang tải nhật ký...
+                    </td>
                   </tr>
                 ))
               ) : data?.items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className='px-6 py-12 text-center text-muted-foreground'>Chưa có hoạt động nào được ghi lại.</td>
+                  <td colSpan={6} className='px-6 py-12 text-center text-muted-foreground'>
+                    Chưa có hoạt động nào được ghi lại.
+                  </td>
                 </tr>
               ) : (
                 data?.items.map((log) => (
@@ -81,11 +79,11 @@ export default function AdminAuditLogsPage() {
                       </div>
                     </td>
                     <td className='px-6 py-4'>
-                      <Badge 
-                        variant='secondary' 
+                      <Badge
+                        variant='secondary'
                         className={
-                          log.action.includes('BAN') || log.action.includes('DELETE') 
-                            ? 'bg-red-50 text-red-700 border-red-100' 
+                          log.action.includes('BAN') || log.action.includes('DELETE')
+                            ? 'bg-red-50 text-red-700 border-red-100'
                             : 'bg-blue-50 text-blue-700 border-blue-100'
                         }
                       >
@@ -93,15 +91,19 @@ export default function AdminAuditLogsPage() {
                       </Badge>
                     </td>
                     <td className='px-6 py-4'>
-                      <Badge variant='outline' className='font-normal uppercase text-[10px]'>{log.entity}</Badge>
+                      <Badge variant='outline' className='font-normal uppercase text-[10px]'>
+                        {log.entity}
+                      </Badge>
                     </td>
-                    <td className='px-6 py-4 font-mono text-[10px] text-muted-foreground'>
-                      {log.entityId}
-                    </td>
+                    <td className='px-6 py-4 font-mono text-[10px] text-muted-foreground'>{log.entityId}</td>
                     <td className='px-6 py-4 text-right'>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant='ghost' size='icon' className='rounded-full h-8 w-8 hover:bg-primary/10 hover:text-primary'>
+                          <Button
+                            variant='ghost'
+                            size='icon'
+                            className='rounded-full h-8 w-8 hover:bg-primary/10 hover:text-primary'
+                          >
                             <Info className='h-4 w-4' />
                           </Button>
                         </DialogTrigger>
@@ -142,26 +144,21 @@ export default function AdminAuditLogsPage() {
             </tbody>
           </table>
         </div>
-        
+
         {data && data.meta.totalPages > 1 && (
           <div className='flex items-center justify-between px-6 py-4 bg-muted/20 border-t'>
             <div className='text-xs text-muted-foreground text-center sm:text-left'>
               Trang {data.meta.page} / {data.meta.totalPages} ({data.meta.total} bản ghi)
             </div>
             <div className='flex gap-2'>
-              <Button 
-                variant='outline' 
-                size='sm' 
-                disabled={page === 1}
-                onClick={() => setPage(p => p - 1)}
-              >
+              <Button variant='outline' size='sm' disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
                 Trước
               </Button>
-              <Button 
-                variant='outline' 
-                size='sm' 
+              <Button
+                variant='outline'
+                size='sm'
                 disabled={page === data.meta.totalPages}
-                onClick={() => setPage(p => p + 1)}
+                onClick={() => setPage((p) => p + 1)}
               >
                 Sau
               </Button>

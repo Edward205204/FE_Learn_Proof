@@ -23,7 +23,8 @@ export interface Transaction {
 }
 
 export const paymentApi = {
-  createPayment: (courseIds: string[]) => http.post<CreatePaymentResponse>('/payment/vnpay/create-payment', { courseIds }),
+  createPayment: (courseIds: string[]) =>
+    http.post<CreatePaymentResponse>('/payment/vnpay/create-payment', { courseIds }),
   createPaymentFromCart: () => http.post<CreatePaymentResponse>('/payment/vnpay/create-payment-from-cart'),
   getHistory: () => http.get<Transaction[]>('/payment/history')
 }

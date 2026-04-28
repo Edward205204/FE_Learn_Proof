@@ -1,17 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { 
-  BookOpen, 
-  Search, 
-  MoreHorizontal, 
-  CheckCircle, 
-  Ban, 
-  Eye,
-  RefreshCw,
-  Trophy,
-  Users
-} from 'lucide-react'
+import { BookOpen, Search, MoreHorizontal, CheckCircle, Ban, Eye, RefreshCw, Trophy, Users } from 'lucide-react'
 
 import { useAdminCoursesQuery, useAdminUpdateCourseStatusMutation } from '@/app/admin/_hooks/use-admin-query'
 import { AdminCourseStatus } from '@/app/admin/_utils/zod'
@@ -25,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -59,7 +49,9 @@ export default function AdminCoursesPage() {
       <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
         <div>
           <h1 className='text-3xl font-bold tracking-tight'>Quản lý khóa học</h1>
-          <p className='text-muted-foreground'>Theo dõi chất lượng, trạng thái phê duyệt và xử lý các khóa học vi phạm.</p>
+          <p className='text-muted-foreground'>
+            Theo dõi chất lượng, trạng thái phê duyệt và xử lý các khóa học vi phạm.
+          </p>
         </div>
         <Button onClick={() => refetch()} variant='outline' size='icon' className='shrink-0 rounded-full'>
           <RefreshCw className='h-4 w-4' />
@@ -69,8 +61,8 @@ export default function AdminCoursesPage() {
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center'>
         <div className='relative flex-1'>
           <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-          <Input 
-            placeholder='Tìm kiếm theo tên khóa học...' 
+          <Input
+            placeholder='Tìm kiếm theo tên khóa học...'
             className='pl-10'
             value={search}
             onChange={handleSearchChange}
@@ -106,12 +98,16 @@ export default function AdminCoursesPage() {
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className='animate-pulse'>
-                    <td colSpan={6} className='px-6 py-8 text-center text-muted-foreground'>Đang tải dữ liệu...</td>
+                    <td colSpan={6} className='px-6 py-8 text-center text-muted-foreground'>
+                      Đang tải dữ liệu...
+                    </td>
                   </tr>
                 ))
               ) : data?.items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className='px-6 py-12 text-center text-muted-foreground'>Không tìm thấy khóa học nào.</td>
+                  <td colSpan={6} className='px-6 py-12 text-center text-muted-foreground'>
+                    Không tìm thấy khóa học nào.
+                  </td>
                 </tr>
               ) : (
                 data?.items.map((course) => (
@@ -154,11 +150,26 @@ export default function AdminCoursesPage() {
                     <td className='px-6 py-4'>
                       <div className='flex flex-col gap-1'>
                         {course.status === 'PUBLISHED' ? (
-                          <Badge variant='secondary' className='w-fit bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none'>ĐANG BÁN</Badge>
+                          <Badge
+                            variant='secondary'
+                            className='w-fit bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none'
+                          >
+                            ĐANG BÁN
+                          </Badge>
                         ) : course.status === 'ARCHIVED' ? (
-                          <Badge variant='secondary' className='w-fit bg-slate-100 text-slate-600 hover:bg-slate-100 border-none'>GỠ XUỐNG</Badge>
+                          <Badge
+                            variant='secondary'
+                            className='w-fit bg-slate-100 text-slate-600 hover:bg-slate-100 border-none'
+                          >
+                            GỠ XUỐNG
+                          </Badge>
                         ) : (
-                          <Badge variant='secondary' className='w-fit bg-amber-100 text-amber-700 hover:bg-amber-100 border-none'>ĐỢI DUYỆT</Badge>
+                          <Badge
+                            variant='secondary'
+                            className='w-fit bg-amber-100 text-amber-700 hover:bg-amber-100 border-none'
+                          >
+                            ĐỢI DUYỆT
+                          </Badge>
                         )}
                       </div>
                     </td>
@@ -179,21 +190,29 @@ export default function AdminCoursesPage() {
                             Xem ở trang chủ
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuLabel className='text-[10px] uppercase text-muted-foreground text-center'>Cập nhật trạng thái</DropdownMenuLabel>
+                          <DropdownMenuLabel className='text-[10px] uppercase text-muted-foreground text-center'>
+                            Cập nhật trạng thái
+                          </DropdownMenuLabel>
                           {course.status !== 'PUBLISHED' && (
-                            <DropdownMenuItem onClick={() => updateCourseStatus.mutate({ id: course.id, status: 'PUBLISHED' })}>
+                            <DropdownMenuItem
+                              onClick={() => updateCourseStatus.mutate({ id: course.id, status: 'PUBLISHED' })}
+                            >
                               <CheckCircle className='mr-2 h-4 w-4 text-emerald-500' />
                               Phê duyệt (Publish)
                             </DropdownMenuItem>
                           )}
                           {course.status !== 'ARCHIVED' && (
-                            <DropdownMenuItem onClick={() => updateCourseStatus.mutate({ id: course.id, status: 'ARCHIVED' })}>
+                            <DropdownMenuItem
+                              onClick={() => updateCourseStatus.mutate({ id: course.id, status: 'ARCHIVED' })}
+                            >
                               <Ban className='mr-2 h-4 w-4 text-slate-400' />
                               Gỡ xuống (Archive)
                             </DropdownMenuItem>
                           )}
                           {course.status === 'ARCHIVED' && (
-                            <DropdownMenuItem onClick={() => updateCourseStatus.mutate({ id: course.id, status: 'PUBLISHED' })}>
+                            <DropdownMenuItem
+                              onClick={() => updateCourseStatus.mutate({ id: course.id, status: 'PUBLISHED' })}
+                            >
                               <RefreshCw className='mr-2 h-4 w-4 text-blue-500' />
                               Mở lại khóa học
                             </DropdownMenuItem>
@@ -207,26 +226,21 @@ export default function AdminCoursesPage() {
             </tbody>
           </table>
         </div>
-        
+
         {data && data.meta.totalPages > 1 && (
           <div className='flex items-center justify-between px-6 py-4 bg-muted/20 border-t'>
             <div className='text-xs text-muted-foreground'>
               Hiển thị trang {data.meta.page} / {data.meta.totalPages} ({data.meta.total} khóa học)
             </div>
             <div className='flex gap-2'>
-              <Button 
-                variant='outline' 
-                size='sm' 
-                disabled={page === 1}
-                onClick={() => setPage(p => p - 1)}
-              >
+              <Button variant='outline' size='sm' disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
                 Trước
               </Button>
-              <Button 
-                variant='outline' 
-                size='sm' 
+              <Button
+                variant='outline'
+                size='sm'
                 disabled={page === data.meta.totalPages}
-                onClick={() => setPage(p => p + 1)}
+                onClick={() => setPage((p) => p + 1)}
               >
                 Sau
               </Button>
