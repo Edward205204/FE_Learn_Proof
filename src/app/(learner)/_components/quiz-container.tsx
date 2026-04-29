@@ -15,7 +15,26 @@ interface QuizContainerProps {
 }
 
 export function QuizContainer({ courseId, lesson, onSubmit }: QuizContainerProps) {
-  const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [answers, setAnswers] = useState<Record<string, string>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(`quiz_draft_${lesson.id}`)
+      if (saved) {
+        try {
+          return JSON.parse(saved)
+        } catch (e) {
+          return {}
+        }
+      }
+    }
+    return {}
+  })
+
+  // Lưu đáp án vào localStorage mỗi khi thay đổi
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`quiz_draft_${lesson.id}`, JSON.stringify(answers))
+    }
+  }, [answers, lesson.id])
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState(0)
   const [resultTotal, setResultTotal] = useState(0)

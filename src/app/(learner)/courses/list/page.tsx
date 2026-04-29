@@ -293,9 +293,7 @@ function CourseCard({ enroll }: { enroll: EnrollmentCourse }) {
             {/* Rating Sync */}
             <div className='flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-400/10 text-amber-500 ml-auto'>
               <Star size={10} fill='currentColor' strokeWidth={0} />
-              <span className='text-[10px] font-black'>
-                {(course as any).overallAnalytics?.avgRating?.toFixed(1) || '0.0'}
-              </span>
+              <span className='text-[10px] font-black'>{course.overallAnalytics?.avgRating?.toFixed(1) || '0.0'}</span>
             </div>
           </div>
         </div>
@@ -304,18 +302,18 @@ function CourseCard({ enroll }: { enroll: EnrollmentCourse }) {
           <div className='space-y-2.5'>
             <div className='flex items-center justify-between text-[11px] font-black tracking-widest uppercase'>
               <span className='text-muted-foreground'>Tiến độ học tập</span>
-              <span className='text-primary'>{enroll.progressPercent}%</span>
+              <span className='text-primary'>{enroll.progressPercent || 0}%</span>
             </div>
             <div className='h-1.5 w-full bg-muted dark:bg-muted/50 rounded-full overflow-hidden'>
               <div
                 className='h-full bg-primary rounded-full transition-all duration-1000 ease-in-out relative overflow-hidden'
-                style={{ width: `${enroll.progressPercent}%` }}
+                style={{ width: `${enroll.progressPercent || 0}%` }}
               >
                 <div className='absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.15)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] animate-[progress-stripe_1s_linear_infinite]' />
               </div>
             </div>
             <p className='text-[10px] font-bold text-muted-foreground/80 uppercase tracking-tighter'>
-              Đã học {enroll.completedLessons} trên {enroll.totalLessons} bài
+              Đã học {enroll.completedLessons || 0} trên {enroll.totalLessons || 0} bài
             </p>
           </div>
 

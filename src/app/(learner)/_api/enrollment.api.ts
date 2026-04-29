@@ -23,6 +23,10 @@ export interface EnrollmentCourse {
       name: string
       slug: string
     } | null
+    overallAnalytics?: {
+      avgRating: number
+      totalStudents: number
+    }
   }
 }
 

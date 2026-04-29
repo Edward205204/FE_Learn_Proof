@@ -36,6 +36,7 @@ export default function CourseCard({ course }: CourseCardProps) {
       <div className='relative aspect-video overflow-hidden bg-muted flex-shrink-0'>
         <Image
           fill
+          unoptimized
           src={getCourseThumbnailUrl(course.thumbnail)}
           alt={course.title}
           className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105'

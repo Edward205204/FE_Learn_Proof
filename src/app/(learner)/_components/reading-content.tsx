@@ -10,32 +10,7 @@ interface ReadingContentProps {
   onComplete?: () => void
 }
 
-const MIN_STUDY_SECONDS = 5 * 60 // 5 phút
-
 export function ReadingContent({ lesson, onComplete }: ReadingContentProps) {
-  const [completed, setCompleted] = useState(false)
-  const [secondsStudied, setSecondsStudied] = useState(0)
-
-  useEffect(() => {
-    // Chỉ chạy timer, không gọi setState đồng bộ
-    // Component sẽ được remount khi lesson thay đổi (key={lesson.id} ở component cha)
-    const timer = setInterval(() => {
-      setSecondsStudied((s) => s + 1)
-    }, 1000)
-    return () => clearInterval(timer)
-  }, [])
-
-  const canComplete = secondsStudied >= MIN_STUDY_SECONDS
-  const remaining = MIN_STUDY_SECONDS - secondsStudied
-  const remainingMins = Math.floor(remaining / 60)
-  const remainingSecs = remaining % 60
-
-  const handleComplete = () => {
-    if (!canComplete) return
-    setCompleted(true)
-    onComplete?.()
-  }
-
   return (
     <div className='space-y-6'>
       {/* Card nội dung chính */}
@@ -57,44 +32,6 @@ export function ReadingContent({ lesson, onComplete }: ReadingContentProps) {
         {/* Nội dung bài đọc */}
         <div className='px-10 py-8 text-foreground/90 text-[15px] leading-[1.9] whitespace-pre-line'>
           {lesson.content}
-        </div>
-
-        {/* Nút hoàn thành */}
-        <div className='px-10 pb-10 space-y-3'>
-          {!canComplete && !completed && (
-            <p className='flex items-center gap-2 text-sm text-amber-600 font-medium'>
-              <Lock size={14} />
-              Nút hoàn thành sẽ mở sau:{' '}
-              <span className='font-mono font-bold'>
-                {remainingMins}:{remainingSecs.toString().padStart(2, '0')}
-              </span>
-            </p>
-          )}
-          <Button
-            onClick={handleComplete}
-            disabled={completed || !canComplete}
-            className={`h-12 px-8 rounded-md font-semibold text-sm transition-all ${
-              completed
-                ? 'bg-emerald-500 hover:bg-emerald-500 text-white shadow-sm disabled:opacity-100'
-                : !canComplete
-                  ? 'bg-muted text-muted-foreground cursor-not-allowed shadow-sm disabled:opacity-70'
-                  : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm active:scale-[0.98]'
-            }`}
-          >
-            {completed ? (
-              <>
-                <CheckCircle2 size={16} className='mr-2' />
-                Đã hoàn thành bài đọc
-              </>
-            ) : !canComplete ? (
-              <>
-                <Lock size={16} className='mr-2' />
-                Chờ {remainingMins}:{remainingSecs.toString().padStart(2, '0')} để hoàn thành
-              </>
-            ) : (
-              'Đánh dấu hoàn thành ✓'
-            )}
-          </Button>
         </div>
       </div>
 

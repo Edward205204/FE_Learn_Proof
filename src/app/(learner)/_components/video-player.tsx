@@ -64,7 +64,7 @@ function formatTime(seconds: number) {
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
-function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastPosition: number }) {
+function YouTubeCustomPlayer({ videoId, lastPosition, lessonId }: { videoId: string; lastPosition: number; lessonId: string }) {
   const containerId = useMemo(() => `yt-player-${videoId}`, [videoId])
   const wrapperRef = useRef<HTMLDivElement | null>(null)
   const playerRef = useRef<YouTubePlayerInstance | null>(null)
@@ -122,6 +122,9 @@ function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastP
 
     if (!isSeekingRef.current) {
       setCurrentTime(nextCurrentTime)
+      if (nextCurrentTime > 0 && typeof window !== 'undefined') {
+        localStorage.setItem(`video_pos_${lessonId}`, String(nextCurrentTime))
+      }
     }
     if (nextDuration > 0) setDuration(nextDuration)
     setIsPlaying(isNowPlaying)
@@ -163,8 +166,18 @@ function YouTubeCustomPlayer({ videoId, lastPosition }: { videoId: string; lastP
           playerRef.current = event.target
           setIsReady(true)
           resetControlsAutoHide()
-          if (!hasSeekedInitialRef.current && lastPosition > 0) {
-            playerRef.current?.seekTo(lastPosition, true)
+          if (!hasSeekedInitialRef.current) {
+            let startPos = lastPosition
+            if (typeof window !== 'undefined') {
+              const savedPos = localStorage.getItem(`video_pos_${lessonId}`)
+              if (savedPos) {
+                // Tiếp tục ở thời điểm cũ trừ đi 5 giây để nhắc lại nội dung
+                startPos = Math.max(0, Number(savedPos) - 5)
+              }
+            }
+            if (startPos > 0) {
+              playerRef.current?.seekTo(startPos, true)
+            }
             hasSeekedInitialRef.current = true
           }
           syncProgress()
@@ -372,7 +385,7 @@ export function VideoPlayer({ url, lastPosition, lessonId }: VideoPlayerProps) {
   return (
     <div className='relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl border border-white/10'>
       {isYoutube && youtubeVideoId && (
-        <YouTubeCustomPlayer key={youtubeVideoId} videoId={youtubeVideoId} lastPosition={lastPosition} />
+        <YouTubeCustomPlayer key={youtubeVideoId} videoId={youtubeVideoId} lastPosition={lastPosition} lessonId={lessonId} />
       )}
       {isYoutube && !youtubeVideoId && (
         <iframe
@@ -395,7 +408,28 @@ export function VideoPlayer({ url, lastPosition, lessonId }: VideoPlayerProps) {
         />
       )}
       {!isYoutube && !isBunnyEmbed && (
-        <video controls playsInline className='w-full h-full object-contain' src={normalizedUrl} preload='metadata' />
+        <video 
+          controls 
+          playsInline 
+          className='w-full h-full object-contain' 
+          src={normalizedUrl} 
+          preload='metadata' 
+          onTimeUpdate={(e) => {
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(`video_pos_${lessonId}`, String(e.currentTarget.currentTime))
+            }
+          }}
+          onLoadedMetadata={(e) => {
+            if (typeof window !== 'undefined') {
+              const savedPos = localStorage.getItem(`video_pos_${lessonId}`)
+              if (savedPos) {
+                e.currentTarget.currentTime = Math.max(0, Number(savedPos) - 5)
+              } else if (lastPosition > 0) {
+                e.currentTarget.currentTime = lastPosition
+              }
+            }
+          }}
+        />
       )}
     </div>
   )

@@ -285,6 +285,7 @@ export default function CourseDetailPage() {
                     src={getCourseThumbnailUrl(courseData.thumbnail)}
                     alt={courseData.title}
                     fill
+                    unoptimized
                     className='object-cover transition-transform duration-700 group-hover:scale-110'
                   />
                 ) : (

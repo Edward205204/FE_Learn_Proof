@@ -1,6 +1,6 @@
 'use client'
 import { LessonTabs } from '@/app/(learner)/_components/lesson-tabs'
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { VideoPlayer } from '../../../../_components/video-player'
 
@@ -8,6 +8,7 @@ import { CurriculumSidebar } from '../../../../_components/curriculum-sidebar'
 import { ReadingContent } from '../../../../_components/reading-content'
 import { QuizContainer } from '../../../../_components/quiz-container'
 import { LessonDiscussion } from '../../../../_components/lesson-discussion'
+import { NextLessonButton } from '../../../../_components/next-lesson-button'
 import { useGetCourseProgressQuery } from '../../../../_hooks/use-course'
 import learnerLessonApi from '../../../../_api/lesson.api'
 import learnerQuizApi from '../../../../_api/quiz.api'
@@ -82,6 +83,24 @@ export default function LessonPage() {
       toast.success('Đã cập nhật tiến độ bài học.')
     }
   })
+
+  // Kiểm tra bài hiện tại đã hoàn thành chưa (để không yêu cầu đợi 5 phút lại)
+  const isCurrentLessonCompleted = useMemo(() => {
+    if (!progressData || !currentLessonId) return false
+    for (const chapter of progressData) {
+      for (const lesson of chapter.lessons) {
+        if (lesson.id === currentLessonId) {
+          return lesson.progress?.[0]?.isCompleted ?? false
+        }
+      }
+    }
+    return false
+  }, [progressData, currentLessonId])
+
+  const handleMarkComplete = useCallback(async () => {
+    if (!currentLessonId) return
+    await markCompleteMutation.mutateAsync(currentLessonId)
+  }, [currentLessonId, markCompleteMutation])
 
   const submitQuizMutation = useMutation({
     mutationFn: ({ quizId, submission }: { quizId: string; submission: { questionId: string; answerId: string }[] }) =>
@@ -192,6 +211,15 @@ export default function LessonPage() {
               description={activeLesson.description}
               materials={activeLesson.materials}
             />
+            <NextLessonButton
+              key={activeLesson.id}
+              courseId={courseId}
+              lessonId={activeLesson.id}
+              nextLessonId={nextLessonId}
+              isAlreadyCompleted={isCurrentLessonCompleted}
+              onComplete={handleMarkComplete}
+              onNavigate={handleNavigate}
+            />
           </div>
         )}
 
@@ -199,12 +227,30 @@ export default function LessonPage() {
           <div className='space-y-6 w-full min-w-0'>
             <ReadingContent key={activeLesson.id} lesson={activeLesson} onComplete={() => markCompleteMutation.mutate(activeLesson.id)} />
             <LessonDiscussion courseId={courseId} lessonId={activeLesson.id} />
+            <NextLessonButton
+              key={activeLesson.id}
+              courseId={courseId}
+              lessonId={activeLesson.id}
+              nextLessonId={nextLessonId}
+              isAlreadyCompleted={isCurrentLessonCompleted}
+              onComplete={handleMarkComplete}
+              onNavigate={handleNavigate}
+            />
           </div>
         )}
 
         {activeLesson.type === 'quiz' && (
-          <div className='w-full min-w-0'>
+          <div className='w-full min-w-0 space-y-0'>
             <QuizContainer courseId={courseId} lesson={activeLesson} onSubmit={handleQuizSubmit} />
+            <NextLessonButton
+              key={activeLesson.id}
+              courseId={courseId}
+              lessonId={activeLesson.id}
+              nextLessonId={nextLessonId}
+              isAlreadyCompleted={isCurrentLessonCompleted}
+              onComplete={handleMarkComplete}
+              onNavigate={handleNavigate}
+            />
           </div>
         )}
       </div>
