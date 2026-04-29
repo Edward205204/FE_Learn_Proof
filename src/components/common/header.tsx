@@ -10,7 +10,8 @@ import {
   BookOpen,
   History as HistoryIcon,
   LayoutDashboard,
-  ShoppingCart
+  ShoppingCart,
+  Award
 } from 'lucide-react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
@@ -305,6 +306,14 @@ export default function Header() {
                         >
                           <BookOpen size={16} />
                           Khóa học của tôi
+                        </Link>
+                        <Link
+                          href='/my-certificates'
+                          className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors'
+                          onClick={closeMenu}
+                        >
+                          <Award size={16} />
+                          Chứng chỉ của tôi
                         </Link>
                         <Link
                           href={PATH.PAYMENT_HISTORY || '/payment-history'}
