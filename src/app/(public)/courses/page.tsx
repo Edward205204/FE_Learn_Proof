@@ -19,15 +19,8 @@ interface CoursesPageProps {
   }>
 }
 
-export default async function CoursesPage({ searchParams }: CoursesPageProps) {
-  // Next.js 15 yêu cầu await searchParams
-  const params = await searchParams
-
-  // Kiểm tra xem có đang dùng bộ lọc/tìm kiếm hay không
-  const isLanding =
-    !params.category && !params.level && !params.price && !params.rating && !params.search && !params.sort
-
-  // Lấy danh sách category cho sidebar
+export default async function CoursesPage() {
+  // Lấy danh sách category
   let categories: CategoryWithCount[] = []
   try {
     const catRes = await homeApi.getCategories()
@@ -52,35 +45,18 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
     console.error('Failed to fetch home sections:', error)
   }
 
-  // Lấy danh sách khóa học theo filter (chỉ khi không ở landing hoặc vẫn cần meta)
-  let courses: HomeCourseCard[] = []
-  let meta: Meta | null = null
-  try {
-    const courseRes = await courseApi.getCourses(params)
-    courses = courseRes.data.items || []
-    meta = courseRes.data.meta
-  } catch (error) {
-    console.error('Failed to fetch courses:', error)
-  }
-
   return (
     <main className='bg-white dark:bg-slate-950 min-h-screen pb-20'>
       <CourseSliderBanner trendingCourses={trendingCourses} newestCourses={newestCourses} />
 
-      <ExploreLayout categories={categories}>
-        <Suspense fallback={<CatalogContent courses={[]} isLoading={true} />}>
-          {isLanding ? (
-            <ExploreSections
-              trendingCourses={trendingCourses}
-              newestCourses={newestCourses}
-              topSellingCourses={topSellingCourses}
-              categories={categories}
-            />
-          ) : (
-            <CatalogContent courses={courses} meta={meta} />
-          )}
-        </Suspense>
-      </ExploreLayout>
+      <div className='max-w-[1400px] mx-auto px-6 py-8'>
+        <ExploreSections
+          trendingCourses={trendingCourses}
+          newestCourses={newestCourses}
+          topSellingCourses={topSellingCourses}
+          categories={categories}
+        />
+      </div>
     </main>
   )
 }

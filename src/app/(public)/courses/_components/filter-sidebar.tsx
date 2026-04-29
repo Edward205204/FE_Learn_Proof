@@ -4,7 +4,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Star } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { CategoryWithCount } from '@/schemas/course.schema'
 import { Suspense } from 'react'
 
@@ -30,6 +30,7 @@ export default function FilterSidebar({ categories }: FilterSidebarProps) {
 function FilterContent({ categories }: { categories: CategoryWithCount[] }) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const pathname = usePathname()
 
   const updateFilters = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -43,8 +44,14 @@ function FilterContent({ categories }: { categories: CategoryWithCount[] }) {
   }
 
   const clearFilters = () => {
-    router.push('/courses', { scroll: false })
+    const params = new URLSearchParams()
+    const currentSearch = searchParams.get('search')
+    if (currentSearch) {
+      params.set('search', currentSearch)
+    }
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
+
 
   return (
     <div className='flex flex-col gap-8 pr-4' suppressHydrationWarning>

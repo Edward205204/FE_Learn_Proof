@@ -73,26 +73,26 @@ export default function SearchInput({
   }, [debouncedSearchQuery])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isSuggestionsOpen || suggestions.length === 0) return
     switch (e.key) {
       case 'ArrowDown':
+        if (!isSuggestionsOpen || suggestions.length === 0) return
         e.preventDefault()
         setSelectedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : prev))
         break
       case 'ArrowUp':
+        if (!isSuggestionsOpen || suggestions.length === 0) return
         e.preventDefault()
         setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1))
         break
       case 'Enter':
         e.preventDefault()
-        if (selectedIndex >= 0) {
+        if (isSuggestionsOpen && selectedIndex >= 0 && suggestions.length > 0) {
           const selectedCourse = suggestions[selectedIndex]
           router.push(`/courses/${selectedCourse.slug}`)
-          setIsSuggestionsOpen(false)
-        } else {
-          router.push(`/courses?search=${encodeURIComponent(searchQuery)}`)
-          setIsSuggestionsOpen(false)
+        } else if (searchQuery.trim().length > 0) {
+          router.push(`/search?search=${encodeURIComponent(searchQuery)}`)
         }
+        setIsSuggestionsOpen(false)
         break
       case 'Escape':
         setIsSuggestionsOpen(false)
@@ -218,7 +218,7 @@ export default function SearchInput({
 
           {suggestions.length > 0 && (
             <Link
-              href={`/courses?search=${encodeURIComponent(searchQuery)}`}
+              href={`/search?search=${encodeURIComponent(searchQuery)}`}
               className='flex items-center justify-center w-full py-4 bg-gray-50/80 dark:bg-white/5 hover:bg-[oklch(0.577_0.245_27.325)] hover:text-white text-xs font-bold text-[oklch(0.552_0.016_285.938)] transition-all gap-2 group/all'
               onClick={() => setIsSuggestionsOpen(false)}
             >

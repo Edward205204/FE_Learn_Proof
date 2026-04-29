@@ -11,6 +11,7 @@ export type LessonWithProgress = {
   type: 'VIDEO' | 'TEXT' | 'QUIZ'
   order: number
   duration: number | null
+  isLocked: boolean
   progress: LessonProgress[] // mảng này sẽ có độ dài 0 hoặc 1 (do đã filter theo userId ở BE)
 }
 

@@ -39,12 +39,12 @@ export default function CatalogContent({ courses, meta, isLoading }: CatalogCont
 
   if (!courses || courses.length === 0) {
     return (
-      <div className='flex flex-col items-center justify-center py-20 px-4 text-center w-full bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-800'>
-        <div className='p-4 bg-white dark:bg-slate-800 rounded-full shadow-xl mb-6'>
-          <Search size={40} className='text-slate-400' />
+      <div className='flex flex-col items-center justify-center py-10 px-4 text-center w-full bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-800'>
+        <div className='p-3 bg-white dark:bg-slate-800 rounded-full shadow-xl mb-4'>
+          <Search size={32} className='text-slate-400' />
         </div>
-        <h3 className='text-xl font-bold mb-2'>Không tìm thấy khóa học nào</h3>
-        <p className='text-slate-500 max-w-xs'>
+        <h3 className='text-lg font-bold mb-2'>Không tìm thấy khóa học nào</h3>
+        <p className='text-slate-500 max-w-xs text-sm'>
           Hãy thử thay đổi bộ lọc hoặc từ khóa tìm kiếm để tìm thấy nội dung phù hợp hơn.
         </p>
       </div>

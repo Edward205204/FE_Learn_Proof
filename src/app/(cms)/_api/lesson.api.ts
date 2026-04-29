@@ -108,7 +108,10 @@ const lessonApi = {
   updateLesson: (lessonId: string, body: UpdateLessonBody) =>
     http.patch<LessonCreatedResponse>(`/lesson/${lessonId}`, body),
 
-  deleteLesson: (lessonId: string) => http.delete(`/lesson/${lessonId}`)
+  deleteLesson: (lessonId: string) => http.delete(`/lesson/${lessonId}`),
+
+  toggleLessonLock: (lessonId: string, isLocked: boolean) =>
+    http.patch<{ id: string; isLocked: boolean }>(`/lesson/${lessonId}/lock`, { isLocked })
 }
 
 export default lessonApi

@@ -16,7 +16,9 @@ import {
   HelpCircle,
   Clock,
   X,
-  Settings
+  Settings,
+  Lock,
+  Unlock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -49,6 +51,7 @@ interface LessonItem {
   title: string
   type?: string
   duration?: number | null
+  isLocked?: boolean
 }
 
 interface ChapterItem {
@@ -76,7 +79,8 @@ export default function ChaptersPage() {
         id: ls.id,
         title: ls.title,
         type: ls.type,
-        duration: ls.duration
+        duration: ls.duration,
+        isLocked: false // Backend không trả isLocked trong manager view; mặc định false
       }))
     }))
   }, [courseDetail])
@@ -550,6 +554,46 @@ export default function ChaptersPage() {
                                         )}
                                       </span>
                                       <div className='flex opacity-0 group-hover/lesson:opacity-100 transition-opacity'>
+                                        {/* Lock toggle button */}
+                                        {!lesson.id.startsWith('ls-') && (
+                                          <Button
+                                            variant='ghost'
+                                            size='icon'
+                                            className={`h-7 w-7 transition-colors ${
+                                              lesson.isLocked
+                                                ? 'text-amber-500 hover:text-amber-600'
+                                                : 'text-muted-foreground hover:text-amber-500'
+                                            }`}
+                                            onClick={() => {
+                                              lessonApi.toggleLessonLock(lesson.id, !lesson.isLocked).then(() => {
+                                                setChapters((prev) =>
+                                                  prev.map((ch) =>
+                                                    ch.id === chapter.id
+                                                      ? {
+                                                          ...ch,
+                                                          lessons: ch.lessons.map((ls) =>
+                                                            ls.id === lesson.id
+                                                              ? { ...ls, isLocked: !ls.isLocked }
+                                                              : ls
+                                                          )
+                                                        }
+                                                      : ch
+                                                  )
+                                                )
+                                                toast.success(
+                                                  !lesson.isLocked ? 'Đã khoá bài học' : 'Đã mở khoá bài học'
+                                                )
+                                              })
+                                            }}
+                                            title={lesson.isLocked ? 'Mở khoá bài học' : 'Khoá bài học'}
+                                          >
+                                            {lesson.isLocked ? (
+                                              <Lock className='w-3.5 h-3.5' />
+                                            ) : (
+                                              <Unlock className='w-3.5 h-3.5' />
+                                            )}
+                                          </Button>
+                                        )}
                                         {lesson.type === 'VIDEO' && (
                                           <Button
                                             variant='ghost'

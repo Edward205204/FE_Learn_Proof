@@ -29,7 +29,7 @@ function CourseSection({ title, subtitle, courses, icon, categorySlug }: CourseS
         </div>
         {categorySlug && (
           <Link
-            href={`/courses?category=${categorySlug}`}
+            href={`/search?category=${categorySlug}`}
             className='flex items-center gap-1 text-sm font-bold text-primary hover:underline'
           >
             Xem tất cả

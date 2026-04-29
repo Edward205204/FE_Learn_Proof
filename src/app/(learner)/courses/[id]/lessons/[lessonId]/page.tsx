@@ -46,7 +46,7 @@ export default function LessonPage() {
           title: lesson.title,
           duration: formatDuration(lesson.duration),
           isCompleted: lesson.progress?.[0]?.isCompleted ?? false,
-          isLocked: false,
+          isLocked: lesson.isLocked,
           type: lesson.type === 'TEXT' ? 'reading' : lesson.type === 'QUIZ' ? 'quiz' : 'video'
         }))
       })),
@@ -197,7 +197,7 @@ export default function LessonPage() {
 
         {activeLesson.type === 'reading' && (
           <div className='space-y-6 w-full min-w-0'>
-            <ReadingContent lesson={activeLesson} onComplete={() => markCompleteMutation.mutate(activeLesson.id)} />
+            <ReadingContent key={activeLesson.id} lesson={activeLesson} onComplete={() => markCompleteMutation.mutate(activeLesson.id)} />
             <LessonDiscussion courseId={courseId} lessonId={activeLesson.id} />
           </div>
         )}
