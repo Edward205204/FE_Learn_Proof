@@ -7,8 +7,9 @@ import { CertificateTemplate } from './certificate-template'
 import { toPng } from 'html-to-image'
 import jsPDF from 'jspdf'
 import { useAuthStore } from '@/store/auth.store'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import enrollmentApi from '../_api/enrollment.api'
+import certificateApi from '../_api/certificate.api'
 
 interface CertificateActionProps {
   courseId: string
@@ -16,22 +17,18 @@ interface CertificateActionProps {
 
 export function CertificateAction({ courseId }: CertificateActionProps) {
   const [isGenerating, setIsGenerating] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   const [isCopied, setIsCopied] = useState(false)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [mintError, setMintError] = useState<string | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
   
-  const certificateRef = useRef<HTMLDivElement>(null)
-
-  // Khôi phục trạng thái đã cấp chứng chỉ từ localStorage
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const issued = localStorage.getItem(`certificate_issued_${courseId}`)
-      if (issued === 'true') {
-        setIsSuccess(true)
-      }
-    }
-  }, [courseId])
+    setIsMounted(true)
+  }, [])
+
+  const certificateRef = useRef<HTMLDivElement>(null)
+  const queryClient = useQueryClient()
 
   // Get real user from store
   const { user } = useAuthStore()
@@ -40,57 +37,84 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
   // Fetch enrollments to get course details and progress
   const { data: enrollmentsData, isLoading } = useQuery({
     queryKey: ['my-enrollments'],
-    queryFn: () => enrollmentApi.getMyEnrollments().then(res => res.data)
+    queryFn: () => enrollmentApi.getMyEnrollments().then((res) => res.data)
   })
 
-  const enrolledCourse = enrollmentsData?.find(e => e.course.id === courseId || e.course.slug === courseId)
+  const enrolledCourse = enrollmentsData?.find((e) => e.course.id === courseId || e.course.slug === courseId)
   const progress = enrolledCourse?.progressPercent || 0
   const courseName = enrolledCourse?.course.title || 'Tên khóa học'
 
   const isEligible = progress === 100
-  
-  // Fake data for blockchain (since we don't have a real blockchain integration yet)
-  const txHash = '0x71c3b42a9d8f1e5c6a7b8c9d0e1f2a3b4c5d6e7f'
-  const certificateId = `LP-${courseId.slice(0, 8).toUpperCase()}`
-  const issueDate = enrolledCourse?.completedAt 
-    ? new Date(enrolledCourse.completedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
-    : new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+
+  // Lấy dữ liệu chứng chỉ thật từ DB (nếu đã được mint)
+  const { data: existingCertificate } = useQuery({
+    queryKey: ['certificate', courseId],
+    queryFn: () =>
+      certificateApi.getMyCertificates().then((res) => res.data.find((c) => c.courseId === enrolledCourse?.course.id)),
+    enabled: !!enrolledCourse
+  })
+
+  const isSuccess = existingCertificate?.status === 'COMPLETED'
+  const txHash = existingCertificate?.txHash || ''
+  const certificateId = existingCertificate
+    ? `CT-${existingCertificate.courseId.slice(0, 8).toUpperCase()}`
+    : `CT-${courseId.slice(0, 8).toUpperCase()}`
+  const issueDate = existingCertificate
+    ? new Date(existingCertificate.issuedAt).toLocaleDateString('en-US', {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric'
+      })
+    : enrolledCourse?.completedAt
+      ? new Date(enrolledCourse.completedAt).toLocaleDateString('en-US', {
+          month: 'short',
+          day: '2-digit',
+          year: 'numeric'
+        })
+      : new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+
+  const mintMutation = useMutation({
+    mutationFn: () => certificateApi.mintCertificate(enrolledCourse!.course.id),
+    onSuccess: () => {
+      // Invalidate để refetch chứng chỉ mới từ DB
+      queryClient.invalidateQueries({ queryKey: ['certificate', courseId] })
+      queryClient.invalidateQueries({ queryKey: ['my-certificates'] })
+    },
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { message?: string } } }
+      const msg = err?.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại!'
+      setMintError(msg)
+    }
+  })
 
   const handleIssueCertificate = async () => {
-    if (!isEligible || isGenerating) return
-
-    setIsGenerating(true)
-    // Giả lập quá trình tạo Hash lên Blockchain
-    setTimeout(() => {
-      setIsGenerating(false)
-      setIsSuccess(true)
-      // Lưu trạng thái vào localStorage để không bị mất khi reload
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(`certificate_issued_${courseId}`, 'true')
-      }
-    }, 3000)
+    if (!isEligible || mintMutation.isPending) return
+    setMintError(null)
+    mintMutation.mutate()
   }
+
+  if (!isMounted) return null
 
   const handleDownloadPDF = async () => {
     if (!certificateRef.current) return
-    
+
     try {
       setIsDownloading(true)
-      
+
       // Sử dụng html-to-image thay vì html2canvas để tránh lỗi compile của Turbopack
       const imgData = await toPng(certificateRef.current, {
         quality: 1,
         pixelRatio: 2, // Chất lượng cao hơn
-        cacheBust: true,
+        cacheBust: true
       })
-      
+
       // Calculate aspect ratio for A4 landscape
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'px',
         format: [1056, 816] // Match our template dimensions
       })
-      
+
       pdf.addImage(imgData, 'PNG', 0, 0, 1056, 816)
       pdf.save(`Certificate_${userName.replace(/\s+/g, '_')}.pdf`)
     } catch (error) {
@@ -102,6 +126,7 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
   }
 
   const handleCopyHash = () => {
+    if (!txHash) return
     navigator.clipboard.writeText(txHash)
     setIsCopied(true)
     setTimeout(() => setIsCopied(false), 2000)
@@ -131,18 +156,18 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
   return (
     <div className='max-w-4xl mx-auto space-y-10 p-6'>
       {/* Hidden div for PDF generation to ensure 100% scale rendering in viewport */}
-      <div 
+      <div
         className='fixed top-0 left-0 pointer-events-none overflow-hidden'
         style={{ zIndex: -9999, opacity: 0.01 }} // Dùng 0.01 thay vì 0 để tránh trình duyệt bỏ qua render
       >
-         <CertificateTemplate 
-            ref={certificateRef}
-            userName={userName}
-            courseName={courseName}
-            issueDate={issueDate}
-            certificateId={certificateId}
-            hash={txHash}
-         />
+        <CertificateTemplate
+          ref={certificateRef}
+          userName={userName}
+          courseName={courseName}
+          issueDate={issueDate}
+          certificateId={certificateId}
+          hash={txHash}
+        />
       </div>
 
       {/* TRẠNG THÁI TIẾN ĐỘ */}
@@ -189,7 +214,7 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
             <div className='space-y-4'>
               <button
                 onClick={handleIssueCertificate}
-                disabled={isGenerating || isSuccess}
+                disabled={mintMutation.isPending || isSuccess}
                 className={cn(
                   'w-full py-5 rounded-2xl font-black flex items-center justify-center gap-3 transition-all shadow-xl',
                   isSuccess
@@ -197,7 +222,7 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
                     : 'bg-primary hover:bg-rose-600 text-white shadow-rose-100 active:scale-[0.98]'
                 )}
               >
-                {isGenerating ? (
+                {mintMutation.isPending ? (
                   <span className='flex items-center gap-2'>
                     <div className='w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin' />
                     Đang tạo Hash...
@@ -213,6 +238,12 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
                 )}
               </button>
 
+              {mintError && (
+                <div className='p-4 bg-red-50 text-red-600 border border-red-200 rounded-2xl text-sm font-medium'>
+                  {mintError}
+                </div>
+              )}
+
               {isSuccess && (
                 <div className='p-5 bg-emerald-50 border border-emerald-100 rounded-2xl space-y-4'>
                   <div className='flex items-start gap-3'>
@@ -222,17 +253,19 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
                       <p className='text-emerald-600 text-sm mt-1 mb-2'>
                         Dữ liệu của bạn đã được ghi lại vĩnh viễn trên mạng lưới.
                       </p>
-                      
+
                       {/* Hash Info Box */}
                       <div className='bg-white border border-emerald-200 rounded-lg p-3 flex flex-col gap-2'>
                         <div className='flex items-center justify-between'>
-                          <span className='text-xs font-bold text-slate-500 uppercase tracking-wider'>Transaction Hash</span>
-                          <button 
+                          <span className='text-xs font-bold text-slate-500 uppercase tracking-wider'>
+                            Transaction Hash
+                          </span>
+                          <button
                             onClick={handleCopyHash}
                             className='text-slate-400 hover:text-emerald-600 transition-colors'
                             title='Copy Hash'
                           >
-                            {isCopied ? <Check size={16} className='text-emerald-500'/> : <Copy size={16} />}
+                            {isCopied ? <Check size={16} className='text-emerald-500' /> : <Copy size={16} />}
                           </button>
                         </div>
                         <p className='font-mono text-[10px] sm:text-xs text-slate-700 break-all bg-slate-50 p-2 rounded border border-slate-100'>
@@ -241,14 +274,17 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
                       </div>
 
                       {/* View on Explorer Button */}
-                      <a 
-                        href={`https://sepolia.etherscan.io/tx/${txHash}`}
+                      <a
+                        href={`https://amoy.polygonscan.com/tx/${txHash}`}
                         target='_blank'
                         rel='noopener noreferrer'
                         className='mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors group'
                       >
                         Xem trên Blockchain Explorer
-                        <ExternalLink size={14} className='group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform' />
+                        <ExternalLink
+                          size={14}
+                          className='group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform'
+                        />
                       </a>
                     </div>
                   </div>
@@ -277,77 +313,80 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
         </div>
 
         {/* Thumbnail Preview Chứng chỉ */}
-        <div className='relative group border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 flex items-center justify-center w-full' style={{ aspectRatio: '4/3' }}>
+        <div
+          className='relative group border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 flex items-center justify-center w-full'
+          style={{ aspectRatio: '4/3' }}
+        >
           {isSuccess ? (
-             <div className='w-full h-full flex items-center justify-center overflow-hidden bg-white'>
-               <div style={{ transform: 'scale(0.35)', transformOrigin: 'center' }}>
-                 <CertificateTemplate 
-                    userName={userName}
-                    courseName={courseName}
-                    issueDate={issueDate}
-                    certificateId={certificateId}
-                    hash={txHash}
-                 />
-               </div>
-               
-               {/* Hover overlay for download */}
-               <div className='absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4'>
-                 <button 
-                   onClick={() => setIsPreviewOpen(true)}
-                   className='bg-white text-slate-900 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-100 transition-colors shadow-lg'
-                 >
-                   <Eye size={20} />
-                   Xem trước
-                 </button>
-                 <button 
-                   onClick={handleDownloadPDF}
-                   disabled={isDownloading}
-                   className='bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-rose-600 transition-colors shadow-lg'
-                 >
-                   {isDownloading ? (
-                      <div className='w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin' />
-                   ) : (
-                      <Download size={20} />
-                   )}
-                   Tải PDF
-                 </button>
-               </div>
-             </div>
+            <div className='w-full h-full flex items-center justify-center overflow-hidden bg-white'>
+              <div style={{ transform: 'scale(0.35)', transformOrigin: 'center' }}>
+                <CertificateTemplate
+                  userName={userName}
+                  courseName={courseName}
+                  issueDate={issueDate}
+                  certificateId={certificateId}
+                  hash={txHash}
+                />
+              </div>
+
+              {/* Hover overlay for download */}
+              <div className='absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4'>
+                <button
+                  onClick={() => setIsPreviewOpen(true)}
+                  className='bg-white text-slate-900 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-100 transition-colors shadow-lg'
+                >
+                  <Eye size={20} />
+                  Xem trước
+                </button>
+                <button
+                  onClick={handleDownloadPDF}
+                  disabled={isDownloading}
+                  className='bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-rose-600 transition-colors shadow-lg'
+                >
+                  {isDownloading ? (
+                    <div className='w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin' />
+                  ) : (
+                    <Download size={20} />
+                  )}
+                  Tải PDF
+                </button>
+              </div>
+            </div>
           ) : (
             <div className='text-center p-6'>
-               <Award size={64} className='mx-auto text-slate-300 mb-4' />
-               <p className='text-sm text-slate-500 font-medium'>Hoàn thành khóa học để xem chứng chỉ của bạn</p>
+              <Award size={64} className='mx-auto text-slate-300 mb-4' />
+              <p className='text-sm text-slate-500 font-medium'>Hoàn thành khóa học để xem chứng chỉ của bạn</p>
             </div>
           )}
         </div>
       </div>
       {/* Preview Modal */}
       {isPreviewOpen && (
-        <div 
-          className='fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 p-4 sm:p-10 backdrop-blur-sm' 
+        <div
+          className='fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/80 p-4 sm:p-10 backdrop-blur-sm'
           onClick={() => setIsPreviewOpen(false)}
         >
-          <button 
+          <button
             onClick={() => setIsPreviewOpen(false)}
             className='absolute top-6 right-6 text-white bg-slate-800/50 hover:bg-slate-800 p-2 rounded-full transition-colors'
           >
             <X size={24} />
           </button>
-          
-          <div 
+
+          <div
             className='bg-white shadow-2xl rounded-sm overflow-auto max-w-[1056px] max-h-[100vh]'
             onClick={(e) => e.stopPropagation()}
           >
-             {/* Scale down slightly on very small screens if needed, otherwise it just scrolls */}
-             <div className="min-w-[1056px]">
-               <CertificateTemplate 
-                  userName={userName}
-                  courseName={courseName}
-                  issueDate={issueDate}
-                  certificateId={certificateId}
-                  hash={txHash}
-               />
-             </div>
+            {/* Scale down slightly on very small screens if needed, otherwise it just scrolls */}
+            <div className='min-w-[1056px]'>
+              <CertificateTemplate
+                userName={userName}
+                courseName={courseName}
+                issueDate={issueDate}
+                certificateId={certificateId}
+                hash={txHash}
+              />
+            </div>
           </div>
         </div>
       )}

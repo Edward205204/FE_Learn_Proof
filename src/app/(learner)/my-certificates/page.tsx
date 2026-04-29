@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Award, ShieldCheck, CheckCircle2, Copy, ExternalLink, Check, Download, Loader2, Eye, X } from 'lucide-react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
-import enrollmentApi from '../_api/enrollment.api'
+import certificateApi from '../_api/certificate.api'
 import { useAuthStore } from '@/store/auth.store'
 import { CertificateTemplate } from '../_components/certificate-template'
 import { toPng } from 'html-to-image'
@@ -20,27 +20,27 @@ export default function MyCertificatesPage() {
     hash: string
   } | null>(null)
   const { user } = useAuthStore()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Mảng refs để tham chiếu đến các chứng chỉ (để xuất PDF)
   const certRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
-  const { data: enrollments, isLoading } = useQuery({
-    queryKey: ['my-enrollments'],
-    queryFn: () => enrollmentApi.getMyEnrollments().then((res) => res.data)
+  const { data: certificates, isLoading } = useQuery({
+    queryKey: ['my-certificates'],
+    queryFn: () => certificateApi.getMyCertificates().then((res) => res.data)
   })
 
-  // Lọc chỉ lấy những khóa học đã hoàn thành 100%
-  const completedCourses = enrollments?.filter((e) => e.progressPercent === 100) || []
+  // Tất cả chứng chỉ trả về từ endpoint này đều đã là COMPLETED
+  const completedCertificates = certificates || []
 
   const handleCopyHash = (hash: string) => {
     navigator.clipboard.writeText(hash)
     setCopiedHash(hash)
     setTimeout(() => setCopiedHash(null), 2000)
-  }
-
-  // Generate fake hash based on course ID for now
-  const generateHash = (courseId: string) => {
-    return `0x71c3b42a9d8f1e5c6a7b8c9d0e1f2a3b4c5d6e7f${courseId.slice(0, 8)}`
   }
 
   const handleDownloadPDF = async (courseId: string, courseTitle: string) => {
@@ -78,6 +78,8 @@ export default function MyCertificatesPage() {
     }
   }
 
+  if (!isMounted) return null
+
   return (
     <div className='max-w-7xl mx-auto p-6 md:p-10 space-y-8 min-h-[600px]'>
       {/* Header Section */}
@@ -96,7 +98,7 @@ export default function MyCertificatesPage() {
 
         <div className='bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 flex items-center gap-2'>
           <ShieldCheck size={18} className='text-emerald-500' />
-          <span className='text-sm font-bold text-slate-700'>{completedCourses.length} Chứng chỉ</span>
+          <span className='text-sm font-bold text-slate-700'>{completedCertificates.length} Chứng chỉ</span>
         </div>
       </div>
 
@@ -107,22 +109,22 @@ export default function MyCertificatesPage() {
             Đang tải danh sách chứng chỉ...
           </p>
         </div>
-      ) : completedCourses.length > 0 ? (
+      ) : completedCertificates.length > 0 ? (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {completedCourses.map((enrollment) => {
-            const txHash = generateHash(enrollment.course.id)
-            const issueDate = enrollment.completedAt
-              ? new Date(enrollment.completedAt).toLocaleDateString('en-US', {
+          {completedCertificates.map((cert) => {
+            const txHash = cert.txHash || ''
+            const issueDate = cert.issuedAt
+              ? new Date(cert.issuedAt).toLocaleDateString('en-US', {
                   month: 'short',
                   day: '2-digit',
                   year: 'numeric'
                 })
               : 'N/A'
-            const certificateId = `CT-${enrollment.course.id.slice(0, 8).toUpperCase()}`
+            const certificateId = `CT-${cert.course.id.slice(0, 8).toUpperCase()}`
 
             return (
               <div
-                key={enrollment.id}
+                key={cert.id}
                 className='bg-white border border-slate-100 rounded-[30px] p-6 shadow-sm flex flex-col hover:shadow-md transition-shadow group relative overflow-hidden'
               >
                 {/* Decorative background element */}
@@ -137,7 +139,7 @@ export default function MyCertificatesPage() {
                     <foreignObject width='1056' height='816'>
                       <CertificateTemplate
                         userName={user?.fullName || 'Học viên'}
-                        courseName={enrollment.course.title}
+                        courseName={cert.course.title}
                         issueDate={issueDate}
                         certificateId={certificateId}
                         hash={txHash}
@@ -150,7 +152,7 @@ export default function MyCertificatesPage() {
                     <button
                       onClick={() =>
                         setPreviewCertificate({
-                          courseTitle: enrollment.course.title,
+                          courseTitle: cert.course.title,
                           issueDate,
                           certificateId,
                           hash: txHash
@@ -168,10 +170,10 @@ export default function MyCertificatesPage() {
                 <div className='fixed -left-[9999px] top-0 opacity-[0.01] pointer-events-none'>
                   <CertificateTemplate
                     ref={(el) => {
-                      certRefs.current[enrollment.course.id] = el
+                      certRefs.current[cert.course.id] = el
                     }}
                     userName={user?.fullName || 'Học viên'}
-                    courseName={enrollment.course.title}
+                    courseName={cert.course.title}
                     issueDate={issueDate}
                     certificateId={certificateId}
                     hash={txHash}
@@ -184,7 +186,7 @@ export default function MyCertificatesPage() {
                     HOÀN THÀNH
                   </span>
                   <h3 className='font-bold text-lg text-slate-900 line-clamp-2 leading-tight group-hover:text-primary transition-colors'>
-                    {enrollment.course.title}
+                    {cert.course.title}
                   </h3>
                   <p className='text-xs font-medium text-slate-400 mt-2 flex items-center gap-1.5'>
                     <CheckCircle2 size={12} className='text-emerald-400' />
@@ -215,7 +217,7 @@ export default function MyCertificatesPage() {
                 {/* Action Buttons */}
                 <div className='mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-3 relative z-10'>
                   <a
-                    href={`https://sepolia.etherscan.io/tx/${txHash}`}
+                    href={`https://amoy.polygonscan.com/tx/${txHash}`}
                     target='_blank'
                     rel='noopener noreferrer'
                     className='inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors'
@@ -225,11 +227,11 @@ export default function MyCertificatesPage() {
                   </a>
 
                   <button
-                    onClick={() => handleDownloadPDF(enrollment.course.id, enrollment.course.title)}
-                    disabled={downloadingId === enrollment.course.id}
+                    onClick={() => handleDownloadPDF(cert.course.id, cert.course.title)}
+                    disabled={downloadingId === cert.course.id}
                     className='inline-flex items-center gap-2 text-sm font-bold text-white transition-colors bg-primary hover:bg-rose-600 px-4 py-2.5 rounded-xl shadow-sm disabled:opacity-70 disabled:cursor-not-allowed'
                   >
-                    {downloadingId === enrollment.course.id ? (
+                    {downloadingId === cert.course.id ? (
                       <>
                         <Loader2 size={16} className='animate-spin' />
                         Đang tải...
