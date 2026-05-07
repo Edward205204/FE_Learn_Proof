@@ -1,7 +1,19 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Award, ShieldCheck, CheckCircle2, Copy, ExternalLink, Check, Download, Loader2, Eye, X } from 'lucide-react'
+import {
+  Award,
+  ShieldCheck,
+  CheckCircle2,
+  Copy,
+  ExternalLink,
+  Check,
+  Download,
+  Loader2,
+  Eye,
+  X,
+  Link as LinkIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import certificateApi from '../_api/certificate.api'
@@ -12,6 +24,7 @@ import { jsPDF } from 'jspdf'
 
 export default function MyCertificatesPage() {
   const [copiedHash, setCopiedHash] = useState<string | null>(null)
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
   const [previewCertificate, setPreviewCertificate] = useState<{
     courseTitle: string
@@ -41,6 +54,13 @@ export default function MyCertificatesPage() {
     navigator.clipboard.writeText(hash)
     setCopiedHash(hash)
     setTimeout(() => setCopiedHash(null), 2000)
+  }
+
+  const handleCopyUrl = (certificateHash: string) => {
+    const url = `${window.location.origin}/verify/${certificateHash}`
+    navigator.clipboard.writeText(url)
+    setCopiedUrl(certificateHash)
+    setTimeout(() => setCopiedUrl(null), 2000)
   }
 
   const handleDownloadPDF = async (courseId: string, courseTitle: string) => {
@@ -216,15 +236,34 @@ export default function MyCertificatesPage() {
 
                 {/* Action Buttons */}
                 <div className='mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-3 relative z-10'>
-                  <a
-                    href={`https://amoy.polygonscan.com/tx/${txHash}`}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors'
-                  >
-                    Xem Explorer
-                    <ExternalLink size={12} />
-                  </a>
+                  <div className='flex items-center gap-2'>
+                    <a
+                      href={`https://amoy.polygonscan.com/tx/${txHash}`}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors'
+                    >
+                      Xem Explorer
+                      <ExternalLink size={12} />
+                    </a>
+                    <span className='text-slate-300 text-xs'>|</span>
+                    <button
+                      id={`copy-verify-url-${cert.id}`}
+                      onClick={() => handleCopyUrl(cert.certificateHash)}
+                      className='inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors'
+                      title='Copy link xác thực cho nhà tuyển dụng'
+                    >
+                      {copiedUrl === cert.certificateHash ? (
+                        <>
+                          <Check size={12} className='text-emerald-500' /> Copied!
+                        </>
+                      ) : (
+                        <>
+                          <LinkIcon size={12} /> Copy URL
+                        </>
+                      )}
+                    </button>
+                  </div>
 
                   <button
                     onClick={() => handleDownloadPDF(cert.course.id, cert.course.title)}

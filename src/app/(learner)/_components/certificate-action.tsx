@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Award, ShieldCheck, Lock, Sparkles, Download, Copy, ExternalLink, Check, Eye, X } from 'lucide-react'
+import { Award, ShieldCheck, Lock, Sparkles, Download, Copy, ExternalLink, Check, Eye, X, Link } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CertificateTemplate } from './certificate-template'
 import { toPng } from 'html-to-image'
@@ -274,18 +274,37 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
                       </div>
 
                       {/* View on Explorer Button */}
-                      <a
-                        href={`https://amoy.polygonscan.com/tx/${txHash}`}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors group'
-                      >
-                        Xem trên Blockchain Explorer
-                        <ExternalLink
-                          size={14}
-                          className='group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform'
-                        />
-                      </a>
+                      <div className='mt-3 flex flex-wrap items-center gap-3'>
+                        <a
+                          href={`https://amoy.polygonscan.com/tx/${txHash}`}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors group'
+                        >
+                          Xem trên Blockchain Explorer
+                          <ExternalLink
+                            size={14}
+                            className='group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform'
+                          />
+                        </a>
+                        <span className='text-slate-300'>|</span>
+                        <button
+                          id='share-verify-link-btn'
+                          onClick={() => {
+                            if (existingCertificate) {
+                              navigator.clipboard.writeText(
+                                `${window.location.origin}/verify/${existingCertificate.certificateHash}`
+                              )
+                              setIsCopied(true)
+                              setTimeout(() => setIsCopied(false), 2000)
+                            }
+                          }}
+                          className='inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors'
+                        >
+                          <Link size={14} />
+                          {isCopied ? 'Copied!' : 'Copy link xác thực'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
