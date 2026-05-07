@@ -14,6 +14,40 @@ import type {
   ReorderLessonPayload
 } from '../_utils/zod'
 
+export type InstructorCourseStats = {
+  status: string
+  _count: { id: number }
+}[]
+
+export type InstructorTopCourse = {
+  id: string
+  title: string
+  thumbnail: string | null
+  status: string
+  avgRating: number
+  totalReviews: number
+  _count: { enrollments: number }
+}
+
+export type InstructorRecentReview = {
+  id: string
+  rating: number
+  comment: string | null
+  createdAt: string
+  user: { fullName: string; avatar: string | null }
+  course: { title: string }
+}
+
+export type InstructorDashboard = {
+  courseStats: InstructorCourseStats
+  totalRevenue: number
+  totalTransactions: number
+  totalStudents: number
+  topCourses: InstructorTopCourse[]
+  recentReviews: InstructorRecentReview[]
+  revenueChart: { month: string; revenue: number }[]
+}
+
 const courseApi = {
   getCategories: () => http.get<Category[]>('/courses/categories'),
 
@@ -60,7 +94,9 @@ const courseApi = {
     }),
 
   deleteChapter: (courseId: string, chapterId: string) =>
-    http.delete(`/courses/${courseId}/delete/chapter/${chapterId}`)
+    http.delete(`/courses/${courseId}/delete/chapter/${chapterId}`),
+
+  getDashboard: (range?: string) => http.get<InstructorDashboard>('/courses/manager/dashboard', { params: { range } })
 }
 
 export default courseApi

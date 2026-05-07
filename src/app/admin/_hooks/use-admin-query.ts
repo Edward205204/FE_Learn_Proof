@@ -8,7 +8,10 @@ export const ADMIN_QUERY_KEYS = {
   courses: (params: AdminGetCoursesQuery) => ['admin', 'courses', params] as const,
   logs: (params: AdminGetAuditLogsQuery) => ['admin', 'logs', params] as const,
   settings: ['admin', 'settings'] as const,
-  dashboardOverview: ['admin', 'dashboard', 'overview'] as const
+  dashboardOverview: ['admin', 'dashboard', 'overview'] as const,
+  dashboardRevenue: (params?: { fromDate?: string; toDate?: string }) => ['admin', 'dashboard', 'revenue', params] as const,
+  dashboardTopCourses: (month: string) => ['admin', 'dashboard', 'top-courses', month] as const,
+  dashboardHardLessons: ['admin', 'dashboard', 'hard-lessons'] as const
 }
 
 export function useAdminUsersQuery(params: AdminGetUsersQuery) {
@@ -79,5 +82,26 @@ export function useAdminDashboardOverviewQuery() {
   return useQuery({
     queryKey: ADMIN_QUERY_KEYS.dashboardOverview,
     queryFn: () => adminApi.getDashboardOverview().then((res) => res.data)
+  })
+}
+
+export function useAdminDashboardRevenueQuery(params?: { fromDate?: string; toDate?: string }) {
+  return useQuery({
+    queryKey: ADMIN_QUERY_KEYS.dashboardRevenue(params),
+    queryFn: () => adminApi.getDashboardRevenue(params).then((res) => res.data)
+  })
+}
+
+export function useAdminDashboardTopCoursesQuery(month: string) {
+  return useQuery({
+    queryKey: ADMIN_QUERY_KEYS.dashboardTopCourses(month),
+    queryFn: () => adminApi.getDashboardTopCourses(month).then((res) => res.data)
+  })
+}
+
+export function useAdminDashboardHardLessonsQuery() {
+  return useQuery({
+    queryKey: ADMIN_QUERY_KEYS.dashboardHardLessons,
+    queryFn: () => adminApi.getDashboardHardLessons().then((res) => res.data)
   })
 }

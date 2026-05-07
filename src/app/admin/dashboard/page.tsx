@@ -4,21 +4,30 @@ import * as React from 'react'
 import {
   Users,
   BookOpen,
-  BarChart3,
-  TrendingUp,
   ShieldAlert,
   ArrowUpRight,
   ArrowDownRight,
-  Zap,
   DollarSign
 } from 'lucide-react'
 
-import { useAdminDashboardOverviewQuery } from '@/app/admin/_hooks/use-admin-query'
+import {
+  useAdminDashboardOverviewQuery,
+  useAdminDashboardRevenueQuery,
+  useAdminDashboardTopCoursesQuery,
+  useAdminDashboardHardLessonsQuery
+} from '@/app/admin/_hooks/use-admin-query'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 
 export default function AdminDashboardPage() {
+  const currentMonth = new Date().toISOString()
+  
   const { data, isLoading } = useAdminDashboardOverviewQuery()
+  const { data: revenueData } = useAdminDashboardRevenueQuery()
+  const { data: topCourses } = useAdminDashboardTopCoursesQuery(currentMonth)
+  const { data: hardLessons } = useAdminDashboardHardLessonsQuery()
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
@@ -67,74 +76,52 @@ export default function AdminDashboardPage() {
       <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-7'>
         <Card className='col-span-4 border-none shadow-sm bg-background/50'>
           <CardHeader>
-            <CardTitle>Hoạt động hệ thống</CardTitle>
-            <CardDescription>Số lượng ghi danh: {data?.totalEnrollments.toLocaleString() || 0}</CardDescription>
+            <CardTitle>Doanh thu theo tháng</CardTitle>
+            <CardDescription>Biểu đồ doanh thu trong năm nay.</CardDescription>
           </CardHeader>
-          <CardContent className='h-[300px] flex items-end gap-3 px-6 pb-2'>
-            {/* Mock Chart using CSS bars */}
-            <div
-              className='flex-1 bg-primary/20 rounded-t-lg h-[40%] hover:bg-primary/40 transition-all cursor-pointer'
-              title='Jan'
-            ></div>
-            <div
-              className='flex-1 bg-primary/20 rounded-t-lg h-[55%] hover:bg-primary/40 transition-all cursor-pointer'
-              title='Feb'
-            ></div>
-            <div
-              className='flex-1 bg-primary/30 rounded-t-lg h-[45%] hover:bg-primary/40 transition-all cursor-pointer'
-              title='Mar'
-            ></div>
-            <div
-              className='flex-1 bg-primary/40 rounded-t-lg h-[70%] hover:bg-primary/40 transition-all cursor-pointer'
-              title='Apr'
-            ></div>
-            <div
-              className='flex-1 bg-primary/50 rounded-t-lg h-[65%] hover:bg-primary/40 transition-all cursor-pointer'
-              title='May'
-            ></div>
-            <div
-              className='flex-1 bg-primary/80 rounded-t-lg h-[90%] hover:bg-primary/40 transition-all cursor-pointer'
-              title='Jun'
-            ></div>
-            <div
-              className='flex-1 bg-primary/20 rounded-t-lg h-[30%] hover:bg-primary/40 transition-all cursor-pointer'
-              title='Jul'
-            ></div>
-            <div
-              className='flex-1 bg-primary/40 rounded-t-lg h-[60%] hover:bg-primary/40 transition-all cursor-pointer'
-              title='Aug'
-            ></div>
-            <div
-              className='flex-1 bg-primary/60 rounded-t-lg h-[75%] hover:bg-primary/40 transition-all cursor-pointer'
-              title='Sep'
-            ></div>
-            <div
-              className='flex-1 bg-primary/10 rounded-t-lg h-[20%] hover:bg-primary/40 transition-all cursor-pointer'
-              title='Oct'
-            ></div>
-            <div
-              className='flex-1 bg-primary/50 rounded-t-lg h-[65%] hover:bg-primary/40 transition-all cursor-pointer'
-              title='Nov'
-            ></div>
-            <div
-              className='flex-1 bg-primary rounded-t-lg h-[100%] hover:bg-primary/40 transition-all cursor-pointer'
-              title='Dec'
-            ></div>
+          <CardContent className='px-2 sm:p-6'>
+            <ChartContainer
+              config={{
+                revenue: {
+                  label: "Doanh thu",
+                  color: "hsl(var(--primary))",
+                },
+              }}
+              className="aspect-auto h-[300px] w-full"
+            >
+              <BarChart
+                accessibilityLayer
+                data={revenueData || []}
+                margin={{
+                  left: 12,
+                  right: 12,
+                }}
+              >
+                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={32}
+                  tickFormatter={(value) => {
+                    const date = new Date(value)
+                    return `T${date.getMonth() + 1}`
+                  }}
+                />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      className="w-[150px]"
+                      nameKey="revenue"
+                      formatter={(val) => formatCurrency(Number(val))}
+                    />
+                  }
+                />
+                <Bar dataKey="revenue" fill="var(--color-revenue)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ChartContainer>
           </CardContent>
-          <div className='flex justify-between px-6 pb-6 text-[10px] text-muted-foreground uppercase font-bold tracking-widest'>
-            <span>T1</span>
-            <span>T2</span>
-            <span>T3</span>
-            <span>T4</span>
-            <span>T5</span>
-            <span>T6</span>
-            <span>T7</span>
-            <span>T8</span>
-            <span>T9</span>
-            <span>T10</span>
-            <span>T11</span>
-            <span>T12</span>
-          </div>
         </Card>
 
         <Card className='col-span-3 border-none shadow-sm bg-gradient-to-br from-primary/5 to-transparent'>
@@ -164,6 +151,59 @@ export default function AdminDashboardPage() {
                   <span className='text-xs font-medium'>Toàn bộ dịch vụ đang hoạt động tốt</span>
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className='grid gap-6 md:grid-cols-2'>
+        {/* Top Courses */}
+        <Card className='border-none shadow-sm'>
+          <CardHeader>
+            <CardTitle>Top khóa học bán chạy tháng này</CardTitle>
+            <CardDescription>Danh sách các khóa học mang lại doanh thu cao nhất.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-4'>
+              {topCourses?.map((course) => (
+                <div key={course.courseId} className='flex items-center justify-between border-b border-border pb-3 last:border-0 last:pb-0'>
+                  <div className='space-y-1'>
+                    <p className='text-sm font-medium leading-none line-clamp-1'>{course.title}</p>
+                    <p className='text-xs text-muted-foreground'>{course.totalSales} lượt mua</p>
+                  </div>
+                  <div className='font-medium text-sm'>{formatCurrency(course.revenue)}</div>
+                </div>
+              ))}
+              {(!topCourses || topCourses.length === 0) && (
+                <div className='text-sm text-muted-foreground text-center py-4'>Chưa có dữ liệu giao dịch trong tháng.</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Hard Lessons */}
+        <Card className='border-none shadow-sm'>
+          <CardHeader>
+            <CardTitle>Bài học có tỷ lệ Drop cao</CardTitle>
+            <CardDescription>Học viên thường bỏ cuộc tại các bài học này.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-4'>
+              {hardLessons?.map((lesson) => (
+                <div key={lesson.lessonId} className='flex items-center justify-between border-b border-border pb-3 last:border-0 last:pb-0'>
+                  <div className='space-y-1 w-2/3'>
+                    <p className='text-sm font-medium leading-none line-clamp-1'>{lesson.title}</p>
+                    <p className='text-xs text-muted-foreground'>{lesson.totalAttempts} lượt học</p>
+                  </div>
+                  <div className='flex flex-col items-end'>
+                    <div className='text-sm font-bold text-rose-500'>{(lesson.dropRate * 100).toFixed(1)}%</div>
+                    <Progress value={lesson.dropRate * 100} className='h-1.5 w-16 mt-1 [&>div]:bg-rose-500 bg-rose-100' />
+                  </div>
+                </div>
+              ))}
+              {(!hardLessons || hardLessons.length === 0) && (
+                <div className='text-sm text-muted-foreground text-center py-4'>Chưa có dữ liệu bài học.</div>
+              )}
             </div>
           </CardContent>
         </Card>

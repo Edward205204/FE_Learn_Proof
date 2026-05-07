@@ -164,3 +164,22 @@ export const AdminDashboardOverviewSchema = z.object({
 })
 
 export type AdminDashboardOverview = z.infer<typeof AdminDashboardOverviewSchema>
+
+export type AdminRevenueItem = {
+  month: string
+  revenue: number
+}
+
+export type AdminTopCourseItem = {
+  courseId: string
+  title: string
+  revenue: number
+  totalSales: number
+}
+
+export type AdminHardLessonItem = {
+  lessonId: string
+  title: string
+  dropRate: number
+  totalAttempts: number
+}

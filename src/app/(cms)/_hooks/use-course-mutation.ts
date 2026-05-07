@@ -17,7 +17,8 @@ export const COURSE_QUERY_KEYS = {
   detail: (id: string) => ['courses', id] as const,
   detailManager: (id: string) => ['courses', id, 'manager-detail'] as const,
   chapters: (id: string) => ['courses', id, 'chapters'] as const,
-  categories: ['categories'] as const
+  categories: ['categories'] as const,
+  instructorDashboard: ['courses', 'manager', 'dashboard'] as const
 }
 
 export function useGetManagerCourseDetailQuery(courseId: string) {
@@ -198,5 +199,13 @@ export function useDeleteChapterMutation(courseId: string) {
     onError: () => {
       toast.error('Có lỗi xảy ra khi xóa chương.')
     }
+  })
+}
+
+export function useInstructorDashboardQuery(range?: string) {
+  return useQuery({
+    queryKey: [...COURSE_QUERY_KEYS.instructorDashboard, range],
+    queryFn: () => courseApi.getDashboard(range).then((res) => res.data),
+    staleTime: 5 * 60 * 1000 // 5 minutes
   })
 }

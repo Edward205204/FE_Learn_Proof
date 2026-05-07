@@ -8,7 +8,10 @@ import type {
   AdminGetAuditLogsQuery,
   AdminGetAuditLogsResponse,
   SystemSetting,
-  AdminDashboardOverview
+  AdminDashboardOverview,
+  AdminRevenueItem,
+  AdminTopCourseItem,
+  AdminHardLessonItem
 } from '@/app/admin/_utils/zod'
 
 const adminApi = {
@@ -36,7 +39,15 @@ const adminApi = {
   updateSetting: (key: string, value: unknown) => http.patch('/admin/settings', { key, value }),
 
   // Dashboard
-  getDashboardOverview: () => http.get<AdminDashboardOverview>('/dashboard/overview')
+  getDashboardOverview: () => http.get<AdminDashboardOverview>('/dashboard/overview'),
+
+  getDashboardRevenue: (params?: { fromDate?: string; toDate?: string }) =>
+    http.get<AdminRevenueItem[]>('/dashboard/revenue', { params }),
+
+  getDashboardTopCourses: (month: string) =>
+    http.get<AdminTopCourseItem[]>('/dashboard/top-courses', { params: { month } }),
+
+  getDashboardHardLessons: () => http.get<AdminHardLessonItem[]>('/dashboard/hard-lessons')
 }
 
 export default adminApi

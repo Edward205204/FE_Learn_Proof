@@ -21,10 +21,10 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   {
-    href: '#',
+    href: '/studio/dashboard',
     label: 'Dashboard',
     icon: LayoutDashboard,
-    match: () => false
+    match: (p) => p === '/studio/dashboard'
   },
   {
     href: PATH.STUDIO_COURSES,
