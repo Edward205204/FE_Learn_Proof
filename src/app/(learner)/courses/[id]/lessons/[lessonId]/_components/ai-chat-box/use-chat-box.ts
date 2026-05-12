@@ -69,7 +69,7 @@ export const useChatBox = ({ lessonId, authToken }: UseChatBoxProps): UseChatBox
     setIsLoading(true)
 
     try {
-      const response = await http.post<{ answer: string; sources: string[] }>(
+      const response = await http.post<{ answer: string; sources: { content: string; score: number }[] }>(
         `/lesson/${lessonId}/ask`,
         { question },
         {

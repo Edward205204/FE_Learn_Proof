@@ -1,14 +1,18 @@
 'use client'
 
-import React from 'react'
 import { cn } from '@/lib/utils'
 import { SourceBadge } from './source-badge'
+
+export interface ChatSource {
+  content: string
+  score: number
+}
 
 export interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
   content: string
-  sources: string[]
+  sources: ChatSource[]
   isLoading: boolean
   isError: boolean
 }
@@ -45,7 +49,7 @@ export const ChatMessageComponent = ({ message }: ChatMessageProps) => {
               <div className='mt-2 flex flex-wrap gap-1.5 pt-2 border-t border-border/50'>
                 <span className='text-[10px] text-muted-foreground w-full mb-0.5'>Nguồn tham khảo:</span>
                 {message.sources.map((source, index) => (
-                  <SourceBadge key={index} source={source} />
+                  <SourceBadge key={index} content={source.content} score={source.score} />
                 ))}
               </div>
             )}
