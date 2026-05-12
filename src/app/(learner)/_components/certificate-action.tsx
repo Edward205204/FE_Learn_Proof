@@ -22,7 +22,7 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [mintError, setMintError] = useState<string | null>(null)
   const [isMounted, setIsMounted] = useState(false)
-  
+
   useEffect(() => {
     setIsMounted(true)
   }, [])

@@ -214,9 +214,9 @@ export default function Home() {
                   <div className='p-8 space-y-2'>
                     <p className='text-blue-400'>
                       import <span className='text-foreground'>LearnProof</span> from{' '}
-                      <span className='text-emerald-400'>'@/career-path'</span>;
+                      <span className='text-emerald-400'>&apos;@/career-path&apos;</span>;
                     </p>
-                    <p className='text-muted-foreground italic mt-4'>// Setup your dream career</p>
+                    <p className='text-muted-foreground italic mt-4'>{'// Setup your dream career'}</p>
                     <p className='text-primary'>
                       const <span className='text-foreground'>myFuture</span> = () ={'>'} &#123;
                     </p>
@@ -224,8 +224,8 @@ export default function Home() {
                       <span className='text-blue-400'>return</span> LearnProof.start(&#123;
                     </p>
                     <p className='pl-12 text-foreground'>
-                      skills: [<span className='text-emerald-400'>'Fullstack'</span>,{' '}
-                      <span className='text-emerald-400'>'DevOps'</span>],
+                      skills: [<span className='text-emerald-400'>&apos;Fullstack&apos;</span>,{' '}
+                      <span className='text-emerald-400'>&apos;DevOps&apos;</span>],
                     </p>
                     <p className='pl-12 text-foreground'>
                       mentorship: <span className='text-amber-400'>true</span>,
@@ -569,7 +569,9 @@ export default function Home() {
                         <Star key={i} size={16} className='text-amber-400 fill-amber-400' />
                       ))}
                     </div>
-                    <p className='text-lg font-medium text-muted-foreground italic leading-relaxed'>"{item.content}"</p>
+                    <p className='text-lg font-medium text-muted-foreground italic leading-relaxed'>
+                      &quot;{item.content}&quot;
+                    </p>
                     <div>
                       <h4 className='font-black text-foreground'>{item.name}</h4>
                       <p className='text-sm font-bold text-primary uppercase tracking-tighter'>{item.role}</p>

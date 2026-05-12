@@ -12,7 +12,7 @@ import {
   Loader2,
   Eye,
   X,
-  Link as LinkIcon,
+  Link as LinkIcon
 } from 'lucide-react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'

@@ -52,8 +52,7 @@ const certificateApi = {
   getMyCertificates: () => http.get<CertificateRecord[]>('/certificate/me'),
 
   // Lấy thông tin chứng chỉ công khai theo hash (không cần đăng nhập)
-  getPublicCertificate: (hash: string) =>
-    http.get<PublicCertificateRecord>(`/certificate/public/${hash}`),
+  getPublicCertificate: (hash: string) => http.get<PublicCertificateRecord>(`/certificate/public/${hash}`)
 }
 
 export default certificateApi

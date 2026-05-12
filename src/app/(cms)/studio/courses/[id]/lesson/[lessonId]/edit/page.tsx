@@ -12,11 +12,7 @@ import { LessonTocSidebar } from './_components/lesson-toc-sidebar'
 import { useGetLessonDetailQuery, useUpdateLessonMutation } from '@/app/(cms)/_hooks/use-lesson'
 import { toast } from 'sonner'
 
-// ─── Save Status ──────────────────────────────────────────────────────────────
-
 type SaveStatus = 'idle' | 'saving' | 'saved'
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function TextLessonEditPage() {
   const router = useRouter()
@@ -35,34 +31,41 @@ export default function TextLessonEditPage() {
   const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null)
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
   const [initialized, setInitialized] = useState(false)
+  const hasPrefilled = useRef(false)
 
-  // Refs for heading anchor DOM nodes keyed by heading index
   const editorContainerRef = useRef<HTMLDivElement>(null)
 
-  // ── Prefill when data arrives ─────────────────────────────────────────────
   useEffect(() => {
-    if (!lessonDetail || initialized) return
+    if (!lessonDetail || hasPrefilled.current) return
+
     if (lessonDetail.type !== 'TEXT') {
-      // Guard: redirect if this is not a text lesson
       toast.error('Bài học này không phải loại văn bản.')
       router.replace(`/studio/courses/${courseId}`)
       return
     }
-    setTitle(lessonDetail.title)
-    setShortDesc(lessonDetail.shortDesc ?? '')
-    setContent(lessonDetail.textContent)
-    // Extract headings from initial content
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(lessonDetail.textContent, 'text/html')
-    const nodes = Array.from(doc.querySelectorAll('h1,h2,h3'))
-    const extracted: HeadingItem[] = nodes.map((el, i) => ({
-      id: `heading-${i}`,
-      level: parseInt(el.tagName[1]) as 1 | 2 | 3,
-      text: el.textContent?.trim() ?? ''
-    }))
-    setHeadings(extracted.filter((h) => h.text))
-    setInitialized(true)
-  }, [lessonDetail, initialized, courseId, router])
+
+    hasPrefilled.current = true
+
+    // Sử dụng queueMicrotask để đẩy việc set state ra khỏi luồng đồng bộ của Effect
+    // Giúp tránh lỗi "Calling setState synchronously within an effect"
+    queueMicrotask(() => {
+      setTitle(lessonDetail.title)
+      setShortDesc(lessonDetail.shortDesc ?? '')
+      setContent(lessonDetail.textContent)
+
+      // Extract headings from initial content
+      const parser = new DOMParser()
+      const doc = parser.parseFromString(lessonDetail.textContent, 'text/html')
+      const nodes = Array.from(doc.querySelectorAll('h1,h2,h3'))
+      const extracted: HeadingItem[] = nodes.map((el, i) => ({
+        id: `heading-${i}`,
+        level: parseInt(el.tagName[1]) as 1 | 2 | 3,
+        text: el.textContent?.trim() ?? ''
+      }))
+      setHeadings(extracted.filter((h) => h.text))
+      setInitialized(true)
+    })
+  }, [lessonDetail, courseId, router])
 
   // ── Intersection Observer — track active heading ──────────────────────────
   useEffect(() => {
@@ -218,9 +221,7 @@ export default function TextLessonEditPage() {
         </div>
       </header>
 
-      {/* ── Main Body: Editor + TOC Sidebar ───────────────────────────────── */}
       <div className='flex flex-1 overflow-hidden'>
-        {/* Editor area */}
         <main className='flex-1 overflow-y-auto' ref={editorContainerRef}>
           <div className='max-w-4xl mx-auto px-4 sm:px-8 py-8'>
             <ProfessionalEditor

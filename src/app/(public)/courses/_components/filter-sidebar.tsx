@@ -52,7 +52,6 @@ function FilterContent({ categories }: { categories: CategoryWithCount[] }) {
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
-
   return (
     <div className='flex flex-col gap-8 pr-4' suppressHydrationWarning>
       <div className='flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md py-2 z-10'>

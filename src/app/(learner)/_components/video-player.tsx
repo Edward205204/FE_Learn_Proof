@@ -64,7 +64,15 @@ function formatTime(seconds: number) {
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
-function YouTubeCustomPlayer({ videoId, lastPosition, lessonId }: { videoId: string; lastPosition: number; lessonId: string }) {
+function YouTubeCustomPlayer({
+  videoId,
+  lastPosition,
+  lessonId
+}: {
+  videoId: string
+  lastPosition: number
+  lessonId: string
+}) {
   const containerId = useMemo(() => `yt-player-${videoId}`, [videoId])
   const wrapperRef = useRef<HTMLDivElement | null>(null)
   const playerRef = useRef<YouTubePlayerInstance | null>(null)
@@ -133,7 +141,7 @@ function YouTubeCustomPlayer({ videoId, lastPosition, lessonId }: { videoId: str
       const normalizedQualities = Array.from(new Set(['auto', ...qualities.filter((q) => q !== 'auto')]))
       setAvailableQualities((prev) => (prev.join(',') === normalizedQualities.join(',') ? prev : normalizedQualities))
     }
-  }, [])
+  }, [lessonId])
 
   const startProgressTimer = useCallback(() => {
     stopTimers()
@@ -205,7 +213,16 @@ function YouTubeCustomPlayer({ videoId, lastPosition, lessonId }: { videoId: str
         }
       }
     })
-  }, [containerId, lastPosition, resetControlsAutoHide, startProgressTimer, stopTimers, syncProgress, videoId])
+  }, [
+    containerId,
+    lastPosition,
+    lessonId,
+    resetControlsAutoHide,
+    startProgressTimer,
+    stopTimers,
+    syncProgress,
+    videoId
+  ])
 
   useEffect(() => {
     if (window.YT?.Player) {
@@ -385,7 +402,12 @@ export function VideoPlayer({ url, lastPosition, lessonId }: VideoPlayerProps) {
   return (
     <div className='relative aspect-video bg-black rounded-2xl overflow-hidden shadow-xl border border-white/10'>
       {isYoutube && youtubeVideoId && (
-        <YouTubeCustomPlayer key={youtubeVideoId} videoId={youtubeVideoId} lastPosition={lastPosition} lessonId={lessonId} />
+        <YouTubeCustomPlayer
+          key={youtubeVideoId}
+          videoId={youtubeVideoId}
+          lastPosition={lastPosition}
+          lessonId={lessonId}
+        />
       )}
       {isYoutube && !youtubeVideoId && (
         <iframe
@@ -408,12 +430,12 @@ export function VideoPlayer({ url, lastPosition, lessonId }: VideoPlayerProps) {
         />
       )}
       {!isYoutube && !isBunnyEmbed && (
-        <video 
-          controls 
-          playsInline 
-          className='w-full h-full object-contain' 
-          src={normalizedUrl} 
-          preload='metadata' 
+        <video
+          controls
+          playsInline
+          className='w-full h-full object-contain'
+          src={normalizedUrl}
+          preload='metadata'
           onTimeUpdate={(e) => {
             if (typeof window !== 'undefined') {
               localStorage.setItem(`video_pos_${lessonId}`, String(e.currentTarget.currentTime))

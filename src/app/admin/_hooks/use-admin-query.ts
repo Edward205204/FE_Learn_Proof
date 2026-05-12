@@ -9,7 +9,8 @@ export const ADMIN_QUERY_KEYS = {
   logs: (params: AdminGetAuditLogsQuery) => ['admin', 'logs', params] as const,
   settings: ['admin', 'settings'] as const,
   dashboardOverview: ['admin', 'dashboard', 'overview'] as const,
-  dashboardRevenue: (params?: { fromDate?: string; toDate?: string }) => ['admin', 'dashboard', 'revenue', params] as const,
+  dashboardRevenue: (params?: { fromDate?: string; toDate?: string }) =>
+    ['admin', 'dashboard', 'revenue', params] as const,
   dashboardTopCourses: (month: string) => ['admin', 'dashboard', 'top-courses', month] as const,
   dashboardHardLessons: ['admin', 'dashboard', 'hard-lessons'] as const
 }

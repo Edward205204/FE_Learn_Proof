@@ -572,9 +572,7 @@ export default function ChaptersPage() {
                                                       ? {
                                                           ...ch,
                                                           lessons: ch.lessons.map((ls) =>
-                                                            ls.id === lesson.id
-                                                              ? { ...ls, isLocked: !ls.isLocked }
-                                                              : ls
+                                                            ls.id === lesson.id ? { ...ls, isLocked: !ls.isLocked } : ls
                                                           )
                                                         }
                                                       : ch
@@ -624,6 +622,21 @@ export default function ChaptersPage() {
                                         >
                                           <Pencil className='size-4' />
                                         </Button>
+
+                                        <Button
+                                          asChild
+                                          variant='ghost'
+                                          size='icon'
+                                          className='h-7 w-7 text-amber-500 hover:text-amber-600 hover:bg-amber-50'
+                                        >
+                                          <Link
+                                            href={`/studio/courses/${courseId}/lesson/${lesson.id}/quiz`}
+                                            title='Quản lý Quiz'
+                                          >
+                                            <HelpCircle className='size-4' />
+                                          </Link>
+                                        </Button>
+
                                         <Button
                                           variant='ghost'
                                           size='icon'

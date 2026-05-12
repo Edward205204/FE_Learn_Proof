@@ -20,6 +20,7 @@ export type VideoLessonDetail = {
   duration: number | null
   videoUrl: string
   videoKey: string | null
+  quizData?: QuizDataPayload
 }
 
 /** Dataset đầy đủ của Bài giảng Text (CMS view) */
@@ -31,6 +32,7 @@ export type TextLessonDetail = {
   order: number
   chapterId: string
   textContent: string
+  quizData?: QuizDataPayload
 }
 
 /** Dataset đầy đủ của Bài giảng Quiz (CMS view — ẩn đáp án đúng phía learner) */

@@ -47,7 +47,7 @@ export function EditCourseStatusDialog({ courseId, open, onOpenChange }: Props) 
   useEffect(() => {
     if (!courseDetail) return
     form.reset({
-      status: courseDetail.status as any
+      status: courseDetail.status as StatusFormValues['status']
     })
   }, [courseDetail, form])
 

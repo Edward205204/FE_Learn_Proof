@@ -16,6 +16,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { LessonData, SidebarChapter } from '../../../../_utils/lesson-types'
+import { AiChatBox } from './_components/ai-chat-box'
+import { useAuthStore } from '@/store/auth.store'
 
 function formatDuration(seconds?: number | null) {
   if (!seconds) return '--:--'
@@ -25,6 +27,7 @@ function formatDuration(seconds?: number | null) {
 }
 
 export default function LessonPage() {
+  const { accessToken } = useAuthStore()
   const queryClient = useQueryClient()
   const router = useRouter()
   const params = useParams<{ id: string; lessonId: string }>()
@@ -225,7 +228,11 @@ export default function LessonPage() {
 
         {activeLesson.type === 'reading' && (
           <div className='space-y-6 w-full min-w-0'>
-            <ReadingContent key={activeLesson.id} lesson={activeLesson} onComplete={() => markCompleteMutation.mutate(activeLesson.id)} />
+            <ReadingContent
+              key={activeLesson.id}
+              lesson={activeLesson}
+              onComplete={() => markCompleteMutation.mutate(activeLesson.id)}
+            />
             <LessonDiscussion courseId={courseId} lessonId={activeLesson.id} />
             <NextLessonButton
               key={activeLesson.id}
@@ -265,6 +272,9 @@ export default function LessonPage() {
           onLessonClick={handleNavigate}
         />
       </div>
+
+      {/* AI Chat Box */}
+      {lessonData && lessonData.type !== 'QUIZ' && <AiChatBox lessonId={currentLessonId!} authToken={accessToken} />}
     </main>
   )
 }

@@ -1,14 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import {
-  Users,
-  BookOpen,
-  ShieldAlert,
-  ArrowUpRight,
-  ArrowDownRight,
-  DollarSign
-} from 'lucide-react'
+import { Users, BookOpen, ShieldAlert, ArrowUpRight, ArrowDownRight, DollarSign } from 'lucide-react'
 
 import {
   useAdminDashboardOverviewQuery,
@@ -23,7 +16,7 @@ import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 
 export default function AdminDashboardPage() {
   const currentMonth = new Date().toISOString()
-  
+
   const { data, isLoading } = useAdminDashboardOverviewQuery()
   const { data: revenueData } = useAdminDashboardRevenueQuery()
   const { data: topCourses } = useAdminDashboardTopCoursesQuery(currentMonth)
@@ -83,23 +76,23 @@ export default function AdminDashboardPage() {
             <ChartContainer
               config={{
                 revenue: {
-                  label: "Doanh thu",
-                  color: "hsl(var(--primary))",
-                },
+                  label: 'Doanh thu',
+                  color: 'hsl(var(--primary))'
+                }
               }}
-              className="aspect-auto h-[300px] w-full"
+              className='aspect-auto h-[300px] w-full'
             >
               <BarChart
                 accessibilityLayer
                 data={revenueData || []}
                 margin={{
                   left: 12,
-                  right: 12,
+                  right: 12
                 }}
               >
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <CartesianGrid vertical={false} strokeDasharray='3 3' />
                 <XAxis
-                  dataKey="month"
+                  dataKey='month'
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
@@ -112,13 +105,13 @@ export default function AdminDashboardPage() {
                 <ChartTooltip
                   content={
                     <ChartTooltipContent
-                      className="w-[150px]"
-                      nameKey="revenue"
+                      className='w-[150px]'
+                      nameKey='revenue'
                       formatter={(val) => formatCurrency(Number(val))}
                     />
                   }
                 />
-                <Bar dataKey="revenue" fill="var(--color-revenue)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey='revenue' fill='var(--color-revenue)' radius={[4, 4, 0, 0]} />
               </BarChart>
             </ChartContainer>
           </CardContent>
@@ -166,7 +159,10 @@ export default function AdminDashboardPage() {
           <CardContent>
             <div className='space-y-4'>
               {topCourses?.map((course) => (
-                <div key={course.courseId} className='flex items-center justify-between border-b border-border pb-3 last:border-0 last:pb-0'>
+                <div
+                  key={course.courseId}
+                  className='flex items-center justify-between border-b border-border pb-3 last:border-0 last:pb-0'
+                >
                   <div className='space-y-1'>
                     <p className='text-sm font-medium leading-none line-clamp-1'>{course.title}</p>
                     <p className='text-xs text-muted-foreground'>{course.totalSales} lượt mua</p>
@@ -175,7 +171,9 @@ export default function AdminDashboardPage() {
                 </div>
               ))}
               {(!topCourses || topCourses.length === 0) && (
-                <div className='text-sm text-muted-foreground text-center py-4'>Chưa có dữ liệu giao dịch trong tháng.</div>
+                <div className='text-sm text-muted-foreground text-center py-4'>
+                  Chưa có dữ liệu giao dịch trong tháng.
+                </div>
               )}
             </div>
           </CardContent>
@@ -190,14 +188,20 @@ export default function AdminDashboardPage() {
           <CardContent>
             <div className='space-y-4'>
               {hardLessons?.map((lesson) => (
-                <div key={lesson.lessonId} className='flex items-center justify-between border-b border-border pb-3 last:border-0 last:pb-0'>
+                <div
+                  key={lesson.lessonId}
+                  className='flex items-center justify-between border-b border-border pb-3 last:border-0 last:pb-0'
+                >
                   <div className='space-y-1 w-2/3'>
                     <p className='text-sm font-medium leading-none line-clamp-1'>{lesson.title}</p>
                     <p className='text-xs text-muted-foreground'>{lesson.totalAttempts} lượt học</p>
                   </div>
                   <div className='flex flex-col items-end'>
                     <div className='text-sm font-bold text-rose-500'>{(lesson.dropRate * 100).toFixed(1)}%</div>
-                    <Progress value={lesson.dropRate * 100} className='h-1.5 w-16 mt-1 [&>div]:bg-rose-500 bg-rose-100' />
+                    <Progress
+                      value={lesson.dropRate * 100}
+                      className='h-1.5 w-16 mt-1 [&>div]:bg-rose-500 bg-rose-100'
+                    />
                   </div>
                 </div>
               ))}

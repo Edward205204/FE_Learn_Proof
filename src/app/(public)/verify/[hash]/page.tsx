@@ -4,17 +4,7 @@ import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import certificateApi from '@/app/(learner)/_api/certificate.api'
 import { CertificateTemplate } from '@/app/(learner)/_components/certificate-template'
-import {
-  CheckCircle2,
-  ExternalLink,
-  Copy,
-  Share2,
-  Linkedin,
-  Shield,
-  AlertTriangle,
-  Loader2,
-  Link,
-} from 'lucide-react'
+import { CheckCircle2, ExternalLink, Copy, Share2, Linkedin, Shield, AlertTriangle, Loader2, Link } from 'lucide-react'
 import { useState } from 'react'
 
 const POLYGON_SCAN = 'https://amoy.polygonscan.com'
@@ -61,18 +51,22 @@ export default function VerifyPage() {
   const params = useParams()
   const hash = typeof params.hash === 'string' ? params.hash : ''
 
-  const { data: cert, isLoading, isError } = useQuery({
+  const {
+    data: cert,
+    isLoading,
+    isError
+  } = useQuery({
     queryKey: ['public-certificate', hash],
     queryFn: () => certificateApi.getPublicCertificate(hash).then((r) => r.data),
     enabled: !!hash,
-    retry: false,
+    retry: false
   })
 
   const issueDate = cert
     ? new Date(cert.issuedAt).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric',
+        day: 'numeric'
       })
     : ''
 
@@ -80,7 +74,7 @@ export default function VerifyPage() {
 
   const linkedInUrl = cert
     ? `https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${encodeURIComponent(
-        `LearnProof: ${cert.course.title}`,
+        `LearnProof: ${cert.course.title}`
       )}&organizationName=LearnProof&issueYear=${new Date(cert.issuedAt).getFullYear()}&issueMonth=${
         new Date(cert.issuedAt).getMonth() + 1
       }&certId=${certificateId}&certUrl=${encodeURIComponent(window?.location?.href ?? '')}`
@@ -131,9 +125,7 @@ export default function VerifyPage() {
             <CheckCircle2 className='w-4 h-4' />
             Chứng chỉ đã được xác thực trên Blockchain
           </div>
-          <h1 className='text-3xl md:text-4xl font-bold text-white'>
-            Certificate Verification Portal
-          </h1>
+          <h1 className='text-3xl md:text-4xl font-bold text-white'>Certificate Verification Portal</h1>
           <p className='text-slate-400 mt-2 text-sm'>
             Trang xác thực chứng chỉ học tập — được bảo vệ bởi Polygon Network
           </p>
@@ -249,38 +241,23 @@ export default function VerifyPage() {
               <div className='bg-violet-500/10 border border-violet-500/20 rounded-lg p-3 mb-4'>
                 <div className='flex items-center gap-2'>
                   <CheckCircle2 className='w-4 h-4 text-violet-400 shrink-0' />
-                  <span className='text-xs text-violet-300 font-medium'>
-                    Verified on Polygon Amoy Testnet
-                  </span>
+                  <span className='text-xs text-violet-300 font-medium'>Verified on Polygon Amoy Testnet</span>
                 </div>
               </div>
 
               <div className='space-y-1'>
                 {cert.txHash && (
-                  <InfoRow
-                    label='Transaction Hash'
-                    value={cert.txHash}
-                    link={`${POLYGON_SCAN}/tx/${cert.txHash}`}
-                  />
+                  <InfoRow label='Transaction Hash' value={cert.txHash} link={`${POLYGON_SCAN}/tx/${cert.txHash}`} />
                 )}
-                {cert.tokenId && (
-                  <InfoRow label='Token ID' value={cert.tokenId} />
-                )}
+                {cert.tokenId && <InfoRow label='Token ID' value={cert.tokenId} />}
                 <InfoRow
                   label='Smart Contract'
                   value={CONTRACT_ADDRESS || '0x69dd39bb382da8334efdd7654bc66f169c6af29d'}
                   link={`${POLYGON_SCAN}/address/${CONTRACT_ADDRESS || '0x69dd39bb382da8334efdd7654bc66f169c6af29d'}`}
                 />
-                <InfoRow
-                  label='Certificate Hash'
-                  value={cert.certificateHash}
-                />
+                <InfoRow label='Certificate Hash' value={cert.certificateHash} />
                 {cert.ipfsHash && (
-                  <InfoRow
-                    label='IPFS Metadata'
-                    value={cert.ipfsHash}
-                    link={`https://ipfs.io/ipfs/${cert.ipfsHash}`}
-                  />
+                  <InfoRow label='IPFS Metadata' value={cert.ipfsHash} link={`https://ipfs.io/ipfs/${cert.ipfsHash}`} />
                 )}
               </div>
             </div>
@@ -303,7 +280,9 @@ export default function VerifyPage() {
 
         {/* Footer */}
         <div className='mt-12 text-center text-xs text-slate-600'>
-          <p>Trang xác thực này được cung cấp bởi <span className='text-slate-400 font-semibold'>LearnProof</span></p>
+          <p>
+            Trang xác thực này được cung cấp bởi <span className='text-slate-400 font-semibold'>LearnProof</span>
+          </p>
           <p className='mt-1'>Mọi thông tin được lưu trữ bất biến trên Polygon Blockchain</p>
         </div>
       </div>

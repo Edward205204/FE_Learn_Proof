@@ -15,6 +15,7 @@ export function TransactionTable({ data }: TransactionTableProps) {
 
   // Đảm bảo component chỉ render nội dung sau khi đã mount ở phía Client
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsClient(true)
   }, [])
 

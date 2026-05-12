@@ -43,7 +43,19 @@ const quizApi = {
     http.patch(`/quiz/${quizId}/questions/${questionId}/finish`),
 
   // Xóa toàn bộ quiz
-  deleteQuiz: (quizId: string) => http.delete(`/quiz/${quizId}`)
+  deleteQuiz: (quizId: string) => http.delete(`/quiz/${quizId}`),
+
+  /**
+   * AI GENERATION & DRAFTS
+   */
+  generateAi: (lessonId: string) => http.post<{ jobId: string }>(`/quiz/lessons/${lessonId}/generate-ai`),
+
+  getDrafts: (lessonId: string) => http.get<import('../_types/ai').QuizDraft[]>(`/quiz/lessons/${lessonId}/drafts`),
+
+  publishDraft: (draftId: string) => http.patch<{ success: true }>(`/quiz/drafts/${draftId}/publish`),
+
+  rejectDraft: (draftId: string, body: { reviewNote?: string }) =>
+    http.patch<{ success: true }>(`/quiz/drafts/${draftId}/reject`, body)
 }
 
 export default quizApi

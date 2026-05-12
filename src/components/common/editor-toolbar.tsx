@@ -149,7 +149,14 @@ export function EditorToolbar({ editor, professional = false }: { editor: Editor
   )
 }
 
-function ToolbarToggle({ active, onClick, icon, tooltip }: any) {
+interface ToolbarToggleProps {
+  active: boolean
+  onClick: () => void
+  icon: React.ReactNode
+  tooltip: string
+}
+
+function ToolbarToggle({ active, onClick, icon, tooltip }: ToolbarToggleProps) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
