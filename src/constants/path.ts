@@ -1,0 +1,41 @@
+export const PATH = {
+  STUDIO_COURSES: '/studio/courses',
+  STUDIO_COURSES_DRAFT: '/studio/courses/draft',
+  STUDIO_COURSES_ARCHIVE: '/studio/courses/archive',
+  HOME: '/',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
+  MAINTENANCE: '/maintenance',
+
+  // Public SSR
+  COURSES: '/courses',
+
+  // Protected — mọi role
+  PROFILE: '/profile',
+  CART: '/cart',
+  CHECKOUT: '/checkout',
+  CHECKOUT_SUCCESS: '/checkout/success',
+  MY_COURSES: '/courses/list',
+  SETTINGS: '/settings',
+  PAYMENT_HISTORY: '/payment-history',
+
+  // CONTENT_MANAGER + ADMIN
+  CREATE_LESSON: '/studio/courses/:id/lesson/new',
+  LESSON_TEXT_EDIT: '/studio/courses/:courseId/lesson/:lessonId/edit',
+  COURSE_EDIT_STEP1: '/studio/courses/:id/edit/step-1',
+  COURSE_NEW_STEP1: '/studio/courses/new/step-1',
+  COURSE_NEW_STEP2: '/studio/courses/new/step-2',
+  COURSE_NEW_STEP3: '/studio/courses/new/step-3',
+  COURSE_NEW_FINISH: '/studio/courses/new/finish',
+  FEEDBACK_LIST: '/studio/feedbacks',
+
+  // ADMIN only
+  ADMIN: '/admin',
+  ADMIN_DASHBOARD: '/admin/dashboard',
+  ADMIN_USERS: '/admin/users',
+  ADMIN_COURSES: '/admin/courses',
+  ADMIN_LOGS: '/admin/audit-logs',
+  ADMIN_SETTINGS: '/admin/settings'
+}

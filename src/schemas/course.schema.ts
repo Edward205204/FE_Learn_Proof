@@ -1,0 +1,196 @@
+import { z } from 'zod'
+
+export const GetCoursesQuery = z
+  .object({
+    page: z.coerce.number().default(1),
+    limit: z.coerce.number().default(12),
+    category: z.string().optional(),
+    level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).optional(),
+    price: z.enum(['true', 'false']).optional(),
+    rating: z.coerce.number().optional(),
+    language: z.enum(['VIETNAMESE', 'ENGLISH', 'JAPANESE', 'KOREAN']).optional(),
+    feature: z.enum(['QUIZ', 'CODING', 'PRACTICE', 'ROLE_PLAY']).optional(),
+    search: z.string().optional(),
+    sort: z.enum(['newest', 'popular', 'rating_desc', 'relevant', 'price-asc', 'price-desc']).optional()
+  })
+  .strict()
+
+export const GetCourseDetailQuery = z
+  .object({
+    slug: z.string()
+  })
+  .strict()
+
+export const CourseItemResponseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  slug: z.string(),
+  thumbnail: z.string().nullable(),
+  price: z.number(),
+  originalPrice: z.number().nullable(),
+  level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
+  shortDesc: z.string(),
+  createdAt: z.coerce.date(),
+  isEnrolled: z.boolean().optional().default(false),
+  category: z.object({
+    name: z.string(),
+    slug: z.string()
+  }),
+  creator: z.object({
+    fullName: z.string(),
+    avatar: z.string().nullable()
+  }),
+  overallAnalytics: z
+    .object({
+      avgRating: z.number(),
+      totalStudents: z.number()
+    })
+    .nullable()
+})
+
+export const GetCoursesResponseSchema = z.object({
+  items: z.array(CourseItemResponseSchema),
+  meta: z.object({
+    total: z.number(),
+    page: z.number(),
+    limit: z.number(),
+    totalPages: z.number()
+  })
+})
+
+export const CurriculumLessonSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  order: z.number(),
+  type: z.enum(['VIDEO', 'TEXT', 'QUIZ', 'CODING', 'PRACTICE', 'ROLE_PLAY']),
+  duration: z.number().int().nullable()
+})
+
+export const CurriculumChapterSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  order: z.number(),
+  lessons: z.array(CurriculumLessonSchema)
+})
+
+export const CourseReviewSchema = z.object({
+  id: z.string(),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().nullable(),
+  createdAt: z.coerce.date(),
+  user: z.object({
+    id: z.string(),
+    fullName: z.string(),
+    avatar: z.string().nullable()
+  }),
+  instructorReply: z.string().nullable().optional(),
+  instructorReplyAt: z.coerce.date().nullable().optional(),
+  learnerReply: z.string().nullable().optional(),
+  learnerReplyAt: z.coerce.date().nullable().optional()
+})
+
+export type CourseReview = z.infer<typeof CourseReviewSchema>
+
+export const CourseDetailResponseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  slug: z.string(),
+  shortDesc: z.string(),
+  thumbnail: z.string().nullable(),
+  level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']),
+  isFree: z.boolean(),
+  price: z.number(),
+  originalPrice: z.number().nullable(),
+  isCompleted: z.boolean(),
+  publishedLessonsCount: z.number().int(),
+  totalPlannedLessons: z.number().int().nullable(),
+  expectedDays: z.number().int().nullable(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  isEnrolled: z.boolean().optional().default(false),
+  category: z.object({
+    name: z.string(),
+    slug: z.string()
+  }),
+  creator: z.object({
+    id: z.string(),
+    fullName: z.string(),
+    avatar: z.string().nullable()
+  }),
+  chapters: z.array(CurriculumChapterSchema),
+  overallAnalytics: z
+    .object({
+      totalStudents: z.number().int(),
+      avgRating: z.number(),
+      completionRate: z.number()
+    })
+    .nullable(),
+  userReview: CourseReviewSchema.nullable().optional(),
+  reviews: z.array(CourseReviewSchema)
+})
+
+/** Card nhỏ dùng chung cho tất cả các section trên trang chủ */
+export const HomeCourseCardSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  slug: z.string(),
+  thumbnail: z.string().nullable(),
+  price: z.number(),
+  originalPrice: z.number().nullable(),
+  isFree: z.boolean(),
+  level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
+  language: z.enum(['VIETNAMESE', 'ENGLISH', 'JAPANESE', 'KOREAN']),
+  avgRating: z.number(),
+  totalReviews: z.number(),
+  shortDesc: z.string(),
+  createdAt: z.coerce.date(),
+  isEnrolled: z.boolean().optional().default(false),
+  category: z.object({ name: z.string(), slug: z.string() }),
+  creator: z.object({ fullName: z.string(), avatar: z.string().nullable() }),
+  overallAnalytics: z
+    .object({
+      avgRating: z.number(),
+      totalStudents: z.number()
+    })
+    .nullable()
+    .optional()
+})
+
+export const HomeSectionsResponseSchema = z.object({
+  trending: z.array(HomeCourseCardSchema),
+  topSelling: z.array(HomeCourseCardSchema),
+  newest: z.array(HomeCourseCardSchema),
+  topRated: z.array(HomeCourseCardSchema)
+})
+
+export const CategoryWithCountSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  _count: z.object({ courses: z.number().int() })
+})
+
+export const GetCategoriesResponseSchema = z.array(CategoryWithCountSchema)
+
+export const GetSearchSuggestionsQuery = z.object({ q: z.string().min(1) }).strict()
+
+export const SearchSuggestionSchema = z.object({
+  title: z.string(),
+  slug: z.string(),
+  thumbnail: z.string().nullable()
+})
+export const AllSlugsResponseSchema = z.array(z.string())
+export const GetSearchSuggestionsResponseSchema = z.array(SearchSuggestionSchema)
+
+// Types
+export type SearchSuggestion = z.infer<typeof SearchSuggestionSchema>
+export type GetSearchSuggestionsQueryType = z.infer<typeof GetSearchSuggestionsQuery>
+export type AllSlugsResponse = z.infer<typeof AllSlugsResponseSchema>
+export type CategoryWithCount = z.infer<typeof CategoryWithCountSchema>
+export type CourseItemResponse = z.infer<typeof CourseItemResponseSchema>
+export type GetCoursesResponse = z.infer<typeof GetCoursesResponseSchema>
+export type GetCoursesQueryType = z.infer<typeof GetCoursesQuery>
+export type HomeSectionsResponse = z.infer<typeof HomeSectionsResponseSchema>
+export type HomeCourseCard = z.infer<typeof HomeCourseCardSchema>
+export type CourseDetailResponse = z.infer<typeof CourseDetailResponseSchema>
