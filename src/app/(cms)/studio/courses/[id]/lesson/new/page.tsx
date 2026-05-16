@@ -5,7 +5,7 @@ import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useRouter, useParams, useSearchParams } from 'next/navigation'
-import { ChevronLeft, Plus, Video, FileText, HelpCircle, ArrowRight, Save, LayoutTemplate } from 'lucide-react'
+import { ChevronLeft, Plus, Video, FileText, HelpCircle, ArrowRight, Save, LayoutTemplate, Sparkles, Wand2 } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -517,6 +517,15 @@ export default function LessonEditorPage() {
             {/* TEXT */}
             {lessonType === 'text' && (
               <Card className='border-none shadow-none bg-transparent'>
+                <div className='bg-primary/5 border border-primary/20 rounded-xl p-4 mb-6 flex items-start gap-3'>
+                  <Wand2 className='w-5 h-5 text-primary shrink-0 mt-0.5' />
+                  <div>
+                    <h4 className='font-bold text-sm text-primary'>Có hỗ trợ AI Assistant</h4>
+                    <p className='text-xs text-muted-foreground mt-1 leading-relaxed'>
+                      Bạn có thể tự nhập nội dung hoặc <b>chỉ cần nhập Tiêu đề, Mô tả và Lưu bài học</b>. Sau khi lưu, màn hình chỉnh sửa sẽ cung cấp công cụ <b>AI Assistant</b> giúp bạn tự động soạn thảo bài đọc chi tiết.
+                    </p>
+                  </div>
+                </div>
                 <div className='space-y-3'>
                   <Controller
                     name='content'
@@ -564,6 +573,16 @@ export default function LessonEditorPage() {
             {/* QUIZ MANAGER */}
             {lessonType === 'quiz' && (
               <div className='space-y-8'>
+                <div className='bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-xl p-4 flex items-start gap-3'>
+                  <Sparkles className='w-5 h-5 text-primary shrink-0 mt-0.5' />
+                  <div>
+                    <h4 className='font-bold text-sm text-primary'>Tự động tạo Quiz bằng AI</h4>
+                    <p className='text-xs text-muted-foreground mt-1 leading-relaxed'>
+                      Hệ thống có hỗ trợ sinh câu hỏi tự động. Vui lòng thêm 1 câu hỏi nháp và bấm <b>Lưu bài học</b> ngay. Tính năng <b>Sinh Quiz bằng AI</b> sẽ xuất hiện trong phần quản lý Bài học để bạn tiếp tục tự động tạo toàn bộ đề thi.
+                    </p>
+                  </div>
+                </div>
+
                 <div className='flex items-center justify-between bg-card border border-border/50 p-6 rounded-3xl shadow-sm'>
                   <div>
                     <h3 className='font-extrabold tracking-tight text-xl'>Danh sách câu hỏi</h3>

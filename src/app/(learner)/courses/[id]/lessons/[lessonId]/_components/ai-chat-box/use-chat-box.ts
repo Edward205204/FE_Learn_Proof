@@ -21,7 +21,25 @@ interface UseChatBoxReturn {
 }
 
 export const useChatBox = ({ lessonId, authToken }: UseChatBoxProps): UseChatBoxReturn => {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(`ai_chat_${lessonId}`)
+      if (saved) {
+        try {
+          return JSON.parse(saved)
+        } catch (e) {
+          return []
+        }
+      }
+    }
+    return []
+  })
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`ai_chat_${lessonId}`, JSON.stringify(messages))
+    }
+  }, [messages, lessonId])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)

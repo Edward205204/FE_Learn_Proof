@@ -40,6 +40,23 @@ export function useAddAnswerMutation(quizId: string, questionId: string) {
   })
 }
 
+export function useEditAnswerMutation(quizId: string, questionId: string) {
+  return useMutation({
+    mutationFn: ({ answerId, content }: { answerId: string; content: string }) =>
+      quizApi.editAnswer(quizId, questionId, answerId, { content }),
+    onSuccess: () => toast.success('Cập nhật đáp án thành công!'),
+    onError: () => toast.error('Có lỗi xảy ra khi cập nhật đáp án.')
+  })
+}
+
+export function useDeleteAnswerMutation(quizId: string, questionId: string) {
+  return useMutation({
+    mutationFn: (answerId: string) => quizApi.deleteAnswer(quizId, questionId, answerId),
+    onSuccess: () => toast.success('Xóa đáp án thành công!'),
+    onError: () => toast.error('Có lỗi xảy ra khi xóa đáp án.')
+  })
+}
+
 export function useChooseCorrectAnswerMutation(quizId: string, questionId: string) {
   return useMutation({
     mutationFn: (answerId: string) => quizApi.chooseCorrectAnswer(quizId, questionId, { answerId }),

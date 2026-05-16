@@ -3,24 +3,26 @@
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { Send, FileText, Download, Bot } from 'lucide-react'
+import { Send, FileText, Download, Bot, MessageCircle, Loader2 } from 'lucide-react'
 import { LessonDiscussion } from './lesson-discussion'
+import { useChatBox } from '../courses/[id]/lessons/[lessonId]/_components/ai-chat-box/use-chat-box'
+import { ChatMessageComponent } from '../courses/[id]/lessons/[lessonId]/_components/ai-chat-box/chat-message'
+import { cn } from '@/lib/utils'
 
 interface LessonTabsProps {
   courseId: string
   lessonId: string
   description: string
   materials: { title: string; size: string; url: string }[]
+  authToken?: string
 }
 
-export function LessonTabs({ courseId, lessonId, description, materials }: LessonTabsProps) {
-  const [aiInput, setAiInput] = useState('')
-
-  const handleSendAi = () => {
-    if (!aiInput.trim()) return
-    console.log('Sending to AI:', { lessonId, content: aiInput })
-    setAiInput('')
-  }
+export function LessonTabs({ courseId, lessonId, description, materials, authToken }: LessonTabsProps) {
+  // Use ChatBox logic but without the isOpen state (it's always open in the tab)
+  const { messages, input, isLoading, setInput, handleSubmit, messagesEndRef } = useChatBox({
+    lessonId,
+    authToken: authToken || ''
+  })
 
   return (
     <Tabs defaultValue='description' className='w-full'>
@@ -64,37 +66,72 @@ export function LessonTabs({ courseId, lessonId, description, materials }: Lesso
 
       {/* --- PHẦN HỎI ĐÁP AI --- */}
       <TabsContent value='ai' className='mt-6 w-full min-w-0'>
-        <div className='bg-muted/30 rounded-2xl p-6 min-h-[400px] flex flex-col justify-between border border-border'>
+        <div className='bg-card rounded-[2rem] p-6 min-h-[500px] max-h-[600px] flex flex-col justify-between border border-white/10 shadow-xl overflow-hidden'>
           {/* Luồng tin nhắn */}
-          <div className='space-y-6'>
-            <div className='flex gap-4'>
-              <div className='h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0'>
-                <Bot size={20} />
+          <div className='flex-1 overflow-y-auto pr-2 scroll-smooth'>
+            {messages.length === 0 ? (
+              <div className='h-full flex flex-col items-center justify-center text-center p-8 gap-6'>
+                <div className='w-20 h-20 rounded-[2rem] bg-muted flex items-center justify-center text-muted-foreground/30'>
+                  <MessageCircle className='w-10 h-10' />
+                </div>
+                <div className='space-y-2'>
+                  <p className='text-sm font-black text-foreground'>Bắt đầu cuộc trò chuyện!</p>
+                  <p className='text-xs text-muted-foreground font-medium leading-relaxed max-w-sm'>
+                    Hãy hỏi tôi bất cứ điều gì về bài học này. Tôi sẽ giúp bạn hiểu rõ hơn về nội dung!
+                  </p>
+                </div>
+                <div className='flex flex-wrap justify-center gap-2'>
+                  {['Tóm tắt bài này', 'Giải thích thuật ngữ', 'Đặt câu hỏi kiểm tra'].map((hint) => (
+                    <button
+                      key={hint}
+                      onClick={() => setInput(hint)}
+                      className='px-4 py-2 rounded-xl bg-muted/50 hover:bg-primary/10 hover:text-primary border border-transparent hover:border-primary/20 text-[11px] font-bold transition-all'
+                    >
+                      {hint}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className='bg-background p-4 rounded-2xl rounded-tl-none shadow-sm text-[15px] text-foreground max-w-[85%] border border-border leading-relaxed'>
-                Chào mừng bạn đến với trợ lý AI của LearnProof! Tôi đã nắm vững nội dung bài học về <b>OKLCH</b>. Bạn có
-                bất kỳ thắc mắc nào về lý thuyết hay cách áp dụng thực tế không?
+            ) : (
+              <div className='space-y-4 pb-4'>
+                <div className='flex gap-4 mb-6 group/msg justify-start'>
+                  <div className='bg-card text-foreground rounded-[1.5rem] rounded-tl-none border border-white/10 shadow-black/5 px-5 py-3.5 text-sm max-w-[85%] leading-relaxed font-medium'>
+                    Chào mừng bạn đến với trợ lý AI của LearnProof! Bạn có bất kỳ thắc mắc nào về lý thuyết hay cách áp dụng thực tế không?
+                  </div>
+                </div>
+                {messages.map((msg) => (
+                  <ChatMessageComponent key={msg.id} message={msg} />
+                ))}
+                <div ref={messagesEndRef} className='h-2' />
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Form nhập liệu Pill-style */}
-          <div className='relative mt-4'>
-            <input
-              type='text'
-              value={aiInput}
-              onChange={(e) => setAiInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendAi()}
-              placeholder='Đặt câu hỏi về bài học này...'
-              className='w-full bg-background border border-input rounded-full py-4 pl-6 pr-14 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all shadow-sm'
-            />
-            <Button
-              onClick={handleSendAi}
-              size='icon'
-              className='absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full h-11 w-11 bg-primary hover:bg-primary/90 shadow-md shadow-primary/20'
-            >
-              <Send size={18} className='text-primary-foreground' />
-            </Button>
+          {/* Form nhập liệu */}
+          <div className='shrink-0 pt-4 mt-2 border-t border-white/10 bg-card'>
+            <div className='relative flex items-center'>
+              <input
+                type='text'
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmit()}
+                placeholder='Đặt câu hỏi về bài học này...'
+                className='w-full bg-background/50 border-2 border-transparent focus:border-primary/20 focus:bg-background h-14 pl-5 pr-14 rounded-2xl text-sm font-medium transition-all outline-none shadow-inner'
+              />
+              <Button
+                onClick={handleSubmit}
+                disabled={!input.trim() || isLoading}
+                size='icon'
+                className={cn(
+                  'absolute right-2 w-10 h-10 rounded-xl transition-all',
+                  input.trim()
+                    ? 'bg-primary shadow-lg shadow-primary/20 scale-100'
+                    : 'bg-muted text-muted-foreground scale-90'
+                )}
+              >
+                {isLoading ? <Loader2 className='w-4 h-4 animate-spin' /> : <Send className='w-4 h-4' />}
+              </Button>
+            </div>
           </div>
         </div>
       </TabsContent>

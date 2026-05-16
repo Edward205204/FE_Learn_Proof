@@ -213,6 +213,7 @@ export default function LessonPage() {
               lessonId={activeLesson.id}
               description={activeLesson.description}
               materials={activeLesson.materials}
+              authToken={accessToken}
             />
             <NextLessonButton
               key={activeLesson.id}

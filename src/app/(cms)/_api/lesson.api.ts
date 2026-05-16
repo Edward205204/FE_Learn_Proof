@@ -113,7 +113,10 @@ const lessonApi = {
   deleteLesson: (lessonId: string) => http.delete(`/lesson/${lessonId}`),
 
   toggleLessonLock: (lessonId: string, isLocked: boolean) =>
-    http.patch<{ id: string; isLocked: boolean }>(`/lesson/${lessonId}/lock`, { isLocked })
+    http.patch<{ id: string; isLocked: boolean }>(`/lesson/${lessonId}/lock`, { isLocked }),
+
+  generateAiContent: (lessonId: string, keywords?: string) =>
+    http.post<{ content: string }>(`/lesson/${lessonId}/generate-content`, { keywords })
 }
 
 export default lessonApi

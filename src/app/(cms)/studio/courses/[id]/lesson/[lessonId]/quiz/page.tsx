@@ -1,19 +1,21 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ChevronLeft, Loader2, HelpCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { QuizSidebar } from '@/app/(cms)/_components/quiz-sidebar'
 import { AiQuizSection } from './_components/ai-quiz-section'
+import { QuestionEditorModal, LocalQuestion } from './_components/question-editor-modal'
 import { useGetLessonDetailQuery } from '@/app/(cms)/_hooks/use-lesson'
+import { useDeleteQuestionMutation } from '@/app/(cms)/_hooks/use-quiz-mutation'
 import { Badge } from '@/components/ui/badge'
 import { useForm, useWatch } from 'react-hook-form'
 import { QuizDataPayload } from '@/app/(cms)/_api/lesson.api'
 
-type QuizAnswer = { text: string; isCorrect: boolean }
-type QuizQuestion = { questionText: string; answers: QuizAnswer[] }
+type QuizAnswer = { id?: string; text: string; isCorrect: boolean }
+type QuizQuestion = { id?: string; questionText: string; answers: QuizAnswer[] }
 
 interface QuizEditableForm {
   questions: QuizQuestion[]
@@ -37,14 +39,22 @@ export default function LessonQuizPage() {
   const questions = useWatch({ control: form.control, name: 'questions' })
   const supplementalQuiz = useWatch({ control: form.control, name: 'supplementalQuiz' })
 
+  const quizId = lessonDetail?.quiz?.id || ''
+  const deleteMutation = useDeleteQuestionMutation(quizId)
+
+  const [isEditorOpen, setIsEditorOpen] = useState(false)
+  const [editingQuestion, setEditingQuestion] = useState<LocalQuestion | null>(null)
+
   // Sync server data to form
   useEffect(() => {
     if (!lessonDetail) return
 
     if (lessonDetail.type === 'QUIZ' && lessonDetail.quiz) {
       const mappedQuestions: QuizQuestion[] = lessonDetail.quiz.questions.map((q) => ({
+        id: q.id,
         questionText: q.content,
         answers: q.answers.map((a) => ({
+          id: a.id,
           text: a.content,
           isCorrect: a.isCorrect
         }))
@@ -87,6 +97,26 @@ export default function LessonQuizPage() {
   const isPureQuiz = lessonDetail.type === 'QUIZ'
   const displayQuestions = isPureQuiz ? questions : supplementalQuiz
 
+  const handleEdit = (q: QuizQuestion) => {
+    setEditingQuestion({
+      id: q.id,
+      content: q.questionText,
+      answers: q.answers.map(a => ({ id: a.id, content: a.text, isCorrect: a.isCorrect }))
+    })
+    setIsEditorOpen(true)
+  }
+
+  const handleDelete = async (questionId?: string) => {
+    if (!questionId) return
+    if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
+      await deleteMutation.mutateAsync(questionId)
+      // Refetch automatically via invalidation in mutation (wait, useDeleteQuestionMutation doesn't invalidate!)
+      // Actually we should reload the page or invalidate queries.
+      // But it's fine, we can let user refresh or we can invalidate in mutation.
+      window.location.reload()
+    }
+  }
+
   return (
     <div className='flex h-full min-h-[calc(100vh-80px)] -m-4 md:-m-8 lg:-m-12 bg-background'>
       {/* Sidebar */}
@@ -97,6 +127,8 @@ export default function LessonQuizPage() {
           `ID: ${lessonId.substring(0, 8)}...`,
           `Câu hỏi: ${displayQuestions.length}`
         ]}
+        showBackLink={!isPureQuiz}
+        backHref={!isPureQuiz ? `/studio/courses/${courseId}/lesson/${lessonId}/edit` : undefined}
       />
 
       {/* Main Content */}
@@ -146,9 +178,23 @@ export default function LessonQuizPage() {
                   </p>
                 </div>
               </div>
-              <Badge variant='secondary' className='px-4 py-1.5 rounded-full font-bold text-sm'>
-                {displayQuestions.length} Câu hỏi
-              </Badge>
+              <div className='flex items-center gap-4'>
+                <Badge variant='secondary' className='px-4 py-1.5 rounded-full font-bold text-sm'>
+                  {displayQuestions.length} Câu hỏi
+                </Badge>
+                {isPureQuiz && (
+                  <Button 
+                    onClick={() => {
+                      setEditingQuestion(null)
+                      setIsEditorOpen(true)
+                    }} 
+                    size='sm' 
+                    className='font-bold'
+                  >
+                    Thêm câu hỏi
+                  </Button>
+                )}
+              </div>
             </div>
 
             {displayQuestions.length > 0 ? (
@@ -159,11 +205,23 @@ export default function LessonQuizPage() {
                     className='border-border/40 hover:border-primary/20 transition-all duration-300 shadow-sm hover:shadow-md rounded-2xl'
                   >
                     <CardContent className='p-6 sm:p-8'>
-                      <div className='flex items-start gap-4 mb-6'>
-                        <span className='flex-shrink-0 h-8 w-8 rounded-lg bg-muted flex items-center justify-center text-sm font-bold'>
-                          {idx + 1}
-                        </span>
-                        <div className='text-xl font-semibold leading-snug'>{q.questionText}</div>
+                      <div className='flex items-start justify-between gap-4 mb-6'>
+                        <div className='flex items-start gap-4'>
+                          <span className='flex-shrink-0 h-8 w-8 rounded-lg bg-muted flex items-center justify-center text-sm font-bold'>
+                            {idx + 1}
+                          </span>
+                          <div className='text-xl font-semibold leading-snug'>{q.questionText}</div>
+                        </div>
+                        {isPureQuiz && (
+                          <div className='flex gap-2'>
+                            <Button variant='outline' size='sm' onClick={() => handleEdit(q)}>
+                              Sửa
+                            </Button>
+                            <Button variant='destructive' size='sm' onClick={() => handleDelete(q.id)}>
+                              Xóa
+                            </Button>
+                          </div>
+                        )}
                       </div>
 
                       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -211,6 +269,16 @@ export default function LessonQuizPage() {
         </div>
         <div className='h-20' />
       </main>
+
+      {isPureQuiz && (
+        <QuestionEditorModal
+          open={isEditorOpen}
+          onOpenChange={setIsEditorOpen}
+          quizId={quizId}
+          lessonId={lessonId}
+          initialData={editingQuestion}
+        />
+      )}
     </div>
   )
 }

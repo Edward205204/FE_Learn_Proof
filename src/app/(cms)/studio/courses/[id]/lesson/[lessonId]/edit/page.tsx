@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { ProfessionalEditor } from '@/components/common/professional-editor'
 import type { HeadingItem } from '@/components/common/professional-editor'
 import { LessonTocSidebar } from './_components/lesson-toc-sidebar'
+import { AiContentButton } from './_components/ai-content-button'
 import { useGetLessonDetailQuery, useUpdateLessonMutation } from '@/app/(cms)/_hooks/use-lesson'
 import { toast } from 'sonner'
 
@@ -188,6 +189,8 @@ export default function TextLessonEditPage() {
           placeholder='Tiêu đề bài học...'
           className='flex-1 h-9 border-transparent bg-transparent shadow-none text-base font-semibold placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:border-border hover:border-border transition-colors px-2 rounded-lg'
         />
+
+        <AiContentButton lessonId={lessonId} onGenerated={(newContent) => setContent(newContent)} />
 
         {/* Save status + button */}
         <div className='flex items-center gap-2 shrink-0'>
