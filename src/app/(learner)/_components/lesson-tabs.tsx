@@ -29,32 +29,31 @@ export function LessonTabs({ courseId, lessonId, description, materials, authTok
 
   return (
     <Tabs defaultValue='description' className='w-full'>
-      {/* Tab Headers */}
-      <TabsList className='bg-transparent border-b border-border rounded-none w-full justify-start h-auto p-0 mb-6 gap-2'>
+      <TabsList className='mb-5 flex h-auto w-full justify-start gap-2 rounded-none border-b border-border bg-transparent p-0'>
         <TabsTrigger
           value='description'
-          className='data-[state=active]:text-primary data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none border-b-2 border-transparent px-2 py-3 font-semibold text-muted-foreground transition-all'
+          className='rounded-none border-b-2 border-transparent px-2 py-3 text-sm font-medium text-muted-foreground transition-colors data-[state=active]:border-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent'
         >
           Mô tả
         </TabsTrigger>
         <TabsTrigger
           value='ai'
-          className='data-[state=active]:text-primary data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none border-b-2 border-transparent px-2 py-3 font-semibold text-muted-foreground transition-all flex items-center gap-1.5'
+          className='flex items-center gap-1.5 rounded-none border-b-2 border-transparent px-2 py-3 text-sm font-medium text-muted-foreground transition-colors data-[state=active]:border-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent'
         >
-          Hỏi đáp AI{' '}
-          <span className='bg-primary/10 text-primary text-[9px] px-1.5 py-0.5 rounded-full uppercase font-bold tracking-wide'>
-            Mới
+          Hỏi đáp AI
+          <span className='rounded-full border border-border bg-muted px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground'>
+            AI
           </span>
         </TabsTrigger>
         <TabsTrigger
           value='discussion'
-          className='data-[state=active]:text-primary data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none border-b-2 border-transparent px-2 py-3 font-semibold text-muted-foreground transition-all'
+          className='rounded-none border-b-2 border-transparent px-2 py-3 text-sm font-medium text-muted-foreground transition-colors data-[state=active]:border-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent'
         >
           Thảo luận
         </TabsTrigger>
         <TabsTrigger
           value='materials'
-          className='data-[state=active]:text-primary data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none border-b-2 border-transparent px-2 py-3 font-semibold text-muted-foreground transition-all'
+          className='rounded-none border-b-2 border-transparent px-2 py-3 text-sm font-medium text-muted-foreground transition-colors data-[state=active]:border-foreground data-[state=active]:text-foreground data-[state=active]:bg-transparent'
         >
           Tài liệu
         </TabsTrigger>
@@ -69,17 +68,30 @@ export function LessonTabs({ courseId, lessonId, description, materials, authTok
 
       {/* --- PHẦN HỎI ĐÁP AI --- */}
       <TabsContent value='ai' className='mt-6 w-full min-w-0'>
-        <div className='bg-card rounded-[2rem] p-6 min-h-[500px] max-h-[600px] flex flex-col justify-between border border-white/10 shadow-xl overflow-hidden'>
-          {/* Luồng tin nhắn */}
-          <div className='flex-1 overflow-y-auto pr-2 scroll-smooth'>
+        <div className='flex min-h-[500px] max-h-[600px] flex-col overflow-hidden rounded-xl border border-border bg-card'>
+          <div className='border-b border-border px-5 py-4'>
+            <div className='flex items-start justify-between gap-4'>
+              <div>
+                <p className='text-sm font-semibold text-foreground'>Hỏi đáp AI</p>
+                <p className='mt-1 text-xs text-muted-foreground'>
+                  Hỏi về nội dung bài học, nhận tóm tắt, giải thích và gợi ý thực hành.
+                </p>
+              </div>
+              <div className='rounded-full border border-border bg-muted px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground'>
+                Trợ lý bài học
+              </div>
+            </div>
+          </div>
+
+          <div className='flex-1 overflow-y-auto px-5 py-5 scroll-smooth'>
             {messages.length === 0 ? (
-              <div className='h-full flex flex-col items-center justify-center text-center p-8 gap-6'>
-                <div className='w-20 h-20 rounded-[2rem] bg-muted flex items-center justify-center text-muted-foreground/30'>
-                  <MessageCircle className='w-10 h-10' />
+              <div className='flex h-full flex-col items-center justify-center gap-5 text-center py-10'>
+                <div className='flex h-16 w-16 items-center justify-center rounded-xl border border-border bg-muted text-muted-foreground'>
+                  <MessageCircle className='h-7 w-7' />
                 </div>
-                <div className='space-y-2'>
-                  <p className='text-sm font-black text-foreground'>Bắt đầu cuộc trò chuyện!</p>
-                  <p className='text-xs text-muted-foreground font-medium leading-relaxed max-w-sm'>
+                <div className='space-y-1'>
+                  <p className='text-sm font-semibold text-foreground'>Bắt đầu cuộc trò chuyện</p>
+                  <p className='max-w-sm text-xs leading-relaxed text-muted-foreground'>
                     Hãy hỏi tôi bất cứ điều gì về bài học này. Tôi sẽ giúp bạn hiểu rõ hơn về nội dung!
                   </p>
                 </div>
@@ -88,7 +100,7 @@ export function LessonTabs({ courseId, lessonId, description, materials, authTok
                     <button
                       key={hint}
                       onClick={() => setInput(hint)}
-                      className='px-4 py-2 rounded-xl bg-muted/50 hover:bg-primary/10 hover:text-primary border border-transparent hover:border-primary/20 text-[11px] font-bold transition-all'
+                      className='rounded-full border border-border bg-background px-4 py-2 text-[11px] font-medium text-foreground transition-colors hover:bg-muted'
                     >
                       {hint}
                     </button>
@@ -97,9 +109,9 @@ export function LessonTabs({ courseId, lessonId, description, materials, authTok
               </div>
             ) : (
               <div className='space-y-4 pb-4'>
-                <div className='flex gap-4 mb-6 group/msg justify-start'>
-                  <div className='bg-card text-foreground rounded-[1.5rem] rounded-tl-none border border-white/10 shadow-black/5 px-5 py-3.5 text-sm max-w-[85%] leading-relaxed font-medium'>
-                    Chào mừng bạn đến với trợ lý AI của LearnProof! Bạn có bất kỳ thắc mắc nào về lý thuyết hay cách áp dụng thực tế không?
+                <div className='flex justify-start'>
+                  <div className='max-w-[85%] rounded-xl rounded-tl-none border border-border bg-muted/30 px-4 py-3 text-sm leading-relaxed text-foreground'>
+                    Chào mừng bạn đến với trợ lý học tập. Bạn có thể hỏi về lý thuyết, ví dụ thực tế hoặc yêu cầu tóm tắt nhanh.
                   </div>
                 </div>
                 {messages.map((msg) => (
@@ -110,14 +122,13 @@ export function LessonTabs({ courseId, lessonId, description, materials, authTok
             )}
           </div>
 
-          {/* Form nhập liệu */}
-          <div className='shrink-0 pt-4 mt-2 border-t border-white/10 bg-card'>
+          <div className='shrink-0 border-t border-border bg-card px-5 py-4'>
             <div className='mb-3 flex items-center justify-between gap-3'>
-              <div className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground'>
+              <div className='text-[10px] font-medium uppercase tracking-widest text-muted-foreground'>
                 Output language
               </div>
               <Select value={outputLanguage} onValueChange={(value) => setOutputLanguage(value as 'vi' | 'en')}>
-                <SelectTrigger className='h-9 w-[112px] rounded-full bg-card/90 backdrop-blur-xl border border-white/15 shadow-[0_10px_24px_rgba(0,0,0,0.12)] px-3 text-xs font-bold uppercase tracking-widest text-muted-foreground'>
+                <SelectTrigger className='h-9 w-[112px] rounded-md border border-border bg-background px-3 text-xs font-medium uppercase tracking-widest text-muted-foreground shadow-none'>
                   <SelectValue placeholder='VI' />
                 </SelectTrigger>
                 <SelectContent>
@@ -134,17 +145,17 @@ export function LessonTabs({ courseId, lessonId, description, materials, authTok
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmit()}
                 placeholder='Đặt câu hỏi về bài học này...'
-                className='w-full bg-background/50 border-2 border-transparent focus:border-primary/20 focus:bg-background h-14 pl-5 pr-14 rounded-2xl text-sm font-medium transition-all outline-none shadow-inner'
+                className='h-12 w-full rounded-md border border-border bg-background px-4 pr-14 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground'
               />
               <Button
                 onClick={handleSubmit}
                 disabled={!input.trim() || isLoading}
                 size='icon'
                 className={cn(
-                  'absolute right-2 w-10 h-10 rounded-xl transition-all',
+                  'absolute right-1.5 h-9 w-9 rounded-md transition-colors',
                   input.trim()
-                    ? 'bg-primary shadow-lg shadow-primary/20 scale-100'
-                    : 'bg-muted text-muted-foreground scale-90'
+                    ? 'bg-foreground text-background hover:bg-foreground/90'
+                    : 'bg-muted text-muted-foreground'
                 )}
               >
                 {isLoading ? <Loader2 className='w-4 h-4 animate-spin' /> : <Send className='w-4 h-4' />}

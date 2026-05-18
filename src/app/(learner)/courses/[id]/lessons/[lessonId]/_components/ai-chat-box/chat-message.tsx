@@ -25,13 +25,13 @@ export const ChatMessageComponent = ({ message }: ChatMessageProps) => {
   const isUser = message.role === 'user'
 
   return (
-    <div className={cn('flex w-full mb-6 group/msg', isUser ? 'justify-end' : 'justify-start')}>
+    <div className={cn('flex w-full mb-4 group/msg', isUser ? 'justify-end' : 'justify-start')}>
       <div
         className={cn(
-          'max-w-[85%] rounded-[1.5rem] px-5 py-3.5 text-sm shadow-xl transition-all duration-300',
+          'max-w-[85%] rounded-xl px-4 py-3 text-sm transition-colors',
           isUser
-            ? 'bg-gradient-to-br from-primary to-orange-500 text-primary-foreground rounded-tr-none shadow-primary/20 hover:shadow-primary/30'
-            : 'bg-card text-foreground rounded-tl-none border border-white/10 shadow-black/5 hover:shadow-black/10'
+            ? 'rounded-tr-none bg-primary text-primary-foreground'
+            : 'rounded-tl-none border border-border bg-card text-foreground'
         )}
       >
         {message.isLoading ? (
@@ -45,7 +45,7 @@ export const ChatMessageComponent = ({ message }: ChatMessageProps) => {
           </div>
         ) : (
           <>
-            <p className={cn('whitespace-pre-wrap leading-relaxed font-medium', message.isError && 'text-destructive')}>
+            <p className={cn('whitespace-pre-wrap leading-relaxed', message.isError && 'text-destructive')}>
               {message.content}
             </p>
             {message.sources.length > 0 && (
