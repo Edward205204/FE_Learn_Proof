@@ -13,6 +13,7 @@ import {
 import lessonApi from '@/app/(cms)/_api/lesson.api'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface AiContentButtonProps {
   lessonId: string
@@ -22,6 +23,7 @@ interface AiContentButtonProps {
 
 export const AiContentButton = ({ lessonId, onGenerated, disabled }: AiContentButtonProps) => {
   const [isLoading, setIsLoading] = useState(false)
+  const [outputLanguage, setOutputLanguage] = useState<'vi' | 'en'>('vi')
 
   const handleGenerate = async (keywords?: string) => {
     setIsLoading(true)
@@ -30,7 +32,7 @@ export const AiContentButton = ({ lessonId, onGenerated, disabled }: AiContentBu
     })
 
     try {
-      const response = await lessonApi.generateAiContent(lessonId, keywords)
+      const response = await lessonApi.generateAiContent(lessonId, keywords, outputLanguage)
       onGenerated(response.data.content)
       toast.success('Đã tạo nội dung thành công!', { id: toastId })
     } catch (error) {
@@ -42,7 +44,16 @@ export const AiContentButton = ({ lessonId, onGenerated, disabled }: AiContentBu
   }
 
   return (
-    <div className='flex items-center gap-1'>
+    <div className='flex items-center gap-2'>
+      <Select value={outputLanguage} onValueChange={(value) => setOutputLanguage(value as 'vi' | 'en')}>
+        <SelectTrigger className='h-9 w-[110px] rounded-xl bg-background/80 border-primary/10'>
+          <SelectValue placeholder='VI' />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value='vi'>Tiếng Việt</SelectItem>
+          <SelectItem value='en'>English</SelectItem>
+        </SelectContent>
+      </Select>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button

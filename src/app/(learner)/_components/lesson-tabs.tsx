@@ -3,11 +3,12 @@
 import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
-import { Send, FileText, Download, Bot, MessageCircle, Loader2 } from 'lucide-react'
+import { Send, FileText, Download, MessageCircle, Loader2 } from 'lucide-react'
 import { LessonDiscussion } from './lesson-discussion'
 import { useChatBox } from '../courses/[id]/lessons/[lessonId]/_components/ai-chat-box/use-chat-box'
 import { ChatMessageComponent } from '../courses/[id]/lessons/[lessonId]/_components/ai-chat-box/chat-message'
 import { cn } from '@/lib/utils'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface LessonTabsProps {
   courseId: string
@@ -18,10 +19,12 @@ interface LessonTabsProps {
 }
 
 export function LessonTabs({ courseId, lessonId, description, materials, authToken }: LessonTabsProps) {
-  // Use ChatBox logic but without the isOpen state (it's always open in the tab)
+  const [outputLanguage, setOutputLanguage] = useState<'vi' | 'en'>('vi')
+
   const { messages, input, isLoading, setInput, handleSubmit, messagesEndRef } = useChatBox({
     lessonId,
-    authToken: authToken || ''
+    authToken: authToken || '',
+    outputLanguage
   })
 
   return (
@@ -109,6 +112,21 @@ export function LessonTabs({ courseId, lessonId, description, materials, authTok
 
           {/* Form nhập liệu */}
           <div className='shrink-0 pt-4 mt-2 border-t border-white/10 bg-card'>
+            <div className='mb-3 flex items-center justify-between gap-3'>
+              <div className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground'>
+                Output language
+              </div>
+              <Select value={outputLanguage} onValueChange={(value) => setOutputLanguage(value as 'vi' | 'en')}>
+                <SelectTrigger className='h-9 w-[112px] rounded-full bg-card/90 backdrop-blur-xl border border-white/15 shadow-[0_10px_24px_rgba(0,0,0,0.12)] px-3 text-xs font-bold uppercase tracking-widest text-muted-foreground'>
+                  <SelectValue placeholder='VI' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='vi'>Tiếng Việt</SelectItem>
+                  <SelectItem value='en'>English</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className='relative flex items-center'>
               <input
                 type='text'

@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Clock, Eye, Check, X } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
-import { QuizDraft } from '@/app/(cms)/_types/ai'
+import { QuizDraft, normalizeQuizDraftQuestions } from '@/app/(cms)/_types/ai'
 
 interface Props {
   draft: QuizDraft
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export function QuizDraftCard({ draft, onPreview, onPublish, onReject, isSubmitting }: Props) {
-  const questionCount = draft.validatedOutput?.questions?.length || 0
+  const questionCount = normalizeQuizDraftQuestions(draft.validatedOutput).length
 
   return (
     <Card className='border-indigo-500/20 bg-indigo-500/5 shadow-sm overflow-hidden'>

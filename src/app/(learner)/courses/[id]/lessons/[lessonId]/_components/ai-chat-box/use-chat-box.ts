@@ -7,6 +7,7 @@ import { ChatMessage } from './chat-message'
 interface UseChatBoxProps {
   lessonId: string
   authToken: string
+  outputLanguage: 'vi' | 'en'
 }
 
 interface UseChatBoxReturn {
@@ -20,7 +21,7 @@ interface UseChatBoxReturn {
   messagesEndRef: React.RefObject<HTMLDivElement | null>
 }
 
-export const useChatBox = ({ lessonId, authToken }: UseChatBoxProps): UseChatBoxReturn => {
+export const useChatBox = ({ lessonId, authToken, outputLanguage }: UseChatBoxProps): UseChatBoxReturn => {
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(`ai_chat_${lessonId}`)
@@ -89,7 +90,7 @@ export const useChatBox = ({ lessonId, authToken }: UseChatBoxProps): UseChatBox
     try {
       const response = await http.post<{ answer: string; sources: { content: string; score: number }[] }>(
         `/lesson/${lessonId}/ask`,
-        { question },
+        { question, language: outputLanguage },
         {
           headers: {
             Authorization: `Bearer ${authToken}`

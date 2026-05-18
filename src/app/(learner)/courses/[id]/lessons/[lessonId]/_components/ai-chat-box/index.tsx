@@ -1,11 +1,12 @@
 'use client'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
+import { useState } from 'react'
 import { useChatBox } from './use-chat-box'
 import { ChatMessageComponent } from './chat-message'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Bot, Send, X, MessageCircle, Loader2, Sparkles } from 'lucide-react'
+import { Bot, Send, MessageCircle, Loader2, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface AiChatBoxProps {
@@ -14,36 +15,19 @@ interface AiChatBoxProps {
 }
 
 export const AiChatBox = ({ lessonId, authToken }: AiChatBoxProps) => {
-  const { messages, input, isLoading, isOpen, setInput, setIsOpen, handleSubmit, messagesEndRef } = useChatBox({
+  const [outputLanguage, setOutputLanguage] = useState<'vi' | 'en'>('vi')
+  const { messages, input, isLoading, setInput, handleSubmit, messagesEndRef } = useChatBox({
     lessonId,
-    authToken
+    authToken,
+    outputLanguage
   })
 
   return (
     <>
-      {/* Floating Button with Pulse Effect */}
-      <div className='fixed bottom-6 right-6 z-[100] group'>
-        {!isOpen && (
-          <div className='absolute inset-0 bg-primary/20 rounded-full animate-ping scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-500' />
-        )}
-        <Button
-          onClick={() => setIsOpen(!isOpen)}
-          className={cn(
-            'relative w-14 h-14 rounded-full shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] z-10 transition-all duration-500 hover:scale-110 active:scale-95',
-            isOpen
-              ? 'bg-destructive hover:bg-destructive/90 rotate-90'
-              : 'bg-gradient-to-br from-primary via-primary/90 to-orange-500 hover:shadow-primary/40'
-          )}
-        >
-          {isOpen ? <X className='w-6 h-6' /> : <Bot className='w-7 h-7' />}
-        </Button>
-      </div>
-
       {/* Chat Box Container */}
       <div
         className={cn(
-          'fixed bottom-24 right-6 w-[400px] h-[600px] max-h-[calc(100vh-120px)] bg-card/80 backdrop-blur-2xl border border-white/20 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[100] flex flex-col overflow-hidden transition-all duration-500 origin-bottom-right',
-          isOpen ? 'scale-100 opacity-100' : 'scale-90 opacity-0 pointer-events-none translate-y-10'
+          'fixed bottom-6 right-6 w-[400px] h-[600px] max-h-[calc(100vh-24px)] bg-card/80 backdrop-blur-2xl border border-white/20 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-[100] flex flex-col overflow-hidden transition-all duration-500 origin-bottom-right scale-100 opacity-100'
         )}
       >
         {/* Header with Sparkles */}
@@ -52,17 +36,21 @@ export const AiChatBox = ({ lessonId, authToken }: AiChatBoxProps) => {
             <Sparkles className='w-5 h-5 text-primary animate-pulse' />
           </div>
           <div className='flex items-center gap-4'>
-            <div className='w-10 h-10 rounded-2xl bg-primary/20 flex items-center justify-center text-primary border border-primary/20 shadow-inner'>
-              <Bot className='w-6 h-6' />
-            </div>
-            <div>
-              <h3 className='font-black text-foreground tracking-tight'>LearnProof Assistant</h3>
-              <div className='flex items-center gap-1.5'>
-                <span className='relative flex h-2 w-2'>
-                  <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
-                  <span className='relative inline-flex rounded-full h-2 w-2 bg-emerald-500'></span>
-                </span>
-                <span className='text-[10px] font-bold text-muted-foreground uppercase tracking-widest'>AI Online</span>
+            <div className='flex items-center gap-4'>
+              <div className='w-10 h-10 rounded-2xl bg-primary/20 flex items-center justify-center text-primary border border-primary/20 shadow-inner'>
+                <Bot className='w-6 h-6' />
+              </div>
+              <div>
+                <h3 className='font-black text-foreground tracking-tight'>LearnProof Assistant</h3>
+                <div className='flex items-center gap-1.5'>
+                  <span className='relative flex h-2 w-2'>
+                    <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
+                    <span className='relative inline-flex rounded-full h-2 w-2 bg-emerald-500'></span>
+                  </span>
+                  <span className='text-[10px] font-bold text-muted-foreground uppercase tracking-widest'>
+                    AI Online
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -105,6 +93,21 @@ export const AiChatBox = ({ lessonId, authToken }: AiChatBoxProps) => {
 
         {/* Footer / Input */}
         <div className='shrink-0 p-6 bg-gradient-to-t from-muted/50 to-transparent border-t border-white/10'>
+          <div className='mb-3 flex items-center justify-between gap-3'>
+            <div className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground'>Output language</div>
+            <div>
+              <Select value={outputLanguage} onValueChange={(value) => setOutputLanguage(value as 'vi' | 'en')}>
+                <SelectTrigger className='h-9 w-[112px] rounded-full bg-card/90 backdrop-blur-xl border border-white/15 shadow-[0_10px_24px_rgba(0,0,0,0.12)] px-3 text-xs font-bold uppercase tracking-widest text-muted-foreground'>
+                  <SelectValue placeholder='VI' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='vi'>Tiếng Việt</SelectItem>
+                  <SelectItem value='en'>English</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className='relative flex items-center'>
             <input
               value={input}

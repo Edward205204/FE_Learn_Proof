@@ -1,4 +1,5 @@
 import http from '@/utils/http'
+import type { AiOutputLanguage } from '../_types/ai'
 
 const quizApi = {
   // Tạm thời comment code cũ do không khớp với thiết kế BE
@@ -48,7 +49,11 @@ const quizApi = {
   /**
    * AI GENERATION & DRAFTS
    */
-  generateAi: (lessonId: string) => http.post<{ jobId: string }>(`/quiz/lessons/${lessonId}/generate-ai`),
+  generateAi: (lessonId: string, language: AiOutputLanguage = 'vi') =>
+    http.post<{ jobId: string }>(`/quiz/lessons/${lessonId}/generate-ai`, { language }),
+
+  getOverview: (lessonId: string) =>
+    http.get<import('../_types/ai').QuizAiOverview>(`/quiz/lessons/${lessonId}/overview`),
 
   getDrafts: (lessonId: string) => http.get<import('../_types/ai').QuizDraft[]>(`/quiz/lessons/${lessonId}/drafts`),
 

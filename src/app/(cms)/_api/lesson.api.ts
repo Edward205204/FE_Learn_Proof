@@ -1,4 +1,5 @@
 import http from '@/utils/http'
+import type { AiOutputLanguage } from '../_types/ai'
 
 /** Kết quả trả về khi tạo/cập nhật bài giảng */
 export type LessonCreatedResponse = {
@@ -115,8 +116,8 @@ const lessonApi = {
   toggleLessonLock: (lessonId: string, isLocked: boolean) =>
     http.patch<{ id: string; isLocked: boolean }>(`/lesson/${lessonId}/lock`, { isLocked }),
 
-  generateAiContent: (lessonId: string, keywords?: string) =>
-    http.post<{ content: string }>(`/lesson/${lessonId}/generate-content`, { keywords })
+  generateAiContent: (lessonId: string, keywords?: string, language: AiOutputLanguage = 'vi') =>
+    http.post<{ content: string }>(`/lesson/${lessonId}/generate-content`, { keywords, language })
 }
 
 export default lessonApi

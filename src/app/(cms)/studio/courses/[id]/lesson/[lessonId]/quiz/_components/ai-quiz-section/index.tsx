@@ -1,10 +1,10 @@
-import { useState } from 'react'
 import { Sparkles, HelpCircle } from 'lucide-react'
+import { useState } from 'react'
 import { useAiQuiz } from './use-ai-quiz'
 import { GenerateButton } from './generate-button'
 import { QuizDraftCard } from './quiz-draft-card'
 import { DraftPreviewModal } from './draft-preview-modal'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface Props {
   lessonId: string
@@ -12,10 +12,19 @@ interface Props {
 }
 
 export function AiQuizSection({ lessonId, lessonType }: Props) {
-  const { draft, isGenerating, isSubmitting, handleGenerate, handlePublish, handleReject } = useAiQuiz(lessonId)
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [outputLanguage, setOutputLanguage] = useState<'vi' | 'en'>('vi')
+  const { draft, activeJob, isGenerating, isSubmitting, handleGenerate, handlePublish, handleReject } = useAiQuiz(
+    lessonId,
+    outputLanguage,
+  )
 
   const hasDraft = !!draft
+  const isActiveJob = !!activeJob && !draft
+  const canGenerateAi = lessonType !== 'QUIZ'
+
+  const scrollToReviewWorkspace = () => {
+    document.getElementById('quiz-review-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   return (
     <section className='space-y-8 py-8 px-8 bg-card/50 backdrop-blur-sm border border-white/10 rounded-[2.5rem] shadow-xl relative overflow-hidden'>
@@ -34,8 +43,19 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
             Sử dụng trí tuệ nhân tạo để phân tích nội dung bài học và tự động soạn thảo bộ câu hỏi trắc nghiệm chất lượng cao.
           </p>
         </div>
-        {!hasDraft && !isGenerating && (
-          <GenerateButton onGenerate={handleGenerate} isGenerating={isGenerating} disabled={hasDraft || isSubmitting} />
+        {!hasDraft && canGenerateAi && !isActiveJob && !isGenerating && (
+          <div className='flex items-center gap-2'>
+            <Select value={outputLanguage} onValueChange={(value) => setOutputLanguage(value as 'vi' | 'en')}>
+              <SelectTrigger className='w-[120px] bg-background/80 border-primary/15 rounded-2xl'>
+                <SelectValue placeholder='VI' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='vi'>Tiếng Việt</SelectItem>
+                <SelectItem value='en'>English</SelectItem>
+              </SelectContent>
+            </Select>
+            <GenerateButton onGenerate={handleGenerate} isGenerating={isGenerating} disabled={hasDraft || isSubmitting} />
+          </div>
         )}
       </div>
 
@@ -43,9 +63,9 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
         {hasDraft ? (
           <QuizDraftCard
             draft={draft}
-            onPreview={() => setIsPreviewOpen(true)}
+            onPreview={scrollToReviewWorkspace}
             onPublish={handlePublish}
-            onReject={() => setIsPreviewOpen(true)}
+            onReject={scrollToReviewWorkspace}
             isSubmitting={isSubmitting}
           />
         ) : (
@@ -57,11 +77,19 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
               <div className='space-y-1'>
                 <h3 className='text-sm font-black text-foreground uppercase tracking-widest'>Chưa có bản nháp AI</h3>
                 <p className='text-xs text-muted-foreground font-medium max-w-[280px]'>
-                  Hệ thống sẵn sàng tạo câu hỏi từ nội dung bài học. Nhấn nút phía trên để bắt đầu!
+                  {canGenerateAi
+                    ? 'Hệ thống sẵn sàng tạo câu hỏi từ nội dung bài học. Nhấn nút phía trên để bắt đầu!'
+                    : 'Lesson kiểu QUIZ đang dùng bộ câu hỏi thủ công. AI generation được tắt để tránh ghi đè nội dung.'}
                 </p>
               </div>
             </div>
           )
+        )}
+
+        {isActiveJob && !hasDraft && (
+          <div className='mb-4 rounded-2xl border border-indigo-500/20 bg-indigo-500/10 px-4 py-3 text-sm text-indigo-700'>
+            AI đang xử lý quiz cho bài học này. Trang sẽ tự cập nhật khi bản nháp hoàn tất.
+          </div>
         )}
 
         {isGenerating && (
@@ -93,14 +121,7 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
         )}
       </div>
 
-      <DraftPreviewModal
-        draft={draft}
-        open={isPreviewOpen}
-        onOpenChange={setIsPreviewOpen}
-        onPublish={handlePublish}
-        onReject={handleReject}
-        isSubmitting={isSubmitting}
-      />
+      <DraftPreviewModal draft={draft} onPublish={handlePublish} onReject={handleReject} isSubmitting={isSubmitting} />
 
       <style jsx>
         {`
