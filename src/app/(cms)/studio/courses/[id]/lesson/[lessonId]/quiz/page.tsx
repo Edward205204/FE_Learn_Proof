@@ -66,11 +66,22 @@ export default function LessonQuizPage() {
   const isPureQuiz = lessonDetail?.type === 'QUIZ'
   const displayQuestions = isPureQuiz ? questions : supplementalQuiz
 
+  const [prevLessonId, setPrevLessonId] = useState<string | undefined>(lessonDetail?.id)
+  const [prevLength, setPrevLength] = useState(displayQuestions.length)
+
+  if (lessonDetail?.id !== prevLessonId || displayQuestions.length !== prevLength) {
+    setPrevLessonId(lessonDetail?.id)
+    setPrevLength(displayQuestions.length)
+    setCurrentIndex(0)
+  }
+
   // Sync server data to form
   useEffect(() => {
     if (!lessonDetail) return
 
-    const publishedQuestions = mapPublishedQuizQuestions(aiOverview?.quiz ?? (lessonDetail.type === 'QUIZ' ? lessonDetail.quiz : null))
+    const publishedQuestions = mapPublishedQuizQuestions(
+      aiOverview?.quiz ?? (lessonDetail.type === 'QUIZ' ? lessonDetail.quiz : null)
+    )
 
     if (publishedQuestions.length > 0) {
       form.reset({
@@ -107,10 +118,6 @@ export default function LessonQuizPage() {
     }
   }, [aiOverview, lessonDetail, form])
 
-  useEffect(() => {
-    setCurrentIndex(0)
-  }, [displayQuestions.length, lessonDetail?.id])
-
   if (isLoading) {
     return (
       <div className='flex h-[60vh] items-center justify-center'>
@@ -127,7 +134,7 @@ export default function LessonQuizPage() {
     setEditingQuestion({
       id: q.id,
       content: q.questionText,
-      answers: q.answers.map(a => ({ id: a.id, content: a.text, isCorrect: a.isCorrect }))
+      answers: q.answers.map((a) => ({ id: a.id, content: a.text, isCorrect: a.isCorrect }))
     })
     setIsEditorOpen(true)
   }
@@ -204,12 +211,12 @@ export default function LessonQuizPage() {
                   {displayQuestions.length} Câu hỏi
                 </Badge>
                 {isPureQuiz && (
-                  <Button 
+                  <Button
                     onClick={() => {
                       setEditingQuestion(null)
                       setIsEditorOpen(true)
-                    }} 
-                    size='sm' 
+                    }}
+                    size='sm'
                     className='font-bold'
                   >
                     Thêm câu hỏi

@@ -32,7 +32,7 @@ export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, init
     if (open) {
       if (initialData) {
         setContent(initialData.content)
-        setAnswers(initialData.answers.map(a => ({ ...a })))
+        setAnswers(initialData.answers.map((a) => ({ ...a })))
       } else {
         setContent('')
         setAnswers([
@@ -46,8 +46,8 @@ export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, init
   const handleSave = async () => {
     if (!content.trim()) return toast.error('Vui lòng nhập nội dung câu hỏi')
     if (answers.length < 2) return toast.error('Phải có ít nhất 2 đáp án')
-    if (answers.some(a => !a.content.trim())) return toast.error('Các đáp án không được để trống')
-    const correctAnswers = answers.filter(a => a.isCorrect)
+    if (answers.some((a) => !a.content.trim())) return toast.error('Các đáp án không được để trống')
+    const correctAnswers = answers.filter((a) => a.isCorrect)
     if (correctAnswers.length !== 1) return toast.error('Phải có chính xác 1 đáp án đúng')
 
     setIsSaving(true)
@@ -66,19 +66,20 @@ export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, init
             if (ans.isCorrect) newCorrectAnswerId = ans.id
           } else {
             const res = await quizApi.addAnswer(quizId, qId, { content: ans.content })
-            // Because addAnswer response might not return the new ID immediately, 
+            // Because addAnswer response might not return the new ID immediately,
             // if this new answer is correct, we might have an issue setting it as correct.
             // But usually users edit text. Let's just catch this case if it happens.
-            if (ans.isCorrect && (res as any)?.data?.id) {
-               newCorrectAnswerId = (res as any).data.id
+            const response = res as { data?: { id?: string } }
+            if (ans.isCorrect && response?.data?.id) {
+              newCorrectAnswerId = response.data.id
             }
           }
         }
-        
+
         // Find deleted answers
-        const initialAnsIds = initialData.answers.map(a => a.id).filter(Boolean)
-        const currentAnsIds = answers.map(a => a.id).filter(Boolean)
-        const deletedIds = initialAnsIds.filter(id => !currentAnsIds.includes(id))
+        const initialAnsIds = initialData.answers.map((a) => a.id).filter(Boolean)
+        const currentAnsIds = answers.map((a) => a.id).filter(Boolean)
+        const deletedIds = initialAnsIds.filter((id) => !currentAnsIds.includes(id))
         for (const dId of deletedIds) {
           if (dId) await quizApi.deleteAnswer(quizId, qId, dId)
         }
@@ -86,13 +87,13 @@ export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, init
         if (newCorrectAnswerId) {
           await quizApi.chooseCorrectAnswer(quizId, qId, { answerId: newCorrectAnswerId })
         }
-        
+
         await quizApi.finishEditQuestion(quizId, qId)
       } else {
         // Add new question
         await quizApi.addQuestion(quizId, {
           content,
-          answers: answers.map(a => ({ content: a.content, isCorrect: a.isCorrect }))
+          answers: answers.map((a) => ({ content: a.content, isCorrect: a.isCorrect }))
         })
       }
 
@@ -115,14 +116,14 @@ export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, init
             {initialData ? 'Chỉnh sửa câu hỏi' : 'Thêm câu hỏi mới'}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className='space-y-6 py-4'>
           <div className='space-y-2'>
             <Label className='text-xs font-bold uppercase tracking-wider text-muted-foreground'>Nội dung câu hỏi</Label>
-            <Input 
-              value={content} 
-              onChange={e => setContent(e.target.value)} 
-              placeholder='Nhập nội dung câu hỏi...' 
+            <Input
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder='Nhập nội dung câu hỏi...'
               className='h-12 text-base'
             />
           </div>
@@ -135,7 +136,7 @@ export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, init
                   type='button'
                   onClick={() => {
                     const newAns = [...answers]
-                    newAns.forEach(a => (a.isCorrect = false))
+                    newAns.forEach((a) => (a.isCorrect = false))
                     newAns[idx].isCorrect = true
                     setAnswers(newAns)
                   }}
@@ -145,7 +146,7 @@ export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, init
                 </button>
                 <Input
                   value={ans.content}
-                  onChange={e => {
+                  onChange={(e) => {
                     const newAns = [...answers]
                     newAns[idx].content = e.target.value
                     setAnswers(newAns)
@@ -177,7 +178,9 @@ export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, init
         </div>
 
         <DialogFooter>
-          <Button variant='ghost' onClick={() => onOpenChange(false)} disabled={isSaving}>Hủy</Button>
+          <Button variant='ghost' onClick={() => onOpenChange(false)} disabled={isSaving}>
+            Hủy
+          </Button>
           <Button onClick={handleSave} disabled={isSaving} className='bg-primary font-bold'>
             {isSaving && <Loader2 className='w-4 h-4 mr-2 animate-spin' />}
             Lưu câu hỏi
