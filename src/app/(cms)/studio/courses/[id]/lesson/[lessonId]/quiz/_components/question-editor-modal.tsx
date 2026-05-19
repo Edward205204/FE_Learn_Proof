@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -129,6 +129,9 @@ export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, init
           <DialogTitle className='text-xl font-bold'>
             {initialData ? 'Chỉnh sửa câu hỏi' : 'Thêm câu hỏi mới'}
           </DialogTitle>
+          <DialogDescription className='sr-only'>
+            Thêm mới hoặc chỉnh sửa câu hỏi quiz, bao gồm nội dung và các đáp án.
+          </DialogDescription>
         </DialogHeader>
 
         <div className='space-y-6 py-4'>

@@ -48,6 +48,7 @@ export function DraftPreviewModal({
   const [reviewNote, setReviewNote] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isEditOpen, setIsEditOpen] = useState(false)
+  const [editingQuestionIndex, setEditingQuestionIndex] = useState<number | null>(null)
 
   const questions = useMemo(() => normalizeQuizDraftQuestions(draft?.validatedOutput || draft?.rawOutput), [draft])
   const reviewedCount = useMemo(
@@ -69,6 +70,13 @@ export function DraftPreviewModal({
   }
 
   const handleEdit = () => {
+    console.log('[DraftPreviewModal] open edit modal', {
+      draftId: draft.id,
+      currentIndex,
+      question: currentQuestion?.question,
+      quizQuestionId: currentQuestion?.quizQuestionId
+    })
+    setEditingQuestionIndex(currentIndex)
     setIsEditOpen(true)
   }
 
@@ -354,10 +362,20 @@ export function DraftPreviewModal({
 
         <DraftQuestionEditorModal
           open={isEditOpen}
-          onOpenChange={setIsEditOpen}
+          onOpenChange={(open) => {
+            setIsEditOpen(open)
+            if (!open) setEditingQuestionIndex(null)
+          }}
           initialData={currentQuestion ?? null}
           onSave={async (body) => {
-            await onUpdateQuestion(draft.id, currentIndex, body)
+            console.log('[DraftPreviewModal] submit draft question edit', {
+              draftId: draft.id,
+              currentIndex,
+              editingQuestionIndex,
+              body,
+              initialData: currentQuestion
+            })
+            await onUpdateQuestion(draft.id, editingQuestionIndex ?? currentIndex, body)
           }}
         />
       </div>

@@ -136,13 +136,23 @@ export function useAiQuiz(lessonId: string, outputLanguage: AiOutputLanguage = '
       draftId: string
       questionIndex: number
       body: { question: string; options: string[]; correctIndex: number; explanation: string }
-    }) => quizApi.updateDraftQuestion(draftId, questionIndex, body),
+    }) => {
+      console.log('[useAiQuiz] updateDraftQuestion request', {
+        draftId,
+        questionIndex,
+        body
+      })
+      return quizApi.updateDraftQuestion(draftId, questionIndex, body)
+    },
     onSuccess: async () => {
       toast.success('Đã cập nhật câu hỏi AI.')
       await queryClient.invalidateQueries({ queryKey: ['ai_quiz_overview', lessonId] })
       await queryClient.invalidateQueries({ queryKey: ['lessons', lessonId] })
     },
     onError: () => {
+      console.log('[useAiQuiz] updateDraftQuestion failed', {
+        lessonId
+      })
       toast.error('Không thể cập nhật câu hỏi AI.')
     }
   })

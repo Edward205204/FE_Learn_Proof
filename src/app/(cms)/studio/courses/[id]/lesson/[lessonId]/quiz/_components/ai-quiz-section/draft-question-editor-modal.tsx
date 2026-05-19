@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -81,6 +81,9 @@ export function DraftQuestionEditorModal({ open, onOpenChange, initialData, onSa
       <DialogContent className='max-w-3xl bg-card border-border/50'>
         <DialogHeader>
           <DialogTitle className='text-xl font-bold'>Chỉnh sửa câu hỏi AI</DialogTitle>
+          <DialogDescription className='sr-only'>
+            Chỉnh sửa câu hỏi, đáp án, đáp án đúng và phần giải thích của bản nháp AI.
+          </DialogDescription>
         </DialogHeader>
 
         <div className='space-y-5 py-4'>
