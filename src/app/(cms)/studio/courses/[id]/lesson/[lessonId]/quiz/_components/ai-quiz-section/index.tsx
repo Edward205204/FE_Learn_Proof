@@ -13,10 +13,17 @@ interface Props {
 
 export function AiQuizSection({ lessonId, lessonType }: Props) {
   const [outputLanguage, setOutputLanguage] = useState<'vi' | 'en'>('vi')
-  const { draft, activeJob, isGenerating, isSubmitting, handleGenerate, handlePublish, handleReject } = useAiQuiz(
-    lessonId,
-    outputLanguage,
-  )
+  const {
+    draft,
+    activeJob,
+    isGenerating,
+    isSubmitting,
+    handleGenerate,
+    handlePublish,
+    handleReject,
+    handleAcceptQuestion,
+    handleRejectQuestion
+  } = useAiQuiz(lessonId, outputLanguage)
 
   const hasDraft = !!draft
   const isActiveJob = !!activeJob && !draft
@@ -121,7 +128,15 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
         )}
       </div>
 
-      <DraftPreviewModal draft={draft} onPublish={handlePublish} onReject={handleReject} isSubmitting={isSubmitting} />
+      <DraftPreviewModal
+        key={draft?.id ?? 'no-draft'}
+        draft={draft}
+        onPublish={handlePublish}
+        onReject={handleReject}
+        onAcceptQuestion={handleAcceptQuestion}
+        onRejectQuestion={handleRejectQuestion}
+        isSubmitting={isSubmitting}
+      />
 
       <style jsx>
         {`

@@ -32,6 +32,9 @@ export interface QuizDraftQuestion {
   options: string[]
   correctIndex: number
   explanation: string
+  reviewStatus?: 'PENDING' | 'ACCEPTED' | 'REJECTED'
+  quizQuestionId?: string | null
+  reviewedAt?: string | null
 }
 
 export type AiOutputLanguage = 'vi' | 'en'
@@ -57,6 +60,12 @@ export interface QuizPublished {
 
 export interface GenerateAiResponse {
   jobId: string
+}
+
+export interface ReviewDraftQuestionResponse {
+  quizId: string | null
+  questionId: string
+  alreadySynced: boolean
 }
 
 export interface QuizAiOverview {

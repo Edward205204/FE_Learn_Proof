@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import {
@@ -10,7 +10,8 @@ import {
   Sparkles,
   ThumbsDown,
   ThumbsUp,
-  WandSparkles
+  WandSparkles,
+  X
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -22,19 +23,28 @@ interface Props {
   draft: QuizDraft | null
   onPublish: (id: string) => void
   onReject: (id: string, note: string) => void
+  onAcceptQuestion: (draftId: string, questionIndex: number) => void
+  onRejectQuestion: (draftId: string, questionIndex: number) => void
   isSubmitting: boolean
 }
 
-export function DraftPreviewModal({ draft, onPublish, onReject, isSubmitting }: Props) {
+export function DraftPreviewModal({
+  draft,
+  onPublish,
+  onReject,
+  onAcceptQuestion,
+  onRejectQuestion,
+  isSubmitting
+}: Props) {
   const [showRejectInput, setShowRejectInput] = useState(false)
   const [reviewNote, setReviewNote] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const questions = useMemo(() => normalizeQuizDraftQuestions(draft?.validatedOutput || draft?.rawOutput), [draft])
-
-  useEffect(() => {
-    setCurrentIndex(0)
-  }, [draft?.id])
+  const reviewedCount = useMemo(
+    () => questions.filter((question) => question.reviewStatus && question.reviewStatus !== 'PENDING').length,
+    [questions]
+  )
 
   if (!draft) return null
 
@@ -52,6 +62,7 @@ export function DraftPreviewModal({ draft, onPublish, onReject, isSubmitting }: 
   const currentQuestion = questions[currentIndex]
   const canGoPrev = currentIndex > 0
   const canGoNext = currentIndex < questions.length - 1
+  const questionStatus = currentQuestion?.reviewStatus ?? 'PENDING'
 
   return (
     <section
@@ -124,6 +135,10 @@ export function DraftPreviewModal({ draft, onPublish, onReject, isSubmitting }: 
                     <div className='text-[11px] uppercase tracking-[0.18em] text-emerald-700/70'>Câu hỏi</div>
                     <div className='mt-1 text-2xl font-black text-emerald-700'>{questions.length}</div>
                   </div>
+                  <div className='rounded-2xl bg-amber-50 px-3 py-3'>
+                    <div className='text-[11px] uppercase tracking-[0.18em] text-amber-700/70'>Đã xử lý</div>
+                    <div className='mt-1 text-2xl font-black text-amber-700'>{reviewedCount}</div>
+                  </div>
                   <div className='rounded-2xl bg-slate-100 px-3 py-3'>
                     <div className='text-[11px] uppercase tracking-[0.18em] text-slate-600'>Prompt</div>
                     <div className='mt-1 text-2xl font-black text-slate-800'>{promptVersion}</div>
@@ -184,7 +199,21 @@ export function DraftPreviewModal({ draft, onPublish, onReject, isSubmitting }: 
                     <Badge variant='outline' className='rounded-full px-3 py-1 uppercase tracking-[0.18em] text-[10px]'>
                       Câu {currentIndex + 1}/{questions.length}
                     </Badge>
-                    <Badge className='bg-emerald-600 hover:bg-emerald-600'>Đáp án đúng đã được đánh dấu</Badge>
+                    <Badge
+                      className={
+                        questionStatus === 'ACCEPTED'
+                          ? 'bg-emerald-600 hover:bg-emerald-600'
+                          : questionStatus === 'REJECTED'
+                            ? 'bg-rose-600 hover:bg-rose-600'
+                            : 'bg-slate-600 hover:bg-slate-600'
+                      }
+                    >
+                      {questionStatus === 'ACCEPTED'
+                        ? 'Đã duyệt'
+                        : questionStatus === 'REJECTED'
+                          ? 'Đã từ chối'
+                          : 'Chờ duyệt'}
+                    </Badge>
                   </div>
 
                   <Card className='border-border/70 shadow-[0_10px_40px_rgba(15,23,42,0.06)] overflow-hidden'>
@@ -227,6 +256,36 @@ export function DraftPreviewModal({ draft, onPublish, onReject, isSubmitting }: 
                       </div>
                     </CardContent>
                   </Card>
+
+                  <div className='flex flex-col gap-3 rounded-[1.5rem] border border-border/70 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6'>
+                    <div className='text-sm text-muted-foreground'>
+                      {questionStatus === 'PENDING'
+                        ? 'Duyệt câu này để thêm vào quiz hiện có, hoặc để hệ thống tạo quiz mới nếu chưa có.'
+                        : questionStatus === 'ACCEPTED'
+                          ? 'Câu hỏi này đã được thêm vào quiz.'
+                          : 'Câu hỏi này đã bị loại khỏi bản nháp.'}
+                    </div>
+                    <div className='flex flex-wrap items-center gap-2'>
+                      <Button
+                        variant='outline'
+                        className='gap-2 border-emerald-200 bg-emerald-50/70 text-emerald-700 hover:bg-emerald-100/80'
+                        onClick={() => onAcceptQuestion(draft.id, currentIndex)}
+                        disabled={isSubmitting || questionStatus !== 'PENDING'}
+                      >
+                        <Check className='h-4 w-4' />
+                        Duyệt câu này
+                      </Button>
+                      <Button
+                        variant='outline'
+                        className='gap-2 border-rose-200 bg-rose-50/70 text-rose-700 hover:bg-rose-100/80'
+                        onClick={() => onRejectQuestion(draft.id, currentIndex)}
+                        disabled={isSubmitting || questionStatus !== 'PENDING'}
+                      >
+                        <X className='h-4 w-4' />
+                        Từ chối câu này
+                      </Button>
+                    </div>
+                  </div>
 
                   <div className='flex items-center justify-between gap-3'>
                     <Button

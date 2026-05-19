@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { toast } from 'sonner'
@@ -12,6 +12,7 @@ type BaseErrorResponse = {
 
 export function useAiQuiz(lessonId: string, outputLanguage: AiOutputLanguage = 'vi') {
   const queryClient = useQueryClient()
+  const failedJobToastRef = useRef<string | null>(null)
   const overviewQuery = useQuery({
     queryKey: ['ai_quiz_overview', lessonId],
     queryFn: async () => {
@@ -48,6 +49,18 @@ export function useAiQuiz(lessonId: string, outputLanguage: AiOutputLanguage = '
   )
 
   const activeJob = overviewQuery.data?.activeJob ?? null
+
+  useEffect(() => {
+    if (activeJob?.status !== 'FAILED') {
+      failedJobToastRef.current = null
+      return
+    }
+
+    if (failedJobToastRef.current === activeJob.id) return
+    failedJobToastRef.current = activeJob.id
+
+    toast.error(activeJob.error || 'Không thể sinh câu hỏi AI. Vui lòng thử lại.')
+  }, [activeJob])
 
   const generateMutation = useMutation({
     mutationFn: () => quizApi.generateAi(lessonId, outputLanguage),
@@ -89,6 +102,31 @@ export function useAiQuiz(lessonId: string, outputLanguage: AiOutputLanguage = '
     }
   })
 
+  const acceptQuestionMutation = useMutation({
+    mutationFn: ({ draftId, questionIndex }: { draftId: string; questionIndex: number }) =>
+      quizApi.acceptDraftQuestion(draftId, questionIndex),
+    onSuccess: async () => {
+      toast.success('Đã duyệt câu hỏi và thêm vào quiz.')
+      await queryClient.invalidateQueries({ queryKey: ['ai_quiz_overview', lessonId] })
+      await queryClient.invalidateQueries({ queryKey: ['lessons', lessonId] })
+    },
+    onError: () => {
+      toast.error('Không thể duyệt câu hỏi.')
+    }
+  })
+
+  const rejectQuestionMutation = useMutation({
+    mutationFn: ({ draftId, questionIndex }: { draftId: string; questionIndex: number }) =>
+      quizApi.rejectDraftQuestion(draftId, questionIndex),
+    onSuccess: async () => {
+      toast.success('Đã loại bỏ câu hỏi khỏi bản nháp.')
+      await queryClient.invalidateQueries({ queryKey: ['ai_quiz_overview', lessonId] })
+    },
+    onError: () => {
+      toast.error('Không thể từ chối câu hỏi.')
+    }
+  })
+
   const handleGenerate = async () => {
     await generateMutation.mutateAsync()
   }
@@ -101,15 +139,29 @@ export function useAiQuiz(lessonId: string, outputLanguage: AiOutputLanguage = '
     await rejectMutation.mutateAsync({ draftId, reviewNote })
   }
 
+  const handleAcceptQuestion = async (draftId: string, questionIndex: number) => {
+    await acceptQuestionMutation.mutateAsync({ draftId, questionIndex })
+  }
+
+  const handleRejectQuestion = async (draftId: string, questionIndex: number) => {
+    await rejectQuestionMutation.mutateAsync({ draftId, questionIndex })
+  }
+
   return {
     overview: overviewQuery.data ?? null,
     draft,
     activeJob,
     isGenerating: generateMutation.isPending || activeJob?.status === 'QUEUED' || activeJob?.status === 'PROCESSING',
-    isSubmitting: publishMutation.isPending || rejectMutation.isPending,
+    isSubmitting:
+      publishMutation.isPending ||
+      rejectMutation.isPending ||
+      acceptQuestionMutation.isPending ||
+      rejectQuestionMutation.isPending,
     handleGenerate,
     handlePublish,
     handleReject,
+    handleAcceptQuestion,
+    handleRejectQuestion,
     refreshDraft: async () => {
       await queryClient.invalidateQueries({ queryKey: ['ai_quiz_overview', lessonId] })
     }

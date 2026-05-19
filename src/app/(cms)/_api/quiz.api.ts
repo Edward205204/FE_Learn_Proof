@@ -1,5 +1,5 @@
 import http from '@/utils/http'
-import type { AiOutputLanguage } from '../_types/ai'
+import type { AiOutputLanguage, ReviewDraftQuestionResponse } from '../_types/ai'
 
 const quizApi = {
   // Tạm thời comment code cũ do không khớp với thiết kế BE
@@ -58,6 +58,12 @@ const quizApi = {
   getDrafts: (lessonId: string) => http.get<import('../_types/ai').QuizDraft[]>(`/quiz/lessons/${lessonId}/drafts`),
 
   publishDraft: (draftId: string) => http.patch<{ success: true }>(`/quiz/drafts/${draftId}/publish`),
+
+  acceptDraftQuestion: (draftId: string, questionIndex: number) =>
+    http.patch<ReviewDraftQuestionResponse>(`/quiz/drafts/${draftId}/questions/${questionIndex}/accept`),
+
+  rejectDraftQuestion: (draftId: string, questionIndex: number) =>
+    http.patch<{ success: true }>(`/quiz/drafts/${draftId}/questions/${questionIndex}/reject`),
 
   rejectDraft: (draftId: string, body: { reviewNote?: string }) =>
     http.patch<{ success: true }>(`/quiz/drafts/${draftId}/reject`, body)
