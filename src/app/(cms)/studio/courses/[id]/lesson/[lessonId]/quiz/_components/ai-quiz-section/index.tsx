@@ -2,7 +2,6 @@ import { Sparkles, HelpCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useAiQuiz } from './use-ai-quiz'
 import { GenerateButton } from './generate-button'
-import { QuizDraftCard } from './quiz-draft-card'
 import { DraftPreviewModal } from './draft-preview-modal'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 

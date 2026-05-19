@@ -90,7 +90,7 @@ export type CreateQuizLessonBody = {
   title: string
   chapterId: string
   shortDesc?: string
-  quizData: QuizDataPayload
+  quizData?: QuizDataPayload
 }
 
 export type CreateLessonBody = CreateVideoLessonBody | CreateTextLessonBody | CreateQuizLessonBody

@@ -340,7 +340,6 @@ export default function LessonQuizPage() {
 
                   {(() => {
                     const q = displayQuestions[currentIndex]
-                    const correctAnswer = q.answers.find((ans) => ans.isCorrect)?.text
 
                     return (
                       <div className='bg-gradient-to-b from-white to-slate-50/60 px-5 py-6 sm:px-6 sm:py-8'>

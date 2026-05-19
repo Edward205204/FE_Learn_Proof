@@ -24,7 +24,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { QuizDraft, normalizeQuizDraftQuestions } from '@/app/(cms)/_types/ai'
 import { DraftQuestionEditorModal } from './draft-question-editor-modal'
@@ -56,7 +56,7 @@ export function DraftPreviewModal({
   isSubmitting
 }: Props) {
   const [showRejectInput, setShowRejectInput] = useState(false)
-  const [reviewNote, setReviewNote] = useState('')
+  const reviewNote = ''
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [editingQuestionIndex, setEditingQuestionIndex] = useState<number | null>(null)
@@ -367,8 +367,6 @@ export function DraftPreviewModal({
                       </Button>
                     </div>
                   </div>
-
-
                 </div>
               ) : (
                 <div className='flex flex-col items-center justify-center gap-3 rounded-[2rem] border border-dashed border-border bg-muted/20 py-20 text-center'>
@@ -411,8 +409,10 @@ export function DraftPreviewModal({
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setShowRejectConfirm(false)}>Hủy</Button>
-              <Button variant="destructive" onClick={confirmRejectQuestion} disabled={isSubmitting}>
+              <Button variant='outline' onClick={() => setShowRejectConfirm(false)}>
+                Hủy
+              </Button>
+              <Button variant='destructive' onClick={confirmRejectQuestion} disabled={isSubmitting}>
                 Từ chối
               </Button>
             </DialogFooter>
