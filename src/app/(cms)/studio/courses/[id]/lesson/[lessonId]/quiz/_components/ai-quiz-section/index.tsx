@@ -31,7 +31,7 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
   const hasPendingDraft = !!draftWithPendingQuestions
   const hasDraft = hasPendingDraft
   const isActiveJob = !!activeJob && !draft
-  const canGenerateAi = lessonType !== 'QUIZ'
+  const canGenerateAi = true
 
   // const scrollToReviewWorkspace = () => {
   //   document.getElementById('quiz-review-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -94,9 +94,9 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
               <div className='space-y-1'>
                 <h3 className='text-sm font-black text-foreground uppercase tracking-widest'>Chưa có bản nháp AI</h3>
                 <p className='text-xs text-muted-foreground font-medium max-w-[280px]'>
-                  {canGenerateAi
-                    ? 'Hệ thống sẵn sàng tạo câu hỏi từ nội dung bài học. Nhấn nút phía trên để bắt đầu!'
-                    : 'Lesson kiểu QUIZ đang dùng bộ câu hỏi thủ công. AI generation được tắt để tránh ghi đè nội dung.'}
+                  {lessonType === 'QUIZ'
+                    ? 'Hệ thống sẵn sàng tạo tự động 20 câu hỏi tổng hợp từ toàn bộ nội dung của chương hoặc khóa học.'
+                    : 'Hệ thống sẵn sàng tạo câu hỏi từ nội dung bài học. Nhấn nút phía trên để bắt đầu!'}
                 </p>
               </div>
             </div>
@@ -126,7 +126,7 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
                   AI đang phân tích &amp; biên soạn...
                 </p>
                 <p className='text-xs text-muted-foreground font-bold uppercase tracking-widest opacity-60'>
-                  Tiến trình: 45% (Ước tính 30-60s)
+                  Ước tính 30-60s
                 </p>
               </div>
               <div className='w-full h-1.5 bg-indigo-100 rounded-full overflow-hidden'>
@@ -136,7 +136,9 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
                 ></div>
               </div>
               <p className='text-[10px] text-muted-foreground italic font-medium'>
-                Mẹo: Nội dung bài học càng chi tiết, câu hỏi AI tạo ra càng chất lượng.
+                {lessonType === 'QUIZ'
+                  ? 'Mẹo: Hệ thống đang tổng hợp dữ liệu toàn chương/khóa học. Việc tạo 20 câu hỏi có thể mất thêm thời gian.'
+                  : 'Mẹo: Nội dung bài học càng chi tiết, câu hỏi AI tạo ra càng chất lượng.'}
               </p>
             </div>
           </div>
