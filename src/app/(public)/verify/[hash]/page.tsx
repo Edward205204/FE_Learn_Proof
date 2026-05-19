@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import certificateApi from '@/app/(learner)/_api/certificate.api'
 import { CertificateTemplate } from '@/app/(learner)/_components/certificate-template'
 import { CheckCircle2, ExternalLink, Copy, Share2, Linkedin, Shield, AlertTriangle, Loader2, Link } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 const POLYGON_SCAN = 'https://amoy.polygonscan.com'
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? ''
@@ -50,6 +50,20 @@ function InfoRow({ label, value, link }: { label: string; value: string; link?: 
 export default function VerifyPage() {
   const params = useParams()
   const hash = typeof params.hash === 'string' ? params.hash : ''
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(1)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const observer = new ResizeObserver((entries) => {
+      if (!entries[0]) return
+      const width = entries[0].contentRect.width
+      setScale(width / 1056)
+    })
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [])
 
   const {
     data: cert,
@@ -135,11 +149,11 @@ export default function VerifyPage() {
           {/* Left: Certificate Display */}
           <div className='xl:col-span-3 space-y-4'>
             {/* Scaled wrapper */}
-            <div className='rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-white'>
-              <div className='w-full overflow-x-auto'>
+            <div className='rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-white w-full'>
+              <div ref={containerRef} className='relative w-full' style={{ aspectRatio: '1056 / 816' }}>
                 <div
-                  className='origin-top-left'
-                  style={{ transform: 'scale(0.58)', transformOrigin: 'top left', width: '1056px', height: '816px' }}
+                  className='absolute top-0 left-0 origin-top-left'
+                  style={{ width: '1056px', height: '816px', transform: `scale(${scale})` }}
                 >
                   <CertificateTemplate
                     userName={cert.user.fullName}
