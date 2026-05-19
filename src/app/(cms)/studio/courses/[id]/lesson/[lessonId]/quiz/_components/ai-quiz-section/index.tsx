@@ -15,6 +15,7 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
   const [outputLanguage, setOutputLanguage] = useState<'vi' | 'en'>('vi')
   const {
     draft,
+    draftWithPendingQuestions,
     activeJob,
     isGenerating,
     isSubmitting,
@@ -26,13 +27,15 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
     handleUpdateQuestion
   } = useAiQuiz(lessonId, outputLanguage)
 
-  const hasDraft = !!draft
+  // Khi không còn câu PENDING thì draft coi như xong → về default để user có thể gen batch mới
+  const hasPendingDraft = !!draftWithPendingQuestions
+  const hasDraft = hasPendingDraft
   const isActiveJob = !!activeJob && !draft
   const canGenerateAi = lessonType !== 'QUIZ'
 
-  const scrollToReviewWorkspace = () => {
-    document.getElementById('quiz-review-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+  // const scrollToReviewWorkspace = () => {
+  //   document.getElementById('quiz-review-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  // }
 
   return (
     <section className='space-y-8 py-8 px-8 bg-card/50 backdrop-blur-sm border border-white/10 rounded-[2.5rem] shadow-xl relative overflow-hidden'>
@@ -47,9 +50,10 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
             </div>
             <h2 className='text-2xl font-black tracking-tight text-foreground'>AI Quiz Studio</h2>
           </div>
-          <p className='text-sm text-muted-foreground font-medium max-w-md'>
-            Sử dụng trí tuệ nhân tạo để phân tích nội dung bài học và tự động soạn thảo bộ câu hỏi trắc nghiệm chất lượng cao.
-          </p>
+          {/* <p className='text-sm text-muted-foreground font-medium max-w-md'>
+            Sử dụng trí tuệ nhân tạo để phân tích nội dung bài học và tự động soạn thảo bộ câu hỏi trắc nghiệm chất
+            lượng cao.
+          </p> */}
         </div>
         {!hasDraft && canGenerateAi && !isActiveJob && !isGenerating && (
           <div className='flex items-center gap-2'>
@@ -62,20 +66,25 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
                 <SelectItem value='en'>English</SelectItem>
               </SelectContent>
             </Select>
-            <GenerateButton onGenerate={handleGenerate} isGenerating={isGenerating} disabled={hasDraft || isSubmitting} />
+            <GenerateButton
+              onGenerate={handleGenerate}
+              isGenerating={isGenerating}
+              disabled={hasDraft || isSubmitting}
+            />
           </div>
         )}
       </div>
 
       <div className='relative z-10'>
-        {hasDraft ? (
-          <QuizDraftCard
-            draft={draft}
-            onPreview={scrollToReviewWorkspace}
-            onPublish={handlePublish}
-            onReject={scrollToReviewWorkspace}
-            isSubmitting={isSubmitting}
-          />
+        {hasPendingDraft ? (
+          // <QuizDraftCard
+          //   draft={draftWithPendingQuestions}
+          //   onPreview={scrollToReviewWorkspace}
+          //   onPublish={handlePublish}
+          //   onReject={scrollToReviewWorkspace}
+          //   isSubmitting={isSubmitting}
+          // />
+          <></>
         ) : (
           !isGenerating && (
             <div className='group p-8 border-2 border-dashed border-white/10 rounded-[2rem] bg-muted/20 flex flex-col items-center justify-center text-center gap-4 transition-all hover:bg-muted/30 hover:border-primary/20'>
@@ -103,7 +112,7 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
         {isGenerating && (
           <div className='p-12 border-2 border-dashed border-indigo-500/30 rounded-[2.5rem] flex flex-col items-center justify-center gap-8 bg-indigo-500/5 overflow-hidden relative'>
             <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite] pointer-events-none' />
-            
+
             <div className='relative'>
               <div className='absolute inset-0 bg-indigo-500/40 blur-3xl rounded-full animate-pulse'></div>
               <div className='relative w-20 h-20 rounded-[2rem] bg-indigo-500 flex items-center justify-center text-white shadow-2xl shadow-indigo-500/50'>
@@ -113,13 +122,18 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
 
             <div className='text-center space-y-4 max-w-xs'>
               <div className='space-y-1'>
-                <p className='text-lg font-black text-indigo-600 tracking-tight'>AI đang phân tích & biên soạn...</p>
+                <p className='text-lg font-black text-indigo-600 tracking-tight'>
+                  AI đang phân tích &amp; biên soạn...
+                </p>
                 <p className='text-xs text-muted-foreground font-bold uppercase tracking-widest opacity-60'>
                   Tiến trình: 45% (Ước tính 30-60s)
                 </p>
               </div>
               <div className='w-full h-1.5 bg-indigo-100 rounded-full overflow-hidden'>
-                <div className='h-full bg-indigo-500 rounded-full animate-[progress_30s_linear_infinite]' style={{ width: '45%' }}></div>
+                <div
+                  className='h-full bg-indigo-500 rounded-full animate-[progress_30s_linear_infinite]'
+                  style={{ width: '45%' }}
+                ></div>
               </div>
               <p className='text-[10px] text-muted-foreground italic font-medium'>
                 Mẹo: Nội dung bài học càng chi tiết, câu hỏi AI tạo ra càng chất lượng.
@@ -130,8 +144,8 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
       </div>
 
       <DraftPreviewModal
-        key={draft?.id ?? 'no-draft'}
-        draft={draft}
+        key={draftWithPendingQuestions?.id ?? 'no-draft'}
+        draft={draftWithPendingQuestions}
         onPublish={handlePublish}
         onReject={handleReject}
         onAcceptQuestion={handleAcceptQuestion}
@@ -143,11 +157,17 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
       <style jsx>
         {`
           @keyframes shimmer {
-            100% { transform: translateX(100%); }
+            100% {
+              transform: translateX(100%);
+            }
           }
           @keyframes progress {
-            0% { width: 0%; }
-            100% { width: 95%; }
+            0% {
+              width: 0%;
+            }
+            100% {
+              width: 95%;
+            }
           }
         `}
       </style>

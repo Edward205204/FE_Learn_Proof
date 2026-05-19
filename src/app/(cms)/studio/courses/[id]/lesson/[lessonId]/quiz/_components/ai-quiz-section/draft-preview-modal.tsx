@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import {
-  AlertCircle,
+  // AlertCircle,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -16,22 +16,33 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
+// import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { QuizDraft, normalizeQuizDraftQuestions } from '@/app/(cms)/_types/ai'
 import { DraftQuestionEditorModal } from './draft-question-editor-modal'
+
+type DraftQuestionPayload = {
+  question: string
+  options: string[]
+  correctIndex: number
+  explanation: string
+}
 
 interface Props {
   draft: QuizDraft | null
   onPublish: (id: string) => void
   onReject: (id: string, note: string) => void
-  onAcceptQuestion: (draftId: string, questionIndex: number) => void
-  onRejectQuestion: (draftId: string, questionIndex: number) => void
-  onUpdateQuestion: (
-    draftId: string,
-    questionIndex: number,
-    body: { question: string; options: string[]; correctIndex: number; explanation: string }
-  ) => void
+  onAcceptQuestion: (draftId: string, questionIndex: number, body: DraftQuestionPayload) => void | Promise<void>
+  onRejectQuestion: (draftId: string, questionIndex: number, body: DraftQuestionPayload) => void | Promise<void>
+  onUpdateQuestion: (draftId: string, questionIndex: number, body: DraftQuestionPayload) => void
   isSubmitting: boolean
 }
 
@@ -49,17 +60,13 @@ export function DraftPreviewModal({
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [editingQuestionIndex, setEditingQuestionIndex] = useState<number | null>(null)
-
+  const [showRejectConfirm, setShowRejectConfirm] = useState(false)
   const questions = useMemo(() => normalizeQuizDraftQuestions(draft?.validatedOutput || draft?.rawOutput), [draft])
-  const reviewedCount = useMemo(
-    () => questions.filter((question) => question.reviewStatus && question.reviewStatus !== 'PENDING').length,
-    [questions]
-  )
 
   if (!draft) return null
 
-  const statusLabel = draft.aiJob?.status ?? draft.status
-  const promptVersion = draft.promptVersion || 'v1'
+  // const statusLabel = draft.aiJob?.status ?? draft.status
+  // const promptVersion = draft.promptVersion || 'v1'
 
   const handleReject = () => {
     if (!showRejectInput) {
@@ -70,20 +77,63 @@ export function DraftPreviewModal({
   }
 
   const handleEdit = () => {
-    console.log('[DraftPreviewModal] open edit modal', {
-      draftId: draft.id,
-      currentIndex,
-      question: currentQuestion?.question,
-      quizQuestionId: currentQuestion?.quizQuestionId
-    })
-    setEditingQuestionIndex(currentIndex)
+    if (!currentQuestion) return
+    setEditingQuestionIndex(currentQuestionIndex)
     setIsEditOpen(true)
   }
 
-  const currentQuestion = questions[currentIndex]
-  const canGoPrev = currentIndex > 0
-  const canGoNext = currentIndex < questions.length - 1
-  const questionStatus = currentQuestion?.reviewStatus ?? 'PENDING'
+  const currentQuestionIndex = Math.min(currentIndex, Math.max(0, questions.length - 1))
+  const currentQuestion = questions[currentQuestionIndex]
+  const canGoPrev = currentQuestionIndex > 0
+  const canGoNext = currentQuestionIndex < questions.length - 1
+
+  const handleRejectQuestion = () => {
+    setShowRejectConfirm(true)
+  }
+
+  const confirmRejectQuestion = async () => {
+    if (!currentQuestion) return
+
+    const removedIndex = currentQuestionIndex
+    const nextIndex = questions.length <= 1 ? 0 : removedIndex < questions.length - 1 ? removedIndex : removedIndex - 1
+    // Dùng originalIndex (vị trí trong mảng gốc chưa filter) để gọi API đúng
+    const apiIndex = currentQuestion.originalIndex ?? currentQuestionIndex
+
+    try {
+      await onRejectQuestion(draft.id, apiIndex, {
+        question: currentQuestion.question,
+        options: currentQuestion.options,
+        correctIndex: currentQuestion.correctIndex,
+        explanation: currentQuestion.explanation
+      })
+      setCurrentIndex(nextIndex)
+      setShowRejectConfirm(false)
+    } catch {
+      // Mutation handlers already show toast and refetch the draft.
+      setShowRejectConfirm(false)
+    }
+  }
+
+  const handleAcceptQuestion = async () => {
+    if (!currentQuestion) return
+
+    const removedIndex = currentQuestionIndex
+    const nextIndex = questions.length <= 1 ? 0 : removedIndex < questions.length - 1 ? removedIndex : removedIndex - 1
+    // Dùng originalIndex (vị trí trong mảng gốc chưa filter) để gọi API đúng
+    const apiIndex = currentQuestion.originalIndex ?? currentQuestionIndex
+
+    try {
+      await onAcceptQuestion(draft.id, apiIndex, {
+        question: currentQuestion.question,
+        options: currentQuestion.options,
+        correctIndex: currentQuestion.correctIndex,
+        explanation: currentQuestion.explanation
+      })
+      setCurrentIndex(nextIndex)
+    } catch {
+      // Mutation handlers already show toast and refetch the draft.
+    }
+  }
 
   return (
     <section
@@ -102,20 +152,20 @@ export function DraftPreviewModal({
                 <Clock3 className='h-3.5 w-3.5' />
                 {formatDistanceToNow(new Date(draft.createdAt), { addSuffix: true, locale: vi })}
               </Badge>
-              <Badge variant='outline' className='uppercase tracking-[0.18em] text-[10px]'>
+              {/* <Badge variant='outline' className='uppercase tracking-[0.18em] text-[10px]'>
                 {statusLabel}
               </Badge>
               <Badge variant='outline' className='uppercase tracking-[0.18em] text-[10px]'>
                 {promptVersion}
-              </Badge>
+              </Badge> */}
             </div>
 
             <div className='space-y-1.5'>
               <h3 className='text-2xl font-black tracking-tight text-foreground'>Bảng duyệt câu hỏi AI</h3>
-              <p className='max-w-3xl text-sm sm:text-base text-muted-foreground leading-relaxed'>
+              {/* <p className='max-w-3xl text-sm sm:text-base text-muted-foreground leading-relaxed'>
                 Duyệt trực tiếp theo danh sách, xem nhanh đáp án đúng, và kiểm tra giải thích trước khi publish hoặc
                 reject. Vùng danh sách có scroll riêng nên số lượng câu hỏi nhiều vẫn không vỡ layout.
-              </p>
+              </p> */}
             </div>
           </div>
 
@@ -157,22 +207,22 @@ export function DraftPreviewModal({
                     <div className='mt-1 text-2xl font-black text-emerald-700'>{questions.length}</div>
                   </div>
                   <div className='rounded-2xl bg-amber-50 px-3 py-3'>
-                    <div className='text-[11px] uppercase tracking-[0.18em] text-amber-700/70'>Đã xử lý</div>
-                    <div className='mt-1 text-2xl font-black text-amber-700'>{reviewedCount}</div>
+                    <div className='text-[11px] uppercase tracking-[0.18em] text-amber-700/70'>Còn lại</div>
+                    <div className='mt-1 text-2xl font-black text-amber-700'>{questions.length}</div>
                   </div>
-                  <div className='rounded-2xl bg-slate-100 px-3 py-3'>
+                  {/* <div className='rounded-2xl bg-slate-100 px-3 py-3'>
                     <div className='text-[11px] uppercase tracking-[0.18em] text-slate-600'>Prompt</div>
                     <div className='mt-1 text-2xl font-black text-slate-800'>{promptVersion}</div>
-                  </div>
+                  </div> */}
                 </div>
-                <div className='rounded-2xl border border-dashed border-border bg-background px-3 py-3 text-sm text-muted-foreground'>
+                {/* <div className='rounded-2xl border border-dashed border-border bg-background px-3 py-3 text-sm text-muted-foreground'>
                   <span className='font-semibold text-foreground'>Mẹo duyệt:</span> hãy ưu tiên kiểm tra độ rõ của câu
                   hỏi, độ nhiễu của phương án và phần giải thích.
-                </div>
+                </div> */}
               </CardContent>
             </Card>
 
-            <Card className='border-border/70 bg-white/90 shadow-sm'>
+            {/* <Card className='border-border/70 bg-white/90 shadow-sm'>
               <CardContent className='p-4 space-y-3'>
                 <div className='flex items-center gap-2 text-sm font-semibold text-foreground'>
                   <AlertCircle className='h-4 w-4 text-amber-600' />
@@ -192,7 +242,7 @@ export function DraftPreviewModal({
                   />
                 )}
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </aside>
 
@@ -202,38 +252,42 @@ export function DraftPreviewModal({
               <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
                   <h4 className='text-lg font-bold text-foreground'>Câu hỏi đang duyệt</h4>
-                  <p className='text-sm text-muted-foreground'>
-                    Dùng nút <span className='font-semibold text-foreground'>Pre</span> và{' '}
-                    <span className='font-semibold text-foreground'>Next</span> để chuyển từng câu.
-                  </p>
+                  <p className='text-sm text-muted-foreground'>Duyệt từng câu bằng nút điều hướng bên cạnh.</p>
                 </div>
-                <Badge variant='secondary' className='px-3 py-1 rounded-full'>
-                  {questions.length} items
-                </Badge>
+                <div className='flex items-center gap-2'>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='gap-1.5'
+                    onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
+                    disabled={!canGoPrev || isSubmitting}
+                  >
+                    <ChevronLeft className='h-4 w-4' />
+                    Trước
+                  </Button>
+                  <Badge variant='secondary' className='px-3 py-1 rounded-full'>
+                    {currentQuestionIndex + 1}/{questions.length}
+                  </Badge>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='gap-1.5'
+                    onClick={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))}
+                    disabled={!canGoNext || isSubmitting}
+                  >
+                    Tiếp theo
+                    <ChevronRight className='h-4 w-4' />
+                  </Button>
+                </div>
               </div>
             </div>
 
-            <div className='min-h-[78vh] bg-gradient-to-b from-white to-slate-50/60 px-5 py-6 sm:px-6 sm:py-8'>
+            <div className='bg-gradient-to-b from-white to-slate-50/60 px-5 py-6 sm:px-6 sm:py-8'>
               {questions.length > 0 && currentQuestion ? (
-                <div className='mx-auto flex min-h-[72vh] max-w-4xl flex-col justify-center gap-6'>
+                <div className='mx-auto flex max-w-4xl flex-col gap-6'>
                   <div className='flex items-center justify-between'>
                     <Badge variant='outline' className='rounded-full px-3 py-1 uppercase tracking-[0.18em] text-[10px]'>
-                      Câu {currentIndex + 1}/{questions.length}
-                    </Badge>
-                    <Badge
-                      className={
-                        questionStatus === 'ACCEPTED'
-                          ? 'bg-emerald-600 hover:bg-emerald-600'
-                          : questionStatus === 'REJECTED'
-                            ? 'bg-rose-600 hover:bg-rose-600'
-                            : 'bg-slate-600 hover:bg-slate-600'
-                      }
-                    >
-                      {questionStatus === 'ACCEPTED'
-                        ? 'Đã duyệt'
-                        : questionStatus === 'REJECTED'
-                          ? 'Đã từ chối'
-                          : 'Chờ duyệt'}
+                      Câu {currentQuestionIndex + 1}/{questions.length}
                     </Badge>
                   </div>
 
@@ -279,13 +333,10 @@ export function DraftPreviewModal({
                   </Card>
 
                   <div className='flex flex-col gap-3 rounded-[1.5rem] border border-border/70 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6'>
-                    <div className='text-sm text-muted-foreground'>
-                      {questionStatus === 'PENDING'
-                        ? 'Duyệt câu này để thêm vào quiz hiện có, hoặc để hệ thống tạo quiz mới nếu chưa có.'
-                        : questionStatus === 'ACCEPTED'
-                          ? 'Câu hỏi này đã được thêm vào quiz.'
-                          : 'Câu hỏi này đã bị loại khỏi bản nháp.'}
-                    </div>
+                    {/* <div className='text-sm text-muted-foreground'>
+                      Duyệt câu này để thêm vào quiz hiện có, hoặc để hệ thống tạo quiz mới nếu chưa có. Từ chối sẽ xóa
+                      câu khỏi bản nháp.
+                    </div> */}
                     <div className='flex flex-wrap items-center gap-2'>
                       <Button
                         variant='outline'
@@ -299,8 +350,8 @@ export function DraftPreviewModal({
                       <Button
                         variant='outline'
                         className='gap-2 border-emerald-200 bg-emerald-50/70 text-emerald-700 hover:bg-emerald-100/80'
-                        onClick={() => onAcceptQuestion(draft.id, currentIndex)}
-                        disabled={isSubmitting || questionStatus !== 'PENDING'}
+                        onClick={handleAcceptQuestion}
+                        disabled={isSubmitting || !currentQuestion}
                       >
                         <Check className='h-4 w-4' />
                         Duyệt câu này
@@ -308,8 +359,8 @@ export function DraftPreviewModal({
                       <Button
                         variant='outline'
                         className='gap-2 border-rose-200 bg-rose-50/70 text-rose-700 hover:bg-rose-100/80'
-                        onClick={() => onRejectQuestion(draft.id, currentIndex)}
-                        disabled={isSubmitting || questionStatus !== 'PENDING'}
+                        onClick={handleRejectQuestion}
+                        disabled={isSubmitting || !currentQuestion}
                       >
                         <X className='h-4 w-4' />
                         Từ chối câu này
@@ -317,41 +368,17 @@ export function DraftPreviewModal({
                     </div>
                   </div>
 
-                  <div className='flex items-center justify-between gap-3'>
-                    <Button
-                      variant='outline'
-                      className='min-w-[140px] gap-2'
-                      onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
-                      disabled={!canGoPrev || isSubmitting}
-                    >
-                      <ChevronLeft className='h-4 w-4' />
-                      Pre
-                    </Button>
 
-                    <div className='text-sm text-muted-foreground'>
-                      {canGoPrev ? 'Xem lại câu trước' : 'Đang ở câu đầu tiên'}
-                    </div>
-
-                    <Button
-                      variant='outline'
-                      className='min-w-[140px] gap-2'
-                      onClick={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))}
-                      disabled={!canGoNext || isSubmitting}
-                    >
-                      Next
-                      <ChevronRight className='h-4 w-4' />
-                    </Button>
-                  </div>
                 </div>
               ) : (
-                <div className='flex min-h-[72vh] flex-col items-center justify-center gap-3 rounded-[2rem] border border-dashed border-border bg-muted/20 text-center'>
+                <div className='flex flex-col items-center justify-center gap-3 rounded-[2rem] border border-dashed border-border bg-muted/20 py-20 text-center'>
                   <div className='flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm'>
                     <Sparkles className='h-8 w-8 text-muted-foreground' />
                   </div>
                   <div className='space-y-1'>
-                    <p className='text-lg font-bold text-foreground'>Không có nội dung câu hỏi hợp lệ</p>
+                    <p className='text-lg font-bold text-foreground'>Không còn câu hỏi đang chờ duyệt</p>
                     <p className='max-w-md text-sm text-muted-foreground'>
-                      Bản nháp chưa có payload câu hỏi hợp lệ. Bạn có thể reject để sinh lại hoặc kiểm tra log backend.
+                      Các câu đã duyệt đã được chuyển vào quiz hiện tại. Câu bị từ chối đã được xóa khỏi bản nháp.
                     </p>
                   </div>
                 </div>
@@ -368,16 +395,29 @@ export function DraftPreviewModal({
           }}
           initialData={currentQuestion ?? null}
           onSave={async (body) => {
-            console.log('[DraftPreviewModal] submit draft question edit', {
-              draftId: draft.id,
-              currentIndex,
-              editingQuestionIndex,
-              body,
-              initialData: currentQuestion
-            })
-            await onUpdateQuestion(draft.id, editingQuestionIndex ?? currentIndex, body)
+            // Dùng originalIndex để gọi API đúng vị trí trong mảng gốc
+            const targetQuestion = editingQuestionIndex !== null ? questions[editingQuestionIndex] : currentQuestion
+            const apiIndex = targetQuestion?.originalIndex ?? editingQuestionIndex ?? currentQuestionIndex
+            await onUpdateQuestion(draft.id, apiIndex, body)
           }}
         />
+
+        <Dialog open={showRejectConfirm} onOpenChange={setShowRejectConfirm}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Từ chối câu hỏi</DialogTitle>
+              <DialogDescription>
+                Bạn có chắc chắn muốn từ chối và xóa câu hỏi này khỏi bản nháp không? Hành động này không thể hoàn tác.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowRejectConfirm(false)}>Hủy</Button>
+              <Button variant="destructive" onClick={confirmRejectQuestion} disabled={isSubmitting}>
+                Từ chối
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </section>
   )

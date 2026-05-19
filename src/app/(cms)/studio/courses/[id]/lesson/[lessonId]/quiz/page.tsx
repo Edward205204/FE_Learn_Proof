@@ -5,6 +5,14 @@ import { useParams, useRouter } from 'next/navigation'
 import { ChevronLeft, ChevronRight, Loader2, HelpCircle, Check, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { AiQuizSection } from './_components/ai-quiz-section'
 import { QuestionEditorModal, LocalQuestion } from './_components/question-editor-modal'
 import { useGetLessonDetailQuery } from '@/app/(cms)/_hooks/use-lesson'
@@ -86,6 +94,7 @@ export default function LessonQuizPage() {
   const [isEditorOpen, setIsEditorOpen] = useState(false)
   const [editingQuestion, setEditingQuestion] = useState<LocalQuestion | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   // Xác định danh sách câu hỏi để hiển thị (đã xuất bản)
   const isPureQuiz = lessonDetail?.type === 'QUIZ'
@@ -112,12 +121,10 @@ export default function LessonQuizPage() {
     if (publishedQuestions.length > 0) {
       const currentQuestions = getValues('questions')
       const currentSupplementalQuiz = getValues('supplementalQuiz')
-      const nextQuestions = lessonDetail.type === 'QUIZ'
-        ? mergeQuestionsPreservingOrder(currentQuestions, publishedQuestions)
-        : []
-      const nextSupplementalQuiz = lessonDetail.type === 'QUIZ'
-        ? []
-        : mergeQuestionsPreservingOrder(currentSupplementalQuiz, publishedQuestions)
+      const nextQuestions =
+        lessonDetail.type === 'QUIZ' ? mergeQuestionsPreservingOrder(currentQuestions, publishedQuestions) : []
+      const nextSupplementalQuiz =
+        lessonDetail.type === 'QUIZ' ? [] : mergeQuestionsPreservingOrder(currentSupplementalQuiz, publishedQuestions)
 
       form.reset({
         questions: nextQuestions,
@@ -207,12 +214,16 @@ export default function LessonQuizPage() {
     setCurrentIndex((prev) => Math.min(Math.max(0, prev), Math.max(0, next.length - 1)))
   }
 
-  const handleDelete = async (questionId?: string) => {
+  const handleDelete = (questionId?: string) => {
     if (!questionId) return
-    if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
-      await deleteMutation.mutateAsync(questionId)
-      applyQuestionDelete(questionId)
-    }
+    setDeleteConfirmId(questionId)
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteConfirmId) return
+    await deleteMutation.mutateAsync(deleteConfirmId)
+    applyQuestionDelete(deleteConfirmId)
+    setDeleteConfirmId(null)
   }
 
   return (
@@ -297,11 +308,33 @@ export default function LessonQuizPage() {
                     <div className='flex items-center justify-between gap-3'>
                       <div>
                         <h4 className='text-lg font-bold text-foreground'>Câu hỏi hiện tại</h4>
-                        <p className='text-sm text-muted-foreground'>Duyệt từng câu bằng nút điều hướng bên dưới.</p>
+                        <p className='text-sm text-muted-foreground'>Duyệt từng câu bằng nút điều hướng bên cạnh.</p>
                       </div>
-                      <Badge variant='secondary' className='px-3 py-1 rounded-full'>
-                        {currentIndex + 1}/{displayQuestions.length}
-                      </Badge>
+                      <div className='flex items-center gap-2'>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          className='gap-1.5'
+                          onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
+                          disabled={currentIndex === 0}
+                        >
+                          <ChevronLeft className='h-4 w-4' />
+                          Trước
+                        </Button>
+                        <Badge variant='secondary' className='px-3 py-1 rounded-full'>
+                          {currentIndex + 1}/{displayQuestions.length}
+                        </Badge>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          className='gap-1.5'
+                          onClick={() => setCurrentIndex((prev) => Math.min(displayQuestions.length - 1, prev + 1))}
+                          disabled={currentIndex >= displayQuestions.length - 1}
+                        >
+                          Tiếp theo
+                          <ChevronRight className='h-4 w-4' />
+                        </Button>
+                      </div>
                     </div>
                   </div>
 
@@ -310,8 +343,8 @@ export default function LessonQuizPage() {
                     const correctAnswer = q.answers.find((ans) => ans.isCorrect)?.text
 
                     return (
-                      <div className='min-h-[78vh] bg-gradient-to-b from-white to-slate-50/60 px-5 py-6 sm:px-6 sm:py-8'>
-                        <div className='mx-auto flex min-h-[72vh] max-w-4xl flex-col justify-center gap-6'>
+                      <div className='bg-gradient-to-b from-white to-slate-50/60 px-5 py-6 sm:px-6 sm:py-8'>
+                        <div className='mx-auto flex max-w-4xl flex-col gap-6'>
                           <div className='flex items-center justify-between'>
                             <Badge
                               variant='outline'
@@ -319,9 +352,9 @@ export default function LessonQuizPage() {
                             >
                               Câu {currentIndex + 1}
                             </Badge>
-                            {q.answers.some((ans) => ans.isCorrect) && (
+                            {/* {q.answers.some((ans) => ans.isCorrect) && (
                               <Badge className='bg-emerald-600 hover:bg-emerald-600'>Đã có đáp án đúng</Badge>
-                            )}
+                            )} */}
                           </div>
 
                           {canManageQuiz && q.id && (
@@ -378,7 +411,7 @@ export default function LessonQuizPage() {
                                 })}
                               </div>
 
-                              <div className='border-t border-border/60 bg-muted/20 px-5 py-5 sm:px-7 sm:py-6'>
+                              {/* <div className='border-t border-border/60 bg-muted/20 px-5 py-5 sm:px-7 sm:py-6'>
                                 <div className='rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-4 text-sm text-amber-900'>
                                   <div className='text-[11px] uppercase tracking-[0.18em] text-amber-700/70'>
                                     Đáp án đúng
@@ -387,35 +420,11 @@ export default function LessonQuizPage() {
                                     {correctAnswer || 'Chưa có đáp án đúng được đánh dấu.'}
                                   </div>
                                 </div>
-                              </div>
+                              </div> */}
                             </CardContent>
                           </Card>
 
-                          <div className='flex items-center justify-between gap-3'>
-                            <Button
-                              variant='outline'
-                              className='min-w-[140px] gap-2'
-                              onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
-                              disabled={currentIndex === 0}
-                            >
-                              <ChevronLeft className='h-4 w-4' />
-                              Pre
-                            </Button>
 
-                            <div className='text-sm text-muted-foreground'>
-                              {currentIndex === 0 ? 'Đang ở câu đầu tiên' : 'Tiếp tục kiểm tra các câu còn lại'}
-                            </div>
-
-                            <Button
-                              variant='outline'
-                              className='min-w-[140px] gap-2'
-                              onClick={() => setCurrentIndex((prev) => Math.min(displayQuestions.length - 1, prev + 1))}
-                              disabled={currentIndex >= displayQuestions.length - 1}
-                            >
-                              Next
-                              <ChevronRight className='h-4 w-4' />
-                            </Button>
-                          </div>
                         </div>
                       </div>
                     )
@@ -453,6 +462,24 @@ export default function LessonQuizPage() {
           onSaved={(question) => applyQuestionUpsert(question)}
         />
       )}
+
+      <Dialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Xóa câu hỏi</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn xóa câu hỏi này? Hành động này không thể hoàn tác.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>Hủy</Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={deleteMutation.isPending}>
+              {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Xóa
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

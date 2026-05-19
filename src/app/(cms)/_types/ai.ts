@@ -35,6 +35,8 @@ export interface QuizDraftQuestion {
   reviewStatus?: 'PENDING' | 'ACCEPTED' | 'REJECTED'
   quizQuestionId?: string | null
   reviewedAt?: string | null
+  /** Index gốc trong validatedOutput.questions (trước khi filter). Dùng để gọi API. */
+  originalIndex?: number
 }
 
 export type AiOutputLanguage = 'vi' | 'en'
@@ -66,6 +68,13 @@ export interface ReviewDraftQuestionResponse {
   quizId: string | null
   questionId: string
   alreadySynced: boolean
+  remainingQuestions?: QuizDraftQuestion[]
+  draftStatus?: QuizDraft['status']
+}
+
+export interface RejectDraftQuestionResponse {
+  remainingQuestions?: QuizDraftQuestion[]
+  draftStatus?: QuizDraft['status']
 }
 
 export interface QuizAiOverview {
@@ -76,13 +85,21 @@ export interface QuizAiOverview {
 }
 
 export function normalizeQuizDraftQuestions(
-  payload: QuizDraft['validatedOutput'] | QuizDraft['rawOutput'],
+  payload: QuizDraft['validatedOutput'] | QuizDraft['rawOutput']
 ): QuizDraftQuestion[] {
+  const withOriginalIndex = (questions: QuizDraftQuestion[]) =>
+    questions.map((q, index) => ({ ...q, originalIndex: index }))
+
+  const onlyPending = (questions: QuizDraftQuestion[]) =>
+    withOriginalIndex(questions).filter(
+      (question) => !question.quizQuestionId && (!question.reviewStatus || question.reviewStatus === 'PENDING')
+    )
+
   if (!payload) return []
-  if (Array.isArray(payload)) return payload as QuizDraftQuestion[]
+  if (Array.isArray(payload)) return onlyPending(payload as QuizDraftQuestion[])
   if (typeof payload === 'object' && payload && 'questions' in payload) {
     const questions = (payload as { questions?: QuizDraftQuestion[] }).questions
-    return Array.isArray(questions) ? questions : []
+    return Array.isArray(questions) ? onlyPending(questions) : []
   }
   return []
 }

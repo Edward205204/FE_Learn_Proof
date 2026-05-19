@@ -1,5 +1,5 @@
 import http from '@/utils/http'
-import type { AiOutputLanguage, ReviewDraftQuestionResponse } from '../_types/ai'
+import type { AiOutputLanguage, RejectDraftQuestionResponse, ReviewDraftQuestionResponse } from '../_types/ai'
 
 const quizApi = {
   // Tạm thời comment code cũ do không khớp với thiết kế BE
@@ -59,16 +59,22 @@ const quizApi = {
 
   publishDraft: (draftId: string) => http.patch<{ success: true }>(`/quiz/drafts/${draftId}/publish`),
 
-  acceptDraftQuestion: (draftId: string, questionIndex: number) =>
-    http.patch<ReviewDraftQuestionResponse>(`/quiz/drafts/${draftId}/questions/${questionIndex}/accept`),
+  acceptDraftQuestion: (
+    draftId: string,
+    questionIndex: number,
+    body?: { question: string; options: string[]; correctIndex: number; explanation: string }
+  ) => http.patch<ReviewDraftQuestionResponse>(`/quiz/drafts/${draftId}/questions/${questionIndex}/accept`, body),
 
-  rejectDraftQuestion: (draftId: string, questionIndex: number) =>
-    http.patch<{ success: true }>(`/quiz/drafts/${draftId}/questions/${questionIndex}/reject`),
+  rejectDraftQuestion: (
+    draftId: string,
+    questionIndex: number,
+    body?: { question: string; options: string[]; correctIndex: number; explanation: string }
+  ) => http.patch<RejectDraftQuestionResponse>(`/quiz/drafts/${draftId}/questions/${questionIndex}/reject`, body),
 
   updateDraftQuestion: (
     draftId: string,
     questionIndex: number,
-    body: { question: string; options: string[]; correctIndex: number; explanation: string },
+    body: { question: string; options: string[]; correctIndex: number; explanation: string }
   ) => http.patch<{ success: true }>(`/quiz/drafts/${draftId}/questions/${questionIndex}`, body),
 
   rejectDraft: (draftId: string, body: { reviewNote?: string }) =>
