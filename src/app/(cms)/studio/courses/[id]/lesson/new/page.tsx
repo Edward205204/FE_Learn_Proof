@@ -199,8 +199,8 @@ export default function LessonEditorPage() {
     }
 
     createLesson(payload, {
-      onSuccess: () => {
-        router.push(`/studio/courses/${courseId}`)
+      onSuccess: (res) => {
+        router.push(`/studio/courses/${courseId}/lesson/${res.data.id}/quiz`)
       }
     })
   }
@@ -483,36 +483,7 @@ export default function LessonEditorPage() {
               </Card>
             )}
 
-            {/* QUIZ bổ sung cho VIDEO — `quizData` tùy chọn (VideoLessonStrategy) */}
-            {lessonType === 'video' && (
-              <div className='space-y-6 mt-8'>
-                <div className='rounded-2xl border border-border/50 bg-muted/20 px-5 py-4'>
-                  <h3 className='font-extrabold text-lg tracking-tight'>Bài kiểm tra cuối bài (tùy chọn)</h3>
-                  <p className='text-muted-foreground text-sm mt-1'>
-                    Thêm trắc nghiệm kèm bài video; quiz được tạo cùng lúc khi lưu bài học.
-                  </p>
-                </div>
-                {supFields.map((field, index) => (
-                  <QuestionCard
-                    key={field.id}
-                    index={index}
-                    form={form}
-                    onRemove={supRemove}
-                    showAnswers
-                    namePrefix='supplementalQuiz'
-                  />
-                ))}
-                <Button
-                  type='button'
-                  variant='outline'
-                  className='w-full border-dashed border-2 py-8 rounded-3xl font-bold bg-muted/20'
-                  onClick={() => supAppend(DEFAULT_QUESTION)}
-                >
-                  <Plus className='w-5 h-5 mr-2 text-primary' />
-                  Thêm câu hỏi trắc nghiệm
-                </Button>
-              </div>
-            )}
+
 
             {/* TEXT */}
             {lessonType === 'text' && (
