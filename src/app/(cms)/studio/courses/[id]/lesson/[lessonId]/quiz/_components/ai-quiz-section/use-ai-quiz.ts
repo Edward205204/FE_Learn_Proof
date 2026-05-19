@@ -127,6 +127,26 @@ export function useAiQuiz(lessonId: string, outputLanguage: AiOutputLanguage = '
     }
   })
 
+  const updateQuestionMutation = useMutation({
+    mutationFn: ({
+      draftId,
+      questionIndex,
+      body
+    }: {
+      draftId: string
+      questionIndex: number
+      body: { question: string; options: string[]; correctIndex: number; explanation: string }
+    }) => quizApi.updateDraftQuestion(draftId, questionIndex, body),
+    onSuccess: async () => {
+      toast.success('Đã cập nhật câu hỏi AI.')
+      await queryClient.invalidateQueries({ queryKey: ['ai_quiz_overview', lessonId] })
+      await queryClient.invalidateQueries({ queryKey: ['lessons', lessonId] })
+    },
+    onError: () => {
+      toast.error('Không thể cập nhật câu hỏi AI.')
+    }
+  })
+
   const handleGenerate = async () => {
     await generateMutation.mutateAsync()
   }
@@ -147,6 +167,14 @@ export function useAiQuiz(lessonId: string, outputLanguage: AiOutputLanguage = '
     await rejectQuestionMutation.mutateAsync({ draftId, questionIndex })
   }
 
+  const handleUpdateQuestion = async (
+    draftId: string,
+    questionIndex: number,
+    body: { question: string; options: string[]; correctIndex: number; explanation: string }
+  ) => {
+    await updateQuestionMutation.mutateAsync({ draftId, questionIndex, body })
+  }
+
   return {
     overview: overviewQuery.data ?? null,
     draft,
@@ -156,12 +184,14 @@ export function useAiQuiz(lessonId: string, outputLanguage: AiOutputLanguage = '
       publishMutation.isPending ||
       rejectMutation.isPending ||
       acceptQuestionMutation.isPending ||
-      rejectQuestionMutation.isPending,
+      rejectQuestionMutation.isPending ||
+      updateQuestionMutation.isPending,
     handleGenerate,
     handlePublish,
     handleReject,
     handleAcceptQuestion,
     handleRejectQuestion,
+    handleUpdateQuestion,
     refreshDraft: async () => {
       await queryClient.invalidateQueries({ queryKey: ['ai_quiz_overview', lessonId] })
     }

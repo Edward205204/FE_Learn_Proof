@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ChevronLeft, ChevronRight, Loader2, HelpCircle, Check } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Loader2, HelpCircle, Check, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { AiQuizSection } from './_components/ai-quiz-section'
@@ -37,6 +37,30 @@ const mapPublishedQuizQuestions = (quiz?: QuizPublished | null): QuizQuestion[] 
   }))
 }
 
+const mergeQuestionsPreservingOrder = (current: QuizQuestion[], next: QuizQuestion[]) => {
+  if (!current.length) return next
+
+  const nextById = new Map(next.filter((q) => q.id).map((q) => [q.id as string, q]))
+  const merged: QuizQuestion[] = []
+  const usedIds = new Set<string>()
+
+  for (const question of current) {
+    if (!question.id) continue
+    const updated = nextById.get(question.id)
+    if (updated) {
+      merged.push(updated)
+      usedIds.add(question.id)
+    }
+  }
+
+  for (const question of next) {
+    if (!question.id || usedIds.has(question.id)) continue
+    merged.push(question)
+  }
+
+  return merged.length ? merged : next
+}
+
 export default function LessonQuizPage() {
   const router = useRouter()
   const params = useParams<{ id: string; lessonId: string }>()
@@ -51,12 +75,13 @@ export default function LessonQuizPage() {
       supplementalQuiz: []
     }
   })
+  const { getValues, setValue } = form
 
   const questions = useWatch({ control: form.control, name: 'questions' })
   const supplementalQuiz = useWatch({ control: form.control, name: 'supplementalQuiz' })
 
-  const quizId = lessonDetail?.type === 'QUIZ' ? lessonDetail.quiz?.id || '' : ''
-  const deleteMutation = useDeleteQuestionMutation(quizId)
+  const quizId = aiOverview?.quiz?.id ?? (lessonDetail?.type === 'QUIZ' ? lessonDetail.quiz?.id || '' : '')
+  const deleteMutation = useDeleteQuestionMutation(lessonId, quizId)
 
   const [isEditorOpen, setIsEditorOpen] = useState(false)
   const [editingQuestion, setEditingQuestion] = useState<LocalQuestion | null>(null)
@@ -64,6 +89,7 @@ export default function LessonQuizPage() {
 
   // Xác định danh sách câu hỏi để hiển thị (đã xuất bản)
   const isPureQuiz = lessonDetail?.type === 'QUIZ'
+  const canManageQuiz = !!quizId
   const displayQuestions = isPureQuiz ? questions : supplementalQuiz
 
   const [prevLessonId, setPrevLessonId] = useState<string | undefined>(lessonDetail?.id)
@@ -84,9 +110,18 @@ export default function LessonQuizPage() {
     )
 
     if (publishedQuestions.length > 0) {
+      const currentQuestions = getValues('questions')
+      const currentSupplementalQuiz = getValues('supplementalQuiz')
+      const nextQuestions = lessonDetail.type === 'QUIZ'
+        ? mergeQuestionsPreservingOrder(currentQuestions, publishedQuestions)
+        : []
+      const nextSupplementalQuiz = lessonDetail.type === 'QUIZ'
+        ? []
+        : mergeQuestionsPreservingOrder(currentSupplementalQuiz, publishedQuestions)
+
       form.reset({
-        questions: lessonDetail.type === 'QUIZ' ? publishedQuestions : [],
-        supplementalQuiz: lessonDetail.type === 'QUIZ' ? [] : publishedQuestions
+        questions: nextQuestions,
+        supplementalQuiz: nextSupplementalQuiz
       })
       return
     }
@@ -139,14 +174,44 @@ export default function LessonQuizPage() {
     setIsEditorOpen(true)
   }
 
+  const applyQuestionUpsert = (question: LocalQuestion) => {
+    const nextQuestion: QuizQuestion = {
+      id: question.id,
+      questionText: question.content,
+      answers: question.answers.map((a) => ({
+        id: a.id,
+        text: a.content,
+        isCorrect: a.isCorrect
+      }))
+    }
+
+    const key = isPureQuiz ? 'questions' : 'supplementalQuiz'
+    const current = getValues(key)
+    const index = current.findIndex((item) => item.id === nextQuestion.id)
+
+    if (index >= 0) {
+      const next = [...current]
+      next[index] = nextQuestion
+      setValue(key, next, { shouldDirty: true, shouldTouch: false, shouldValidate: false })
+      return
+    }
+
+    setValue(key, [...current, nextQuestion], { shouldDirty: true, shouldTouch: false, shouldValidate: false })
+  }
+
+  const applyQuestionDelete = (questionId: string) => {
+    const key = isPureQuiz ? 'questions' : 'supplementalQuiz'
+    const current = getValues(key)
+    const next = current.filter((item) => item.id !== questionId)
+    setValue(key, next, { shouldDirty: true, shouldTouch: false, shouldValidate: false })
+    setCurrentIndex((prev) => Math.min(Math.max(0, prev), Math.max(0, next.length - 1)))
+  }
+
   const handleDelete = async (questionId?: string) => {
     if (!questionId) return
     if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
       await deleteMutation.mutateAsync(questionId)
-      // Refetch automatically via invalidation in mutation (wait, useDeleteQuestionMutation doesn't invalidate!)
-      // Actually we should reload the page or invalidate queries.
-      // But it's fine, we can let user refresh or we can invalidate in mutation.
-      window.location.reload()
+      applyQuestionDelete(questionId)
     }
   }
 
@@ -210,7 +275,7 @@ export default function LessonQuizPage() {
                 <Badge variant='secondary' className='px-4 py-1.5 rounded-full font-bold text-sm'>
                   {displayQuestions.length} Câu hỏi
                 </Badge>
-                {isPureQuiz && (
+                {canManageQuiz && (
                   <Button
                     onClick={() => {
                       setEditingQuestion(null)
@@ -258,6 +323,30 @@ export default function LessonQuizPage() {
                               <Badge className='bg-emerald-600 hover:bg-emerald-600'>Đã có đáp án đúng</Badge>
                             )}
                           </div>
+
+                          {canManageQuiz && q.id && (
+                            <div className='flex flex-wrap items-center gap-2'>
+                              <Button
+                                variant='outline'
+                                size='sm'
+                                className='gap-2 border-sky-200 bg-sky-50/70 text-sky-700 hover:bg-sky-100/80'
+                                onClick={() => handleEdit(q)}
+                              >
+                                <Pencil className='h-4 w-4' />
+                                Chỉnh sửa
+                              </Button>
+                              <Button
+                                variant='outline'
+                                size='sm'
+                                className='gap-2 border-rose-200 bg-rose-50/70 text-rose-700 hover:bg-rose-100/80'
+                                onClick={() => handleDelete(q.id)}
+                                disabled={deleteMutation.isPending}
+                              >
+                                <Trash2 className='h-4 w-4' />
+                                Xóa câu hỏi
+                              </Button>
+                            </div>
+                          )}
 
                           <Card className='border-border/70 shadow-[0_10px_40px_rgba(15,23,42,0.06)] overflow-hidden'>
                             <CardContent className='p-0'>
@@ -354,13 +443,14 @@ export default function LessonQuizPage() {
         <div className='h-20' />
       </main>
 
-      {isPureQuiz && (
+      {canManageQuiz && (
         <QuestionEditorModal
           open={isEditorOpen}
           onOpenChange={setIsEditorOpen}
           quizId={quizId}
           lessonId={lessonId}
           initialData={editingQuestion}
+          onSaved={(question) => applyQuestionUpsert(question)}
         />
       )}
     </div>

@@ -65,6 +65,12 @@ const quizApi = {
   rejectDraftQuestion: (draftId: string, questionIndex: number) =>
     http.patch<{ success: true }>(`/quiz/drafts/${draftId}/questions/${questionIndex}/reject`),
 
+  updateDraftQuestion: (
+    draftId: string,
+    questionIndex: number,
+    body: { question: string; options: string[]; correctIndex: number; explanation: string },
+  ) => http.patch<{ success: true }>(`/quiz/drafts/${draftId}/questions/${questionIndex}`, body),
+
   rejectDraft: (draftId: string, body: { reviewNote?: string }) =>
     http.patch<{ success: true }>(`/quiz/drafts/${draftId}/reject`, body)
 }

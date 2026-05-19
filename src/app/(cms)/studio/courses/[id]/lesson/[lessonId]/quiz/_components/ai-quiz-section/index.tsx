@@ -22,7 +22,8 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
     handlePublish,
     handleReject,
     handleAcceptQuestion,
-    handleRejectQuestion
+    handleRejectQuestion,
+    handleUpdateQuestion
   } = useAiQuiz(lessonId, outputLanguage)
 
   const hasDraft = !!draft
@@ -135,6 +136,7 @@ export function AiQuizSection({ lessonId, lessonType }: Props) {
         onReject={handleReject}
         onAcceptQuestion={handleAcceptQuestion}
         onRejectQuestion={handleRejectQuestion}
+        onUpdateQuestion={handleUpdateQuestion}
         isSubmitting={isSubmitting}
       />
 

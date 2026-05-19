@@ -1,6 +1,7 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import quizApi from '../_api/quiz.api'
+import { LESSON_QUERY_KEYS } from './use-lesson'
 
 // Các hook cũ đã được comment lại do BE không còn hỗ trợ save toàn bộ quiz qua 1 endpoint
 // export function useSaveLessonQuizMutation(lessonId: string) { ... }
@@ -24,10 +25,15 @@ export function useEditQuestionMutation(quizId: string) {
   })
 }
 
-export function useDeleteQuestionMutation(quizId: string) {
+export function useDeleteQuestionMutation(lessonId: string, quizId: string) {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (questionId: string) => quizApi.deleteQuestion(quizId, questionId),
-    onSuccess: () => toast.success('Xóa câu hỏi thành công!'),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: LESSON_QUERY_KEYS.detail(lessonId) })
+      await queryClient.invalidateQueries({ queryKey: ['ai_quiz_overview', lessonId] })
+      toast.success('Xóa câu hỏi thành công!')
+    },
     onError: () => toast.error('Có lỗi xảy ra khi xóa câu hỏi.')
   })
 }

@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock3,
+  Pencil,
   Sparkles,
   ThumbsDown,
   ThumbsUp,
@@ -18,6 +19,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { QuizDraft, normalizeQuizDraftQuestions } from '@/app/(cms)/_types/ai'
+import { DraftQuestionEditorModal } from './draft-question-editor-modal'
 
 interface Props {
   draft: QuizDraft | null
@@ -25,6 +27,11 @@ interface Props {
   onReject: (id: string, note: string) => void
   onAcceptQuestion: (draftId: string, questionIndex: number) => void
   onRejectQuestion: (draftId: string, questionIndex: number) => void
+  onUpdateQuestion: (
+    draftId: string,
+    questionIndex: number,
+    body: { question: string; options: string[]; correctIndex: number; explanation: string }
+  ) => void
   isSubmitting: boolean
 }
 
@@ -34,11 +41,13 @@ export function DraftPreviewModal({
   onReject,
   onAcceptQuestion,
   onRejectQuestion,
+  onUpdateQuestion,
   isSubmitting
 }: Props) {
   const [showRejectInput, setShowRejectInput] = useState(false)
   const [reviewNote, setReviewNote] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [isEditOpen, setIsEditOpen] = useState(false)
 
   const questions = useMemo(() => normalizeQuizDraftQuestions(draft?.validatedOutput || draft?.rawOutput), [draft])
   const reviewedCount = useMemo(
@@ -57,6 +66,10 @@ export function DraftPreviewModal({
       return
     }
     onReject(draft.id, reviewNote)
+  }
+
+  const handleEdit = () => {
+    setIsEditOpen(true)
   }
 
   const currentQuestion = questions[currentIndex]
@@ -268,6 +281,15 @@ export function DraftPreviewModal({
                     <div className='flex flex-wrap items-center gap-2'>
                       <Button
                         variant='outline'
+                        className='gap-2 border-sky-200 bg-sky-50/70 text-sky-700 hover:bg-sky-100/80'
+                        onClick={handleEdit}
+                        disabled={isSubmitting || !currentQuestion}
+                      >
+                        <Pencil className='h-4 w-4' />
+                        Chỉnh sửa câu này
+                      </Button>
+                      <Button
+                        variant='outline'
                         className='gap-2 border-emerald-200 bg-emerald-50/70 text-emerald-700 hover:bg-emerald-100/80'
                         onClick={() => onAcceptQuestion(draft.id, currentIndex)}
                         disabled={isSubmitting || questionStatus !== 'PENDING'}
@@ -329,6 +351,15 @@ export function DraftPreviewModal({
             </div>
           </div>
         </div>
+
+        <DraftQuestionEditorModal
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          initialData={currentQuestion ?? null}
+          onSave={async (body) => {
+            await onUpdateQuestion(draft.id, currentIndex, body)
+          }}
+        />
       </div>
     </section>
   )

@@ -20,9 +20,10 @@ interface Props {
   quizId: string
   lessonId: string
   initialData?: LocalQuestion | null
+  onSaved?: (question: LocalQuestion) => void
 }
 
-export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, initialData }: Props) {
+export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, initialData, onSaved }: Props) {
   const queryClient = useQueryClient()
   const [content, setContent] = useState('')
   const [answers, setAnswers] = useState<LocalAnswer[]>([])
@@ -89,9 +90,21 @@ export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, init
         }
 
         await quizApi.finishEditQuestion(quizId, qId)
+
+        onSaved?.({
+          id: qId,
+          content,
+          answers: answers.map((a) => ({ id: a.id, content: a.content, isCorrect: a.isCorrect }))
+        })
       } else {
         // Add new question
-        await quizApi.addQuestion(quizId, {
+        const res = await quizApi.addQuestion(quizId, {
+          content,
+          answers: answers.map((a) => ({ content: a.content, isCorrect: a.isCorrect }))
+        })
+        const createdId = (res as { data?: { id?: string } })?.data?.id
+        onSaved?.({
+          id: createdId,
           content,
           answers: answers.map((a) => ({ content: a.content, isCorrect: a.isCorrect }))
         })
@@ -99,6 +112,7 @@ export function QuestionEditorModal({ open, onOpenChange, quizId, lessonId, init
 
       toast.success('Lưu câu hỏi thành công')
       queryClient.invalidateQueries({ queryKey: LESSON_QUERY_KEYS.detail(lessonId) })
+      queryClient.invalidateQueries({ queryKey: ['ai_quiz_overview', lessonId] })
       onOpenChange(false)
     } catch (error) {
       console.error(error)
