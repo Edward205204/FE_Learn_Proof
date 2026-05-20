@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import certificateApi from '@/app/(learner)/_api/certificate.api'
 import { CertificateTemplate } from '@/app/(learner)/_components/certificate-template'
 import { CheckCircle2, ExternalLink, Copy, Share2, Linkedin, Shield, AlertTriangle, Loader2, Link } from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 
 const POLYGON_SCAN = 'https://amoy.polygonscan.com'
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? ''
@@ -51,19 +51,6 @@ export default function VerifyPage() {
   const params = useParams()
   const hash = typeof params.hash === 'string' ? params.hash : ''
 
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [scale, setScale] = useState(1)
-
-  useEffect(() => {
-    if (!containerRef.current) return
-    const observer = new ResizeObserver((entries) => {
-      if (!entries[0]) return
-      const width = entries[0].contentRect.width
-      setScale(width / 1056)
-    })
-    observer.observe(containerRef.current)
-    return () => observer.disconnect()
-  }, [])
 
   const {
     data: cert,
@@ -148,13 +135,13 @@ export default function VerifyPage() {
         <div className='grid grid-cols-1 xl:grid-cols-5 gap-8 items-start'>
           {/* Left: Certificate Display */}
           <div className='xl:col-span-3 space-y-4'>
-            {/* Scaled wrapper */}
+            {/* Scaled wrapper using SVG foreignObject for perfect responsive scaling */}
             <div className='rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-white w-full'>
-              <div ref={containerRef} className='relative w-full' style={{ aspectRatio: '1056 / 816' }}>
-                <div
-                  className='absolute top-0 left-0 origin-top-left'
-                  style={{ width: '1056px', height: '816px', transform: `scale(${scale})` }}
-                >
+              <svg
+                viewBox='0 0 1056 816'
+                className='w-full aspect-[1056/816] pointer-events-none'
+              >
+                <foreignObject width='1056' height='816'>
                   <CertificateTemplate
                     userName={cert.user.fullName}
                     courseName={cert.course.title}
@@ -162,8 +149,8 @@ export default function VerifyPage() {
                     certificateId={certificateId}
                     hash={cert.certificateHash}
                   />
-                </div>
-              </div>
+                </foreignObject>
+              </svg>
             </div>
 
             {/* Action Buttons */}
