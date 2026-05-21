@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { ClipboardList, Trophy } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ClipboardList, Trophy, HelpCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { QuizLesson } from '../_utils/lesson-types'
 import { LessonDiscussion } from './lesson-discussion'
@@ -41,7 +41,7 @@ export function QuizContainer({ courseId, lesson, onSubmit }: QuizContainerProps
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const answeredCount = Object.keys(answers).length
-  const totalQuestions = lesson.questions.length
+  const totalQuestions = lesson.questions?.length ?? 0
 
   const handleSelect = (questionId: string, optionId: string) => {
     if (submitted) return
@@ -67,6 +67,39 @@ export function QuizContainer({ courseId, lesson, onSubmit }: QuizContainerProps
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  if (totalQuestions === 0) {
+    return (
+      <div className='space-y-8'>
+        <div>
+          <div className='flex items-center gap-2 mb-3'>
+            <span className='inline-flex items-center gap-1.5 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-primary/20'>
+              <ClipboardList size={11} />
+              Quiz
+            </span>
+          </div>
+          <h1 className='text-3xl font-bold text-foreground leading-tight tracking-tight'>{lesson.title}</h1>
+        </div>
+
+        <div className='p-16 border-2 border-dashed border-muted-foreground/20 rounded-[2.5rem] bg-muted/5 flex flex-col items-center justify-center text-center gap-6'>
+          <div className='w-20 h-20 rounded-[2rem] bg-muted flex items-center justify-center text-muted-foreground/30'>
+            <HelpCircle size={40} />
+          </div>
+          <div className='space-y-2'>
+            <h3 className='text-xl font-black text-foreground'>Chưa có câu hỏi nào</h3>
+            <p className='text-sm text-muted-foreground max-w-sm mx-auto leading-relaxed'>
+              Bài kiểm tra này hiện đang được biên soạn nội dung. Vui lòng quay lại sau nhé!
+            </p>
+          </div>
+          <Button variant='outline' onClick={() => window.history.back()} className='rounded-xl font-bold'>
+            Quay lại
+          </Button>
+        </div>
+
+        <LessonDiscussion courseId={courseId} lessonId={lesson.id} />
+      </div>
+    )
   }
 
   return (

@@ -51,6 +51,7 @@ export default function VerifyPage() {
   const params = useParams()
   const hash = typeof params.hash === 'string' ? params.hash : ''
 
+
   const {
     data: cert,
     isLoading,
@@ -134,13 +135,13 @@ export default function VerifyPage() {
         <div className='grid grid-cols-1 xl:grid-cols-5 gap-8 items-start'>
           {/* Left: Certificate Display */}
           <div className='xl:col-span-3 space-y-4'>
-            {/* Scaled wrapper */}
-            <div className='rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-white'>
-              <div className='w-full overflow-x-auto'>
-                <div
-                  className='origin-top-left'
-                  style={{ transform: 'scale(0.58)', transformOrigin: 'top left', width: '1056px', height: '816px' }}
-                >
+            {/* Scaled wrapper using SVG foreignObject for perfect responsive scaling */}
+            <div className='rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-white w-full'>
+              <svg
+                viewBox='0 0 1056 816'
+                className='w-full aspect-[1056/816] pointer-events-none'
+              >
+                <foreignObject width='1056' height='816'>
                   <CertificateTemplate
                     userName={cert.user.fullName}
                     courseName={cert.course.title}
@@ -148,8 +149,8 @@ export default function VerifyPage() {
                     certificateId={certificateId}
                     hash={cert.certificateHash}
                   />
-                </div>
-              </div>
+                </foreignObject>
+              </svg>
             </div>
 
             {/* Action Buttons */}

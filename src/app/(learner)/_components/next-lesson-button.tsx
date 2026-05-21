@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowRight, Clock, CheckCircle2, Award } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const REQUIRED_SECONDS = 3 * 60 // 3 phút
+const REQUIRED_SECONDS = 1 * 60 // 1 phút
 
 interface NextLessonButtonProps {
   lessonId: string
@@ -139,8 +139,8 @@ export function NextLessonButton({
 
         <p className='text-xs text-muted-foreground'>
           {isUnlocked
-            ? 'Bạn đã học đủ 3 phút. Có thể chuyển sang bài tiếp theo!'
-            : `Hãy học ít nhất 3 phút để mở khóa bài tiếp theo. Còn ${minutes} phút ${secs} giây.`}
+            ? 'Bạn đã học đủ 1 phút. Có thể chuyển sang bài tiếp theo!'
+            : `Hãy học ít nhất 1 phút để mở khóa bài tiếp theo. Còn ${minutes} phút ${secs} giây.`}
         </p>
 
         {/* Button */}

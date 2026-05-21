@@ -16,7 +16,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { LessonData, SidebarChapter } from '../../../../_utils/lesson-types'
-import { AiChatBox } from './_components/ai-chat-box'
 import { useAuthStore } from '@/store/auth.store'
 
 function formatDuration(seconds?: number | null) {
@@ -213,6 +212,7 @@ export default function LessonPage() {
               lessonId={activeLesson.id}
               description={activeLesson.description}
               materials={activeLesson.materials}
+              authToken={accessToken}
             />
             <NextLessonButton
               key={activeLesson.id}
@@ -272,9 +272,6 @@ export default function LessonPage() {
           onLessonClick={handleNavigate}
         />
       </div>
-
-      {/* AI Chat Box */}
-      {lessonData && lessonData.type !== 'QUIZ' && <AiChatBox lessonId={currentLessonId!} authToken={accessToken} />}
     </main>
   )
 }

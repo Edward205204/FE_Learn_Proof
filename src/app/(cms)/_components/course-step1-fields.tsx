@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import { CloudUpload, Loader2, Sparkles } from 'lucide-react'
+import { CloudUpload, Loader2 } from 'lucide-react'
 
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -10,12 +10,12 @@ import { SimpleEditor } from '@/components/common/simple-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import { LEVEL_OPTIONS } from '@/app/(cms)/_constants/course-workflow'
-import type { Categories, CreateCourseStep1 } from '@/app/(cms)/_utils/zod'
+import type { Category, CreateCourseStep1 } from '@/app/(cms)/_utils/zod'
 import { toMediaUrl, useUploadImageMutation } from '@/app/(cms)/_hooks/use-media'
 
 type Props = {
   form: UseFormReturn<CreateCourseStep1>
-  categories?: Categories[]
+  categories?: Category[]
   shortDescriptionLength: number
   thumbnailUrl?: string | null
 }

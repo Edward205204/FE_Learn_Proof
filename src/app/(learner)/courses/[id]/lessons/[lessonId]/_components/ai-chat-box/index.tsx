@@ -1,11 +1,12 @@
 'use client'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
+import { useState } from 'react'
 import { useChatBox } from './use-chat-box'
 import { ChatMessageComponent } from './chat-message'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Bot, Send, X, MessageCircle, Loader2, Sparkles } from 'lucide-react'
+import { Bot, Send, MessageCircle, Loader2, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface AiChatBoxProps {
@@ -14,98 +15,117 @@ interface AiChatBoxProps {
 }
 
 export const AiChatBox = ({ lessonId, authToken }: AiChatBoxProps) => {
-  const { messages, input, isLoading, isOpen, setInput, setIsOpen, handleSubmit, messagesEndRef } = useChatBox({
+  const [outputLanguage, setOutputLanguage] = useState<'vi' | 'en'>('vi')
+  const { messages, input, isLoading, setInput, handleSubmit, messagesEndRef } = useChatBox({
     lessonId,
-    authToken
+    authToken,
+    outputLanguage
   })
 
   return (
     <>
-      {/* Toggle Button */}
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        className={cn(
-          'fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-2xl z-[100] transition-all duration-300 hover:scale-105',
-          isOpen ? 'bg-destructive hover:bg-destructive/90' : 'bg-primary hover:bg-primary/90'
-        )}
-      >
-        {isOpen ? <X className='w-6 h-6' /> : <Bot className='w-7 h-7' />}
-      </Button>
-
-      {/* Chat Panel */}
       <div
         className={cn(
-          'fixed bottom-24 right-6 w-[380px] h-[550px] max-h-[calc(100vh-120px)] bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right z-[100]',
-          isOpen ? 'scale-100 opacity-100' : 'scale-90 opacity-0 pointer-events-none'
+          'fixed bottom-6 right-6 z-[100] flex h-[600px] w-[400px] max-h-[calc(100vh-24px)] flex-col overflow-hidden rounded-xl border border-border bg-card shadow-lg transition-all duration-300'
         )}
       >
-        {/* Header */}
-        <div className='bg-primary p-4 flex items-center justify-between text-primary-foreground shrink-0'>
-          <div className='flex items-center gap-2'>
-            <Sparkles className='w-5 h-5 text-yellow-300' />
-            <h3 className='font-semibold text-sm'>Hỏi về bài học</h3>
+        <div className='shrink-0 border-b border-border px-5 py-4'>
+          <div className='flex items-start justify-between gap-4'>
+            <div className='flex items-center gap-3'>
+              <div className='flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-muted text-foreground'>
+                <Bot className='h-5 w-5' />
+              </div>
+              <div>
+                <h3 className='text-sm font-semibold text-foreground'>LearnProof Assistant</h3>
+                <div className='mt-1 flex items-center gap-1.5'>
+                  <span className='relative flex h-2 w-2'>
+                    <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
+                    <span className='relative inline-flex rounded-full h-2 w-2 bg-emerald-500'></span>
+                  </span>
+                  <span className='text-[10px] font-medium uppercase tracking-widest text-muted-foreground'>
+                    AI Online
+                  </span>
+                </div>
+              </div>
+            </div>
+            <Sparkles className='h-4 w-4 text-muted-foreground' />
           </div>
-          <Button
-            variant='ghost'
-            size='icon'
-            onClick={() => setIsOpen(false)}
-            className='text-primary-foreground hover:bg-primary-foreground/10 h-8 w-8'
-          >
-            <X className='w-4 h-4' />
-          </Button>
         </div>
 
-        {/* Message List */}
-        <ScrollArea className='flex-1 p-4'>
-          <div className='flex flex-col min-h-full'>
-            {messages.length === 0 ? (
-              <div className='flex-1 flex flex-col items-center justify-center text-center p-8 space-y-4 text-muted-foreground opacity-60 mt-10'>
-                <div className='w-16 h-16 rounded-full bg-muted flex items-center justify-center'>
-                  <MessageCircle className='w-8 h-8' />
-                </div>
-                <div>
-                  <p className='font-medium'>Chào bạn!</p>
-                  <p className='text-xs'>Hãy đặt câu hỏi về nội dung bài học này để AI hỗ trợ bạn nhé.</p>
-                </div>
+        <ScrollArea className='flex-1 px-5 py-5 scroll-smooth'>
+          {messages.length === 0 ? (
+            <div className='flex h-full flex-col items-center justify-center gap-5 text-center py-10'>
+              <div className='flex h-16 w-16 items-center justify-center rounded-xl border border-border bg-muted text-muted-foreground'>
+                <MessageCircle className='h-7 w-7' />
               </div>
-            ) : (
-              <div className='space-y-2'>
-                {messages.map((message) => (
-                  <ChatMessageComponent key={message.id} message={message} />
+              <div className='space-y-1'>
+                <p className='text-sm font-semibold text-foreground'>Bắt đầu cuộc trò chuyện</p>
+                <p className='px-4 text-xs leading-relaxed text-muted-foreground'>
+                  Hãy hỏi tôi bất cứ điều gì về bài học này. Tôi sẽ giúp bạn hiểu rõ hơn về nội dung!
+                </p>
+              </div>
+              <div className='flex flex-wrap justify-center gap-2'>
+                {['Tóm tắt bài này', 'Giải thích thuật ngữ', 'Đặt câu hỏi kiểm tra'].map((hint) => (
+                  <button
+                    key={hint}
+                    onClick={() => setInput(hint)}
+                    className='rounded-full border border-border bg-background px-4 py-2 text-[11px] font-medium text-foreground transition-colors hover:bg-muted'
+                  >
+                    {hint}
+                  </button>
                 ))}
-                <div ref={messagesEndRef} className='h-2' />
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className='space-y-4'>
+              {messages.map((msg) => (
+                <ChatMessageComponent key={msg.id} message={msg} />
+              ))}
+              <div ref={messagesEndRef} className='h-2' />
+            </div>
+          )}
         </ScrollArea>
 
-        {/* Input Area */}
-        <div className='p-4 border-t border-border bg-background shrink-0'>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              handleSubmit()
-            }}
-            className='flex items-center gap-2'
-          >
-            <Input
+        <div className='shrink-0 border-t border-border bg-card px-5 py-4'>
+          <div className='mb-3 flex items-center justify-between gap-3'>
+            <div className='text-[10px] font-medium uppercase tracking-widest text-muted-foreground'>Output language</div>
+            <div>
+              <Select value={outputLanguage} onValueChange={(value) => setOutputLanguage(value as 'vi' | 'en')}>
+                <SelectTrigger className='h-9 w-[112px] rounded-md border border-border bg-background px-3 text-xs font-medium uppercase tracking-widest text-muted-foreground shadow-none'>
+                  <SelectValue placeholder='VI' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='vi'>Tiếng Việt</SelectItem>
+                  <SelectItem value='en'>English</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className='relative flex items-center'>
+            <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder='Nhập câu hỏi của bạn...'
-              disabled={isLoading}
-              className='flex-1 text-sm bg-muted/30 focus-visible:ring-primary h-10'
+              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmit()}
+              placeholder='Hỏi AI điều gì đó...'
+              className='h-12 w-full rounded-md border border-border bg-background px-4 pr-14 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground'
             />
             <Button
-              type='submit'
               size='icon'
-              disabled={isLoading || !input.trim()}
-              className='shrink-0 h-10 w-10 shadow-sm'
+              disabled={!input.trim() || isLoading}
+              onClick={handleSubmit}
+              className={cn(
+                'absolute right-1.5 h-9 w-9 rounded-md transition-colors',
+                input.trim()
+                  ? 'bg-foreground text-background hover:bg-foreground/90'
+                  : 'bg-muted text-muted-foreground'
+              )}
             >
               {isLoading ? <Loader2 className='w-4 h-4 animate-spin' /> : <Send className='w-4 h-4' />}
             </Button>
-          </form>
-          <p className='text-[10px] text-center text-muted-foreground mt-2 px-2'>
-            AI có thể phản hồi chưa chính xác. Vui lòng kiểm tra lại thông tin quan trọng.
+          </div>
+          <p className='mt-4 text-center text-[9px] font-medium uppercase tracking-[0.1em] text-muted-foreground'>
+            Powered by LearnProof AI Ecosystem
           </p>
         </div>
       </div>

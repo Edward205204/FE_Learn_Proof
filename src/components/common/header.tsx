@@ -1,9 +1,6 @@
 'use client'
 
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
 import {
-  Search,
   LogOut,
   User as UserIcon,
   Settings,
@@ -13,57 +10,28 @@ import {
   ShoppingCart,
   Award
 } from 'lucide-react'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { PATH } from '@/constants/path'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useHeader } from '@/hooks/use-header'
 import { Role } from '@/@types/user'
-import { useRef, useEffect, useState } from 'react'
-import { useNotificationStore } from '@/store/notification.store'
+import { useRef, useEffect } from 'react'
 import { useCartQuery } from '@/app/(learner)/_hooks/use-cart'
 import SearchInput from './search-input'
+import { NotificationBell } from '@/app/(learner)/_components/notification-bell'
 
 export default function Header() {
-  const router = useRouter()
   const { user, isLoggedIn, isMenuOpen, toggleMenu, handleLogout, closeMenu } = useHeader()
 
   const menuRef = useRef<HTMLDivElement>(null)
-
-  // Notification logic
-  const [isNotifOpen, setIsNotifOpen] = useState(false)
-  const [showAllNotifs, setShowAllNotifs] = useState(false)
-  const notifRef = useRef<HTMLDivElement>(null)
-
-  const { notifications, markAsRead } = useNotificationStore()
-  const displayedNotifs = showAllNotifs ? notifications : notifications.slice(0, 5)
-  const unreadCount = notifications.filter((n) => n.unread).length
   const pathname = usePathname()
   const isAuthPage = [PATH.LOGIN, PATH.REGISTER].includes(pathname)
 
   const { data: cartData } = useCartQuery(isLoggedIn && !isAuthPage)
   const cartCount = cartData?.items?.length || 0
 
-  // Close notif when clicking outside
-  useEffect(() => {
-    const handleClickOutsideNotif = (event: MouseEvent) => {
-      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
-        setIsNotifOpen(false)
-        setTimeout(() => setShowAllNotifs(false), 200)
-      }
-    }
-
-    if (isNotifOpen) {
-      document.addEventListener('mousedown', handleClickOutsideNotif)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutsideNotif)
-    }
-  }, [isNotifOpen])
-
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -170,84 +138,8 @@ export default function Header() {
               </Link>
             )}
 
-            <div
-              className='relative group flex items-center'
-              ref={notifRef}
-              onMouseEnter={() => setIsNotifOpen(true)}
-              onMouseLeave={() => {
-                setIsNotifOpen(false)
-                setShowAllNotifs(false)
-              }}
-            >
-              <button
-                className='hover:text-[oklch(0.577_0.245_27.325)] transition-colors focus:outline-none'
-                onClick={() => setIsNotifOpen(!isNotifOpen)}
-                onFocus={() => setIsNotifOpen(true)}
-                aria-expanded={isNotifOpen}
-              >
-                Thông báo
-              </button>
-
-              {isNotifOpen && (
-                <div className='absolute right-0 top-full pt-4 w-80 z-50'>
-                  <div className='overflow-hidden rounded-xl border bg-white shadow-xl dark:bg-[oklch(0.141_0.005_285.823)] dark:border-[oklch(0.274_0.006_286.033)] animate-in fade-in zoom-in-95 duration-200 origin-top-right'>
-                    <div className='px-4 py-3 border-b dark:border-[oklch(0.274_0.006_286.033)] flex justify-between items-center bg-gray-50/50 dark:bg-transparent'>
-                      <p className='font-semibold text-sm text-[oklch(0.141_0.005_285.823)] dark:text-white'>
-                        Thông báo mới
-                      </p>
-                      {unreadCount > 0 && (
-                        <span className='text-[10px] text-white bg-rose-500 px-2 py-0.5 rounded-full font-bold'>
-                          {unreadCount}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className='max-h-[360px] overflow-y-auto overscroll-contain'>
-                      {displayedNotifs.length > 0 ? (
-                        displayedNotifs.map((noti) => (
-                          <div
-                            key={noti.id}
-                            onClick={() => {
-                              markAsRead(noti.id)
-                              if (noti.link) router.push(noti.link)
-                            }}
-                            className={`p-4 border-b dark:border-[oklch(0.274_0.006_286.033)] hover:bg-[oklch(0.967_0.001_0)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors cursor-pointer ${noti.unread ? 'bg-rose-50/30 dark:bg-rose-900/10' : ''}`}
-                          >
-                            <p
-                              className={`text-sm ${noti.unread ? 'font-semibold' : 'font-medium'} text-[oklch(0.141_0.005_285.823)] dark:text-gray-100`}
-                            >
-                              {noti.title}
-                            </p>
-                            <p className='text-xs text-[oklch(0.552_0.016_285.938)] mt-1 line-clamp-2'>
-                              {noti.message}
-                            </p>
-                            <p
-                              className={`text-[10px] mt-2 ${noti.unread ? 'text-[oklch(0.577_0.245_27.325)] font-bold' : 'text-[oklch(0.552_0.016_285.938)] font-medium'}`}
-                            >
-                              {noti.time}
-                            </p>
-                          </div>
-                        ))
-                      ) : (
-                        <div className='p-8 text-center'>
-                          <p className='text-sm text-muted-foreground'>Không có thông báo nào</p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className='p-3 border-t dark:border-[oklch(0.274_0.006_286.033)] text-center bg-gray-50/50 dark:bg-transparent'>
-                      <Link
-                        href='/notifications'
-                        onClick={() => setIsNotifOpen(false)}
-                        className='text-xs text-[oklch(0.577_0.245_27.325)] font-bold hover:underline transition-all'
-                      >
-                        Xem tất cả thông báo
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Thông báo — sử dụng NotificationBell từ API thực */}
+            {isLoggedIn && <NotificationBell />}
           </nav>
 
           <div

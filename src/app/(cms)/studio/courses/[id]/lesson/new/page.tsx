@@ -5,7 +5,18 @@ import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useRouter, useParams, useSearchParams } from 'next/navigation'
-import { ChevronLeft, Plus, Video, FileText, HelpCircle, ArrowRight, Save, LayoutTemplate } from 'lucide-react'
+import {
+  ChevronLeft,
+  Plus,
+  Video,
+  FileText,
+  HelpCircle,
+  ArrowRight,
+  Save,
+  LayoutTemplate,
+  Sparkles,
+  Wand2
+} from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -71,14 +82,6 @@ const lessonSchema = z
         path: ['content']
       })
     }
-
-    if (data.type === 'quiz' && data.questions.length === 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Phải có ít nhất một câu hỏi',
-        path: ['questions']
-      })
-    }
   })
 
 type LessonForm = z.infer<typeof lessonSchema>
@@ -138,11 +141,6 @@ export default function LessonEditorPage() {
     }
   })
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'questions'
-  })
-
   const {
     fields: supFields,
     append: supAppend,
@@ -152,12 +150,38 @@ export default function LessonEditorPage() {
     name: 'supplementalQuiz'
   })
 
-  const nextStep = async () => {
+  const createQuizLessonFromMetadata = async () => {
     const valid = await form.trigger(['title', 'shortDescription', 'type'])
     if (!valid) return
-    if (form.getValues('type') === 'quiz' && form.getValues('questions').length === 0) {
-      append(DEFAULT_QUESTION)
+
+    if (!chapterId) {
+      toast.error('Không tìm thấy thông tin Chương để thêm bài học')
+      return
     }
+
+    const data = form.getValues()
+    const payload: CreateLessonBody = {
+      type: 'QUIZ',
+      title: data.title,
+      chapterId,
+      shortDesc: data.shortDescription
+    }
+
+    createLesson(payload, {
+      onSuccess: (res) => {
+        router.push(`/studio/courses/${courseId}/lesson/${res.data.id}/quiz`)
+      }
+    })
+  }
+
+  const nextStep = async () => {
+    if (lessonType === 'quiz') {
+      await createQuizLessonFromMetadata()
+      return
+    }
+
+    const valid = await form.trigger(['title', 'shortDescription', 'type'])
+    if (!valid) return
     setStep(2)
   }
 
@@ -194,13 +218,13 @@ export default function LessonEditorPage() {
         title: data.title,
         chapterId,
         shortDesc: data.shortDescription,
-        quizData: mapBlocksToQuizData(data.questions)
+        ...(data.questions.length > 0 ? { quizData: mapBlocksToQuizData(data.questions) } : {})
       }
     }
 
     createLesson(payload, {
-      onSuccess: () => {
-        router.push(`/studio/courses/${courseId}`)
+      onSuccess: (res) => {
+        router.push(`/studio/courses/${courseId}/lesson/${res.data.id}/quiz`)
       }
     })
   }
@@ -356,11 +380,21 @@ export default function LessonEditorPage() {
             <div className='mt-8 flex justify-end pb-8'>
               <Button
                 onClick={nextStep}
+                disabled={isPending}
                 size='lg'
                 className='h-14 w-full sm:w-auto px-8 rounded-2xl shadow-xl shadow-primary/20 font-bold text-base bg-primary hover:bg-primary/95 transition-transform active:scale-[0.98]'
               >
-                Tiếp tục soạn thảo
-                <ArrowRight className='w-5 h-5 ml-2' />
+                {lessonType === 'quiz' ? (
+                  <>
+                    {isPending ? 'Đang lưu...' : 'Lưu và đi đến tạo bài học'}
+                    <Save className='w-5 h-5 ml-2' />
+                  </>
+                ) : (
+                  <>
+                    Tiếp tục soạn thảo
+                    <ArrowRight className='w-5 h-5 ml-2' />
+                  </>
+                )}
               </Button>
             </div>
           </div>
@@ -483,40 +517,20 @@ export default function LessonEditorPage() {
               </Card>
             )}
 
-            {/* QUIZ bổ sung cho VIDEO — `quizData` tùy chọn (VideoLessonStrategy) */}
-            {lessonType === 'video' && (
-              <div className='space-y-6 mt-8'>
-                <div className='rounded-2xl border border-border/50 bg-muted/20 px-5 py-4'>
-                  <h3 className='font-extrabold text-lg tracking-tight'>Bài kiểm tra cuối bài (tùy chọn)</h3>
-                  <p className='text-muted-foreground text-sm mt-1'>
-                    Thêm trắc nghiệm kèm bài video; quiz được tạo cùng lúc khi lưu bài học.
-                  </p>
-                </div>
-                {supFields.map((field, index) => (
-                  <QuestionCard
-                    key={field.id}
-                    index={index}
-                    form={form}
-                    onRemove={supRemove}
-                    showAnswers
-                    namePrefix='supplementalQuiz'
-                  />
-                ))}
-                <Button
-                  type='button'
-                  variant='outline'
-                  className='w-full border-dashed border-2 py-8 rounded-3xl font-bold bg-muted/20'
-                  onClick={() => supAppend(DEFAULT_QUESTION)}
-                >
-                  <Plus className='w-5 h-5 mr-2 text-primary' />
-                  Thêm câu hỏi trắc nghiệm
-                </Button>
-              </div>
-            )}
-
             {/* TEXT */}
             {lessonType === 'text' && (
               <Card className='border-none shadow-none bg-transparent'>
+                <div className='bg-primary/5 border border-primary/20 rounded-xl p-4 mb-6 flex items-start gap-3'>
+                  <Wand2 className='w-5 h-5 text-primary shrink-0 mt-0.5' />
+                  <div>
+                    <h4 className='font-bold text-sm text-primary'>Có hỗ trợ AI Assistant</h4>
+                    <p className='text-xs text-muted-foreground mt-1 leading-relaxed'>
+                      Bạn có thể tự nhập nội dung hoặc <b>chỉ cần nhập Tiêu đề, Mô tả và Lưu bài học</b>. Sau khi lưu,
+                      màn hình chỉnh sửa sẽ cung cấp công cụ <b>AI Assistant</b> giúp bạn tự động soạn thảo bài đọc chi
+                      tiết.
+                    </p>
+                  </div>
+                </div>
                 <div className='space-y-3'>
                   <Controller
                     name='content'
@@ -564,33 +578,31 @@ export default function LessonEditorPage() {
             {/* QUIZ MANAGER */}
             {lessonType === 'quiz' && (
               <div className='space-y-8'>
-                <div className='flex items-center justify-between bg-card border border-border/50 p-6 rounded-3xl shadow-sm'>
+                <div className='bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-xl p-4 flex items-start gap-3'>
+                  <Sparkles className='w-5 h-5 text-primary shrink-0 mt-0.5' />
                   <div>
-                    <h3 className='font-extrabold tracking-tight text-xl'>Danh sách câu hỏi</h3>
-                    <p className='text-muted-foreground text-sm mt-1'>
-                      Thêm các câu hỏi trắc nghiệm để đánh giá học viên.
+                    <h4 className='font-bold text-sm text-primary'>Tạo Quiz bằng AI ngay sau khi lưu</h4>
+                    <p className='text-xs text-muted-foreground mt-1 leading-relaxed'>
+                      Bạn không cần tạo câu hỏi nháp thủ công nữa. Hãy lưu bài học để mở ngay <b>AI Quiz Studio</b> và
+                      sinh toàn bộ đề thi bằng AI.
                     </p>
                   </div>
-                  <div className='bg-primary/10 text-primary font-black text-2xl h-14 w-14 rounded-2xl flex items-center justify-center ring-1 ring-primary/20 shadow-sm shrink-0'>
-                    {fields.length}
-                  </div>
                 </div>
 
-                <div className='space-y-6'>
-                  {fields.map((field, index) => (
-                    <QuestionCard key={field.id} index={index} form={form} onRemove={remove} showAnswers />
-                  ))}
-
-                  <Button
-                    type='button'
-                    variant='outline'
-                    className='w-full border-dashed border-2 py-10 rounded-3xl font-bold bg-muted/30 hover:bg-muted/60 transition-all text-muted-foreground hover:text-foreground'
-                    onClick={() => append(DEFAULT_QUESTION)}
-                  >
-                    <Plus className='w-5 h-5 mr-2 text-primary' />
-                    Thêm lượt câu hỏi mới
-                  </Button>
-                </div>
+                <Card className='border-2 border-dashed border-primary/20 rounded-3xl bg-primary/5 shadow-none'>
+                  <CardContent className='p-8 text-center space-y-4'>
+                    <div className='mx-auto w-16 h-16 bg-background rounded-2xl flex items-center justify-center shadow-sm'>
+                      <Sparkles className='h-8 w-8 text-primary' />
+                    </div>
+                    <div className='space-y-1'>
+                      <h3 className='font-extrabold tracking-tight text-xl'>Sẵn sàng mở AI Quiz Studio</h3>
+                      <p className='text-muted-foreground text-sm max-w-md mx-auto'>
+                        Sau khi lưu, hệ thống tạo bài học Quiz rỗng và hiển thị giao diện sinh, duyệt, xuất bản câu hỏi
+                        giống trang quản lý Quiz hiện tại.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
 
@@ -615,7 +627,7 @@ export default function LessonEditorPage() {
                   className='h-12 px-8 rounded-xl font-bold flex-1 shadow-lg shadow-primary/20 bg-primary hover:bg-primary/95 text-primary-foreground'
                 >
                   <Save className='w-4 h-4 mr-2' />
-                  {isPending ? 'Đang lưu...' : 'Lưu Bài Học'}
+                  {isPending ? 'Đang lưu...' : lessonType === 'quiz' ? 'Lưu & mở AI Studio' : 'Lưu Bài Học'}
                 </Button>
               </div>
             </div>

@@ -30,9 +30,10 @@ export function ReadingContent({ lesson, onComplete }: ReadingContentProps) {
         </div>
 
         {/* Nội dung bài đọc */}
-        <div className='px-10 py-8 text-foreground/90 text-[15px] leading-[1.9] whitespace-pre-line'>
-          {lesson.content}
-        </div>
+        <div 
+          className='px-10 py-8 text-[15px] leading-[1.9] prose prose-rose max-w-none dark:prose-invert prose-p:text-foreground/90 prose-headings:text-foreground prose-a:text-primary hover:prose-a:text-primary/80'
+          dangerouslySetInnerHTML={{ __html: lesson.content }}
+        />
       </div>
 
       {/* Tài liệu đính kèm (nếu có) */}

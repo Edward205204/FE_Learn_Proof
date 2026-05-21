@@ -11,19 +11,24 @@ interface SourceBadgeProps {
 export const SourceBadge = ({ content, score }: SourceBadgeProps) => {
   return (
     <TooltipProvider>
-      <Tooltip>
+      <Tooltip delayDuration={300}>
         <TooltipTrigger asChild>
           <Badge
-            variant='outline'
-            className='max-w-[200px] truncate cursor-help text-[10px] py-0 px-1.5 font-normal bg-muted/50'
+            variant='secondary'
+            className='max-w-[140px] truncate cursor-help rounded-full border border-border bg-muted px-3 py-1 text-[10px] font-medium text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground'
           >
             {content}
           </Badge>
         </TooltipTrigger>
-        <TooltipContent side='top' className='max-w-xs break-words'>
-          <div className='space-y-1'>
-            <p className='text-[10px] font-bold text-primary'>Độ liên quan: {(score * 100).toFixed(1)}%</p>
-            <p className='text-xs'>{content}</p>
+        <TooltipContent side='top' className='max-w-xs rounded-xl border border-border bg-card p-4 shadow-lg'>
+          <div className='space-y-3'>
+            <div className='flex items-center justify-between gap-4'>
+              <span className='text-[10px] font-semibold uppercase tracking-widest text-foreground'>Source Evidence</span>
+              <Badge className='border border-border bg-muted text-[10px] font-medium text-foreground'>
+                {(score * 100).toFixed(0)}% MATCH
+              </Badge>
+            </div>
+            <p className='text-sm leading-relaxed text-foreground/80 italic'>&quot;{content}&quot;</p>
           </div>
         </TooltipContent>
       </Tooltip>

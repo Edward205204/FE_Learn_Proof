@@ -7,6 +7,7 @@ import { ChatMessage } from './chat-message'
 interface UseChatBoxProps {
   lessonId: string
   authToken: string
+  outputLanguage: 'vi' | 'en'
 }
 
 interface UseChatBoxReturn {
@@ -20,8 +21,26 @@ interface UseChatBoxReturn {
   messagesEndRef: React.RefObject<HTMLDivElement | null>
 }
 
-export const useChatBox = ({ lessonId, authToken }: UseChatBoxProps): UseChatBoxReturn => {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+export const useChatBox = ({ lessonId, authToken, outputLanguage }: UseChatBoxProps): UseChatBoxReturn => {
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(`ai_chat_${lessonId}`)
+      if (saved) {
+        try {
+          return JSON.parse(saved)
+        } catch (e) {
+          return []
+        }
+      }
+    }
+    return []
+  })
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`ai_chat_${lessonId}`, JSON.stringify(messages))
+    }
+  }, [messages, lessonId])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -71,7 +90,7 @@ export const useChatBox = ({ lessonId, authToken }: UseChatBoxProps): UseChatBox
     try {
       const response = await http.post<{ answer: string; sources: { content: string; score: number }[] }>(
         `/lesson/${lessonId}/ask`,
-        { question },
+        { question, language: outputLanguage },
         {
           headers: {
             Authorization: `Bearer ${authToken}`

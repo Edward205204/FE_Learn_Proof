@@ -1,4 +1,5 @@
 import http from '@/utils/http'
+import type { AiOutputLanguage } from '../_types/ai'
 
 /** Kết quả trả về khi tạo/cập nhật bài giảng */
 export type LessonCreatedResponse = {
@@ -89,7 +90,7 @@ export type CreateQuizLessonBody = {
   title: string
   chapterId: string
   shortDesc?: string
-  quizData: QuizDataPayload
+  quizData?: QuizDataPayload
 }
 
 export type CreateLessonBody = CreateVideoLessonBody | CreateTextLessonBody | CreateQuizLessonBody
@@ -113,7 +114,10 @@ const lessonApi = {
   deleteLesson: (lessonId: string) => http.delete(`/lesson/${lessonId}`),
 
   toggleLessonLock: (lessonId: string, isLocked: boolean) =>
-    http.patch<{ id: string; isLocked: boolean }>(`/lesson/${lessonId}/lock`, { isLocked })
+    http.patch<{ id: string; isLocked: boolean }>(`/lesson/${lessonId}/lock`, { isLocked }),
+
+  generateAiContent: (lessonId: string, keywords?: string, language: AiOutputLanguage = 'vi') =>
+    http.post<{ content: string }>(`/lesson/${lessonId}/generate-content`, { keywords, language })
 }
 
 export default lessonApi

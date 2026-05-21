@@ -1,23 +1,72 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ChevronLeft, Loader2, HelpCircle } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Loader2, HelpCircle, Check, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { QuizSidebar } from '@/app/(cms)/_components/quiz-sidebar'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { AiQuizSection } from './_components/ai-quiz-section'
+import { QuestionEditorModal, LocalQuestion } from './_components/question-editor-modal'
 import { useGetLessonDetailQuery } from '@/app/(cms)/_hooks/use-lesson'
+import { useDeleteQuestionMutation } from '@/app/(cms)/_hooks/use-quiz-mutation'
 import { Badge } from '@/components/ui/badge'
 import { useForm, useWatch } from 'react-hook-form'
 import { QuizDataPayload } from '@/app/(cms)/_api/lesson.api'
+import { useAiQuiz } from './_components/ai-quiz-section/use-ai-quiz'
+import type { QuizPublished } from '@/app/(cms)/_types/ai'
 
-type QuizAnswer = { text: string; isCorrect: boolean }
-type QuizQuestion = { questionText: string; answers: QuizAnswer[] }
+type QuizAnswer = { id?: string; text: string; isCorrect: boolean }
+type QuizQuestion = { id?: string; questionText: string; answers: QuizAnswer[] }
 
 interface QuizEditableForm {
   questions: QuizQuestion[]
   supplementalQuiz: QuizQuestion[]
+}
+
+const mapPublishedQuizQuestions = (quiz?: QuizPublished | null): QuizQuestion[] => {
+  if (!quiz?.questions?.length) return []
+
+  return quiz.questions.map((q) => ({
+    id: q.id,
+    questionText: q.content,
+    answers: q.answers.map((a) => ({
+      id: a.id,
+      text: a.content,
+      isCorrect: a.isCorrect
+    }))
+  }))
+}
+
+const mergeQuestionsPreservingOrder = (current: QuizQuestion[], next: QuizQuestion[]) => {
+  if (!current.length) return next
+
+  const nextById = new Map(next.filter((q) => q.id).map((q) => [q.id as string, q]))
+  const merged: QuizQuestion[] = []
+  const usedIds = new Set<string>()
+
+  for (const question of current) {
+    if (!question.id) continue
+    const updated = nextById.get(question.id)
+    if (updated) {
+      merged.push(updated)
+      usedIds.add(question.id)
+    }
+  }
+
+  for (const question of next) {
+    if (!question.id || usedIds.has(question.id)) continue
+    merged.push(question)
+  }
+
+  return merged.length ? merged : next
 }
 
 export default function LessonQuizPage() {
@@ -26,6 +75,7 @@ export default function LessonQuizPage() {
   const { id: courseId, lessonId } = params
 
   const { data: lessonDetail, isLoading } = useGetLessonDetailQuery(lessonId)
+  const { overview: aiOverview } = useAiQuiz(lessonId)
 
   const form = useForm<QuizEditableForm>({
     defaultValues: {
@@ -33,27 +83,57 @@ export default function LessonQuizPage() {
       supplementalQuiz: []
     }
   })
+  const { getValues, setValue } = form
 
   const questions = useWatch({ control: form.control, name: 'questions' })
   const supplementalQuiz = useWatch({ control: form.control, name: 'supplementalQuiz' })
+
+  const quizId = aiOverview?.quiz?.id ?? (lessonDetail?.type === 'QUIZ' ? lessonDetail.quiz?.id || '' : '')
+  const deleteMutation = useDeleteQuestionMutation(lessonId, quizId)
+
+  const [isEditorOpen, setIsEditorOpen] = useState(false)
+  const [editingQuestion, setEditingQuestion] = useState<LocalQuestion | null>(null)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
+
+  // Xác định danh sách câu hỏi để hiển thị (đã xuất bản)
+  const isPureQuiz = lessonDetail?.type === 'QUIZ'
+  const canManageQuiz = !!quizId
+  const displayQuestions = isPureQuiz ? questions : supplementalQuiz
+
+  const [prevLessonId, setPrevLessonId] = useState<string | undefined>(lessonDetail?.id)
+  const [prevLength, setPrevLength] = useState(displayQuestions.length)
+
+  if (lessonDetail?.id !== prevLessonId || displayQuestions.length !== prevLength) {
+    setPrevLessonId(lessonDetail?.id)
+    setPrevLength(displayQuestions.length)
+    setCurrentIndex(0)
+  }
 
   // Sync server data to form
   useEffect(() => {
     if (!lessonDetail) return
 
-    if (lessonDetail.type === 'QUIZ' && lessonDetail.quiz) {
-      const mappedQuestions: QuizQuestion[] = lessonDetail.quiz.questions.map((q) => ({
-        questionText: q.content,
-        answers: q.answers.map((a) => ({
-          text: a.content,
-          isCorrect: a.isCorrect
-        }))
-      }))
+    const publishedQuestions = mapPublishedQuizQuestions(
+      aiOverview?.quiz ?? (lessonDetail.type === 'QUIZ' ? lessonDetail.quiz : null)
+    )
+
+    if (publishedQuestions.length > 0) {
+      const currentQuestions = getValues('questions')
+      const currentSupplementalQuiz = getValues('supplementalQuiz')
+      const nextQuestions =
+        lessonDetail.type === 'QUIZ' ? mergeQuestionsPreservingOrder(currentQuestions, publishedQuestions) : []
+      const nextSupplementalQuiz =
+        lessonDetail.type === 'QUIZ' ? [] : mergeQuestionsPreservingOrder(currentSupplementalQuiz, publishedQuestions)
+
       form.reset({
-        questions: mappedQuestions,
-        supplementalQuiz: []
+        questions: nextQuestions,
+        supplementalQuiz: nextSupplementalQuiz
       })
-    } else if (lessonDetail.type === 'VIDEO' || lessonDetail.type === 'TEXT') {
+      return
+    }
+
+    if (lessonDetail.type === 'VIDEO' || lessonDetail.type === 'TEXT') {
       const quizData = lessonDetail.quizData as QuizDataPayload | undefined
       if (quizData) {
         const mappedSupplemental: QuizQuestion[] = quizData.map((q) => ({
@@ -68,8 +148,17 @@ export default function LessonQuizPage() {
           supplementalQuiz: mappedSupplemental
         })
       }
+      return
     }
-  }, [lessonDetail, form])
+
+    if (lessonDetail.type === 'QUIZ' && lessonDetail.quiz) {
+      const mappedQuestions = mapPublishedQuizQuestions(lessonDetail.quiz)
+      form.reset({
+        questions: mappedQuestions,
+        supplementalQuiz: []
+      })
+    }
+  }, [aiOverview, lessonDetail, form])
 
   if (isLoading) {
     return (
@@ -83,25 +172,64 @@ export default function LessonQuizPage() {
     return <div className='p-8 text-center'>Không tìm thấy thông tin bài học.</div>
   }
 
-  // Xác định danh sách câu hỏi để hiển thị (đã xuất bản)
-  const isPureQuiz = lessonDetail.type === 'QUIZ'
-  const displayQuestions = isPureQuiz ? questions : supplementalQuiz
+  const handleEdit = (q: QuizQuestion) => {
+    setEditingQuestion({
+      id: q.id,
+      content: q.questionText,
+      answers: q.answers.map((a) => ({ id: a.id, content: a.text, isCorrect: a.isCorrect }))
+    })
+    setIsEditorOpen(true)
+  }
+
+  const applyQuestionUpsert = (question: LocalQuestion) => {
+    const nextQuestion: QuizQuestion = {
+      id: question.id,
+      questionText: question.content,
+      answers: question.answers.map((a) => ({
+        id: a.id,
+        text: a.content,
+        isCorrect: a.isCorrect
+      }))
+    }
+
+    const key = isPureQuiz ? 'questions' : 'supplementalQuiz'
+    const current = getValues(key)
+    const index = current.findIndex((item) => item.id === nextQuestion.id)
+
+    if (index >= 0) {
+      const next = [...current]
+      next[index] = nextQuestion
+      setValue(key, next, { shouldDirty: true, shouldTouch: false, shouldValidate: false })
+      return
+    }
+
+    setValue(key, [...current, nextQuestion], { shouldDirty: true, shouldTouch: false, shouldValidate: false })
+  }
+
+  const applyQuestionDelete = (questionId: string) => {
+    const key = isPureQuiz ? 'questions' : 'supplementalQuiz'
+    const current = getValues(key)
+    const next = current.filter((item) => item.id !== questionId)
+    setValue(key, next, { shouldDirty: true, shouldTouch: false, shouldValidate: false })
+    setCurrentIndex((prev) => Math.min(Math.max(0, prev), Math.max(0, next.length - 1)))
+  }
+
+  const handleDelete = (questionId?: string) => {
+    if (!questionId) return
+    setDeleteConfirmId(questionId)
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteConfirmId) return
+    await deleteMutation.mutateAsync(deleteConfirmId)
+    applyQuestionDelete(deleteConfirmId)
+    setDeleteConfirmId(null)
+  }
 
   return (
-    <div className='flex h-full min-h-[calc(100vh-80px)] -m-4 md:-m-8 lg:-m-12 bg-background'>
-      {/* Sidebar */}
-      <QuizSidebar
-        title={lessonDetail.title}
-        infoLines={[
-          `Loại: ${lessonDetail.type}`,
-          `ID: ${lessonId.substring(0, 8)}...`,
-          `Câu hỏi: ${displayQuestions.length}`
-        ]}
-      />
-
-      {/* Main Content */}
-      <main className='flex-1 p-6 md:p-10 overflow-y-auto'>
-        <div className='max-w-4xl mx-auto space-y-10'>
+    <div className='min-h-[calc(100vh-80px)] -m-4 md:-m-8 lg:-m-12 bg-background'>
+      <main className='h-full w-full overflow-y-auto px-6 py-6 md:px-8 md:py-8 lg:px-10'>
+        <div className='mx-auto max-w-7xl space-y-10'>
           <div className='flex items-center justify-between'>
             <Button
               variant='ghost'
@@ -112,6 +240,14 @@ export default function LessonQuizPage() {
               <ChevronLeft className='mr-2 h-4 w-4' />
               Quay lại quản lý khóa học
             </Button>
+
+            <div className='hidden md:flex items-center gap-2 rounded-full border border-border/60 bg-muted/30 px-4 py-2 text-xs font-medium text-muted-foreground'>
+              <span>{lessonDetail.title}</span>
+              <span className='h-1 w-1 rounded-full bg-muted-foreground/40' />
+              <span>{lessonDetail.type}</span>
+              <span className='h-1 w-1 rounded-full bg-muted-foreground/40' />
+              <span>{displayQuestions.length} câu hỏi</span>
+            </div>
           </div>
 
           <div className='space-y-2'>
@@ -146,50 +282,153 @@ export default function LessonQuizPage() {
                   </p>
                 </div>
               </div>
-              <Badge variant='secondary' className='px-4 py-1.5 rounded-full font-bold text-sm'>
-                {displayQuestions.length} Câu hỏi
-              </Badge>
+              <div className='flex items-center gap-4'>
+                <Badge variant='secondary' className='px-4 py-1.5 rounded-full font-bold text-sm'>
+                  {displayQuestions.length} Câu hỏi
+                </Badge>
+                {canManageQuiz && (
+                  <Button
+                    onClick={() => {
+                      setEditingQuestion(null)
+                      setIsEditorOpen(true)
+                    }}
+                    size='sm'
+                    className='font-bold'
+                  >
+                    Thêm câu hỏi
+                  </Button>
+                )}
+              </div>
             </div>
 
             {displayQuestions.length > 0 ? (
-              <div className='grid gap-6'>
-                {displayQuestions.map((q, idx) => (
-                  <Card
-                    key={idx}
-                    className='border-border/40 hover:border-primary/20 transition-all duration-300 shadow-sm hover:shadow-md rounded-2xl'
-                  >
-                    <CardContent className='p-6 sm:p-8'>
-                      <div className='flex items-start gap-4 mb-6'>
-                        <span className='flex-shrink-0 h-8 w-8 rounded-lg bg-muted flex items-center justify-center text-sm font-bold'>
-                          {idx + 1}
-                        </span>
-                        <div className='text-xl font-semibold leading-snug'>{q.questionText}</div>
+              <div className='min-w-0'>
+                <div className='rounded-[2rem] border border-border/70 bg-white/90 shadow-sm overflow-hidden'>
+                  <div className='border-b border-border/70 px-5 py-4 sm:px-6 sm:py-5'>
+                    <div className='flex items-center justify-between gap-3'>
+                      <div>
+                        <h4 className='text-lg font-bold text-foreground'>Câu hỏi hiện tại</h4>
+                        <p className='text-sm text-muted-foreground'>Duyệt từng câu bằng nút điều hướng bên cạnh.</p>
                       </div>
+                      <div className='flex items-center gap-2'>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          className='gap-1.5'
+                          onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
+                          disabled={currentIndex === 0}
+                        >
+                          <ChevronLeft className='h-4 w-4' />
+                          Trước
+                        </Button>
+                        <Badge variant='secondary' className='px-3 py-1 rounded-full'>
+                          {currentIndex + 1}/{displayQuestions.length}
+                        </Badge>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          className='gap-1.5'
+                          onClick={() => setCurrentIndex((prev) => Math.min(displayQuestions.length - 1, prev + 1))}
+                          disabled={currentIndex >= displayQuestions.length - 1}
+                        >
+                          Tiếp theo
+                          <ChevronRight className='h-4 w-4' />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
 
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        {q.answers.map((ans, aIdx) => (
-                          <div
-                            key={aIdx}
-                            className={`p-4 rounded-2xl border transition-all ${
-                              ans.isCorrect
-                                ? 'bg-emerald-500/5 border-emerald-500/30 text-emerald-800 shadow-[0_0_15px_rgba(16,185,129,0.05)]'
-                                : 'bg-muted/10 border-transparent text-muted-foreground'
-                            }`}
-                          >
-                            <div className='flex items-center justify-between gap-3'>
-                              <span className='font-medium'>{ans.text}</span>
-                              {ans.isCorrect && (
-                                <Badge className='bg-emerald-500 hover:bg-emerald-500 text-[10px] h-5 px-2 uppercase tracking-tighter'>
-                                  Đúng
-                                </Badge>
-                              )}
-                            </div>
+                  {(() => {
+                    const q = displayQuestions[currentIndex]
+
+                    return (
+                      <div className='bg-gradient-to-b from-white to-slate-50/60 px-5 py-6 sm:px-6 sm:py-8'>
+                        <div className='mx-auto flex max-w-4xl flex-col gap-6'>
+                          <div className='flex items-center justify-between'>
+                            <Badge
+                              variant='outline'
+                              className='rounded-full px-3 py-1 uppercase tracking-[0.18em] text-[10px]'
+                            >
+                              Câu {currentIndex + 1}
+                            </Badge>
+                            {/* {q.answers.some((ans) => ans.isCorrect) && (
+                              <Badge className='bg-emerald-600 hover:bg-emerald-600'>Đã có đáp án đúng</Badge>
+                            )} */}
                           </div>
-                        ))}
+
+                          {canManageQuiz && q.id && (
+                            <div className='flex flex-wrap items-center gap-2'>
+                              <Button
+                                variant='outline'
+                                size='sm'
+                                className='gap-2 border-sky-200 bg-sky-50/70 text-sky-700 hover:bg-sky-100/80'
+                                onClick={() => handleEdit(q)}
+                              >
+                                <Pencil className='h-4 w-4' />
+                                Chỉnh sửa
+                              </Button>
+                              <Button
+                                variant='outline'
+                                size='sm'
+                                className='gap-2 border-rose-200 bg-rose-50/70 text-rose-700 hover:bg-rose-100/80'
+                                onClick={() => handleDelete(q.id)}
+                                disabled={deleteMutation.isPending}
+                              >
+                                <Trash2 className='h-4 w-4' />
+                                Xóa câu hỏi
+                              </Button>
+                            </div>
+                          )}
+
+                          <Card className='border-border/70 shadow-[0_10px_40px_rgba(15,23,42,0.06)] overflow-hidden'>
+                            <CardContent className='p-0'>
+                              <div className='border-b border-border/60 bg-gradient-to-r from-slate-50 to-transparent px-5 py-5 sm:px-7 sm:py-6'>
+                                <div className='text-sm font-medium text-muted-foreground mb-2'>Câu hỏi</div>
+                                <div className='text-xl sm:text-2xl font-semibold leading-relaxed text-foreground'>
+                                  {q.questionText}
+                                </div>
+                              </div>
+
+                              <div className='grid gap-3 px-5 py-5 sm:px-7 sm:py-6 sm:grid-cols-2'>
+                                {q.answers.map((ans, aIdx) => {
+                                  const isCorrect = ans.isCorrect
+                                  return (
+                                    <div
+                                      key={aIdx}
+                                      className={`rounded-2xl border px-4 py-4 text-sm sm:text-base leading-relaxed transition-colors ${
+                                        isCorrect
+                                          ? 'border-emerald-300 bg-emerald-50 text-emerald-900 shadow-[0_8px_24px_rgba(16,185,129,0.08)]'
+                                          : 'border-border/70 bg-background text-muted-foreground'
+                                      }`}
+                                    >
+                                      <div className='flex items-start justify-between gap-3'>
+                                        <span className='font-medium'>{ans.text}</span>
+                                        {isCorrect && <Check className='mt-0.5 h-4 w-4 shrink-0 text-emerald-600' />}
+                                      </div>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+
+                              {/* <div className='border-t border-border/60 bg-muted/20 px-5 py-5 sm:px-7 sm:py-6'>
+                                <div className='rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-4 text-sm text-amber-900'>
+                                  <div className='text-[11px] uppercase tracking-[0.18em] text-amber-700/70'>
+                                    Đáp án đúng
+                                  </div>
+                                  <div className='mt-1 leading-relaxed whitespace-pre-wrap break-words'>
+                                    {correctAnswer || 'Chưa có đáp án đúng được đánh dấu.'}
+                                  </div>
+                                </div>
+                              </div> */}
+                            </CardContent>
+                          </Card>
+
+
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                    )
+                  })()}
+                </div>
               </div>
             ) : (
               <Card className='border-2 border-dashed border-muted-foreground/20 rounded-3xl bg-muted/5'>
@@ -211,6 +450,35 @@ export default function LessonQuizPage() {
         </div>
         <div className='h-20' />
       </main>
+
+      {canManageQuiz && (
+        <QuestionEditorModal
+          open={isEditorOpen}
+          onOpenChange={setIsEditorOpen}
+          quizId={quizId}
+          lessonId={lessonId}
+          initialData={editingQuestion}
+          onSaved={(question) => applyQuestionUpsert(question)}
+        />
+      )}
+
+      <Dialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Xóa câu hỏi</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn xóa câu hỏi này? Hành động này không thể hoàn tác.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>Hủy</Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={deleteMutation.isPending}>
+              {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Xóa
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
