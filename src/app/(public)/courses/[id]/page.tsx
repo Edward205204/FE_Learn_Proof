@@ -95,7 +95,7 @@ export default function CourseDetailPage() {
   if (isLoading) {
     return (
       <div className='min-h-screen bg-[oklch(0.985_0_0)] dark:bg-transparent flex items-center justify-center'>
-        <div className='w-8 h-8 rounded-full border-4 border-rose-500 border-t-transparent animate-spin'></div>
+        <div className='w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin'></div>
       </div>
     )
   }
@@ -104,7 +104,7 @@ export default function CourseDetailPage() {
     return (
       <div className='min-h-screen bg-[oklch(0.985_0_0)] dark:bg-transparent flex flex-col items-center justify-center'>
         <h1 className='text-2xl font-bold text-slate-800 dark:text-slate-200'>Không tìm thấy khóa học</h1>
-        <Link href='/courses' className='text-rose-600 hover:underline mt-4'>
+        <Link href='/courses' className='text-primary hover:underline mt-4'>
           Quay lại danh sách
         </Link>
       </div>
@@ -128,15 +128,15 @@ export default function CourseDetailPage() {
         <div className='max-w-[1240px] mx-auto px-6 py-8'>
           {/* Breadcrumbs */}
           <div className='flex items-center gap-2 text-[10px] font-black tracking-[0.1em] text-slate-400 uppercase mb-8'>
-            <Link href='/' className='hover:text-rose-500 transition-colors'>
+            <Link href='/' className='hover:text-primary transition-colors'>
               Trang chủ
             </Link>
             <ChevronRight size={10} strokeWidth={3} />
-            <Link href='/courses' className='hover:text-rose-500 transition-colors'>
+            <Link href='/courses' className='hover:text-primary transition-colors'>
               Khóa học
             </Link>
             <ChevronRight size={10} strokeWidth={3} />
-            <span className='text-rose-500'>{courseData.title}</span>
+            <span className='text-primary'>{courseData.title}</span>
           </div>
 
           <div className='max-w-[800px] space-y-6'>
@@ -158,7 +158,7 @@ export default function CourseDetailPage() {
                   <p className='text-sm font-black text-slate-900 dark:text-white leading-none mb-1'>
                     {courseData.creator.fullName}
                   </p>
-                  <p className='text-[10px] font-black text-rose-500 uppercase tracking-widest'>Giảng viên</p>
+                  <p className='text-[10px] font-black text-primary uppercase tracking-widest'>Giảng viên</p>
                 </div>
               </div>
 
@@ -185,8 +185,8 @@ export default function CourseDetailPage() {
           {/* Curriculum Section */}
           <section>
             <div className='flex items-center gap-3 mb-8'>
-              <div className='w-8 h-8 rounded-full bg-rose-500/10 flex items-center justify-center'>
-                <Layers size={16} className='text-rose-600' />
+              <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
+                <Layers size={16} className='text-primary' />
               </div>
               <h2 className='text-xl font-black text-slate-900 dark:text-white uppercase tracking-wider'>
                 Nội dung khóa học
@@ -229,14 +229,14 @@ export default function CourseDetailPage() {
                             <div className='flex items-center gap-4'>
                               <div className='w-9 h-9 rounded-full bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center shrink-0'>
                                 {lesson.type === 'VIDEO' ? (
-                                  <Play size={14} className='text-rose-600 fill-rose-600' />
+                                  <Play size={14} className='text-primary fill-primary' />
                                 ) : lesson.type === 'QUIZ' ? (
                                   <Zap size={14} className='text-amber-500 fill-amber-500' />
                                 ) : (
                                   <FileText size={14} className='text-blue-500' />
                                 )}
                               </div>
-                              <span className='text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-rose-600 transition-colors'>
+                              <span className='text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors'>
                                 {lesson.title}
                               </span>
                             </div>
@@ -244,7 +244,7 @@ export default function CourseDetailPage() {
                               {lesson.type === 'VIDEO' && (
                                 <Badge
                                   variant='secondary'
-                                  className='bg-rose-50 text-rose-500 border-none text-[9px] font-black uppercase tracking-tighter'
+                                  className='bg-primary/10 text-primary border-none text-[9px] font-black uppercase tracking-tighter'
                                 >
                                   Xem thử
                                 </Badge>
@@ -296,7 +296,7 @@ export default function CourseDetailPage() {
                 <div className='absolute inset-0 bg-slate-900/40 flex items-center justify-center'>
                   <div
                     onClick={() => firstVideoLesson && setPreviewLessonId(firstVideoLesson.id)}
-                    className='w-16 h-16 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform cursor-pointer'
+                    className='w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform cursor-pointer'
                   >
                     <Play size={24} fill='currentColor' className='ml-1' />
                   </div>
@@ -340,7 +340,7 @@ export default function CourseDetailPage() {
                     'w-full h-14 font-black text-base rounded-2xl shadow-xl active:scale-[0.98] transition-all disabled:opacity-70',
                     isLoggedIn && isEnrolled
                       ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200 dark:shadow-emerald-900/20'
-                      : 'bg-rose-600 hover:bg-rose-700 shadow-rose-200 dark:shadow-rose-900/20'
+                      : 'bg-primary hover:bg-primary/90 shadow-primary/20 dark:shadow-primary/20'
                   )}
                   disabled={addMutation.isPending || createPaymentMutation.isPending || isEnrollmentLoading}
                   onClick={async () => {
@@ -368,7 +368,7 @@ export default function CourseDetailPage() {
                   {!isLoggedIn || !isEnrolled ? (
                     <Button
                       variant='outline'
-                      className='flex-1 h-12 rounded-2xl border-2 border-slate-200 dark:border-slate-700 font-black text-sm text-slate-700 dark:text-slate-200 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all gap-2 active:scale-[0.98] disabled:opacity-50'
+                      className='flex-1 h-12 rounded-2xl border-2 border-slate-200 dark:border-slate-700 font-black text-sm text-slate-700 dark:text-slate-200 hover:border-primary hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/10 transition-all gap-2 active:scale-[0.98] disabled:opacity-50'
                       onClick={() => addMutation.mutate(courseIdOrSlug)}
                       disabled={addMutation.isPending || isEnrollmentLoading}
                     >
@@ -386,8 +386,8 @@ export default function CourseDetailPage() {
                     disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
                     className={`h-12 w-12 shrink-0 rounded-2xl border-2 flex items-center justify-center transition-all active:scale-[0.92] disabled:opacity-50 ${
                       isWishlisted
-                        ? 'border-rose-400 bg-rose-50 dark:bg-rose-500/10 text-rose-500'
-                        : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-rose-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10'
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-primary hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/10'
                     }`}
                     title={isWishlisted ? 'Bỏ yêu thích' : 'Yêu thích'}
                   >
@@ -434,7 +434,7 @@ export default function CourseDetailPage() {
             <div className='bg-slate-100 dark:bg-white/5 rounded-[2rem] p-6 text-center'>
               <p className='text-sm font-bold text-slate-600 dark:text-slate-400'>
                 Bạn chưa chắc chắn? Hãy thử <br />
-                Dùng thử miễn phí <span className='text-rose-600 underline cursor-pointer'>7 ngày</span>
+                Dùng thử miễn phí <span className='text-primary underline cursor-pointer'>7 ngày</span>
               </p>
             </div>
           </div>
@@ -450,7 +450,7 @@ export default function CourseDetailPage() {
           <div className='aspect-video w-full'>
             {isLoadingPreview ? (
               <div className='w-full h-full flex items-center justify-center bg-slate-900'>
-                <Loader2 className='w-10 h-10 animate-spin text-rose-500' />
+                <Loader2 className='w-10 h-10 animate-spin text-primary' />
               </div>
             ) : lessonPreviewData?.type === 'VIDEO' ? (
               <VideoPlayer url={lessonPreviewData.videoUrl || ''} lessonId={previewLessonId || ''} lastPosition={0} />
@@ -469,7 +469,7 @@ export default function CourseDetailPage() {
 function FeatureItem({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
     <div className='flex items-center gap-3 text-slate-600 dark:text-slate-300 font-bold text-xs'>
-      <div className='text-rose-600'>{icon}</div>
+      <div className='text-primary'>{icon}</div>
       <span>{text}</span>
     </div>
   )

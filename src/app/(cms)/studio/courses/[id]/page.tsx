@@ -375,8 +375,8 @@ export default function ChaptersPage() {
                   <span className='font-medium text-emerald-700 dark:text-emerald-400'>Miễn phí</span>
                 </div>
               ) : courseDetail?.price !== undefined ? (
-                <div className='flex items-center gap-1.5 bg-rose-50/50 dark:bg-rose-950/30 px-2.5 py-1 rounded-md border border-rose-100 dark:border-rose-900 shadow-sm'>
-                  <span className='font-medium text-rose-700 dark:text-rose-400'>
+                <div className='flex items-center gap-1.5 bg-primary/10 dark:bg-primary/20 px-2.5 py-1 rounded-md border border-primary/20 dark:border-primary/30 shadow-sm'>
+                  <span className='font-medium text-primary dark:text-primary'>
                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(courseDetail.price)}
                   </span>
                 </div>

@@ -70,7 +70,7 @@ export function TransactionTable({ data }: TransactionTableProps) {
                 </span>
               </td>
               <td className='px-6 py-6 text-center'>
-                <button className='text-rose-500 hover:text-rose-700 transition-colors flex items-center justify-center gap-1 mx-auto font-bold text-xs group'>
+                <button className='text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-1 mx-auto font-bold text-xs group'>
                   <Download size={14} className='group-hover:translate-y-0.5 transition-transform' />
                   <span className='hidden md:inline'>Hóa đơn</span>
                 </button>

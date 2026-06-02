@@ -54,11 +54,11 @@ export default function WishlistPage() {
   return (
     <div className='container mx-auto py-10 px-6 max-w-[1200px]' suppressHydrationWarning>
       <nav className='flex items-center gap-2 text-[12px] font-black tracking-widest uppercase text-slate-400 mb-8 mt-2'>
-        <Link href='/' className='hover:text-[oklch(0.577_0.245_27.325)] transition-colors'>
+        <Link href='/' className='hover:text-primary transition-colors'>
           Trang chủ
         </Link>
         <ChevronRight size={14} />
-        <span className='text-[oklch(0.577_0.245_27.325)]'>Yêu thích</span>
+        <span className='text-primary'>Yêu thích</span>
       </nav>
       <h1 className='text-3xl font-bold mb-8 text-[oklch(0.141_0.005_285.823)] dark:text-white'>
         Khóa học Yêu thích ({wishlistItems.length})
@@ -92,16 +92,16 @@ export default function WishlistPage() {
               {/* Content */}
               <div className='p-5 flex flex-col h-[280px]'>
                 <div>
-                  <h3 className='font-semibold text-lg line-clamp-2 text-gray-900 dark:text-white mb-2 group-hover:text-[oklch(0.577_0.245_27.325)] transition-colors'>
+                  <h3 className='font-semibold text-lg line-clamp-2 text-gray-900 dark:text-white mb-2 group-hover:text-primary transition-colors'>
                     <Link href={`/courses/${item.course.id}`}>{item.course.title}</Link>
                   </h3>
                   <p className='text-sm text-[oklch(0.552_0.016_285.938)] mb-3'>{item.course.creator.fullName}</p>
 
                   <div className='flex items-center gap-2 mb-4'>
-                    <span className='font-bold text-[oklch(0.577_0.245_27.325)]'>
+                    <span className='font-bold text-primary'>
                       {item.course.overallAnalytics?.avgRating?.toFixed(1) || '0.0'}
                     </span>
-                    <div className='flex text-[oklch(0.577_0.245_27.325)]'>
+                    <div className='flex text-primary'>
                       {[1, 2, 3, 4, 5].map((s) => (
                         <Star
                           key={s}
@@ -149,7 +149,7 @@ export default function WishlistPage() {
           <p className='text-[oklch(0.552_0.016_285.938)] mb-4'>Bạn chưa có khóa học nào trong danh sách yêu thích.</p>
           <Link
             href='/courses'
-            className='inline-flex px-6 py-3 bg-[oklch(0.577_0.245_27.325)] text-white font-medium rounded-lg hover:opacity-90 transition-opacity'
+            className='inline-flex px-6 py-3 bg-primary text-white font-medium rounded-lg hover:opacity-90 transition-opacity'
           >
             Khám phá ngay
           </Link>

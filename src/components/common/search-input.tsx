@@ -23,7 +23,7 @@ function HighlightedText({ text, keyword }: { text: string; keyword: string }) {
     <span>
       {parts.map((part, i) =>
         part.toLowerCase() === keyword.toLowerCase() ? (
-          <span key={i} className='text-[oklch(0.577_0.245_27.325)] font-bold'>
+          <span key={i} className='text-primary font-bold'>
             {part}
           </span>
         ) : (
@@ -117,10 +117,10 @@ export default function SearchInput({
         className={`group relative flex h-11 items-center transition-all duration-300 ease-in-out
           ${isFocused ? 'w-full md:w-[320px]' : 'w-full md:w-64'}
           bg-[oklch(0.967_0.001_0)] dark:bg-[oklch(0.21_0.006_285.885)] 
-          border ${isFocused ? 'border-[oklch(0.577_0.245_27.325)] shadow-[0_0_15px_rgba(234,88,12,0.1)]' : 'border-transparent'} 
+          border ${isFocused ? 'border-primary shadow-[0_0_15px_oklch(var(--primary)/0.2)]' : 'border-transparent'} 
           rounded-full px-4 overflow-hidden`}
       >
-        <div className='flex items-center justify-center text-[oklch(0.552_0.016_285.938)] transition-colors group-focus-within:text-[oklch(0.577_0.245_27.325)]'>
+        <div className='flex items-center justify-center text-[oklch(0.552_0.016_285.938)] transition-colors group-focus-within:text-primary'>
           {isPending ? <Loader2 size={18} className='animate-spin' /> : <Search size={18} />}
         </div>
 
@@ -171,7 +171,7 @@ export default function SearchInput({
                     className={`flex items-center gap-4 p-3 rounded-xl transition-all duration-200 group
                       ${
                         selectedIndex === index
-                          ? 'bg-[oklch(0.577_0.245_27.325)]/10 translate-x-1'
+                          ? 'bg-primary/10 translate-x-1'
                           : 'hover:bg-gray-100/50 dark:hover:bg-gray-800/50 hover:translate-x-1'
                       }`}
                     onClick={() => setIsSuggestionsOpen(false)}
@@ -189,10 +189,10 @@ export default function SearchInput({
                       />
                     </div>
                     <div className='flex flex-col min-w-0 flex-1 gap-0.5'>
-                      <h4 className='text-sm font-bold text-[oklch(0.141_0.005_285.823)] dark:text-white truncate leading-tight transition-colors group-hover:text-[oklch(0.577_0.245_27.325)]'>
+                      <h4 className='text-sm font-bold text-[oklch(0.141_0.005_285.823)] dark:text-white truncate leading-tight transition-colors group-hover:text-primary'>
                         <HighlightedText text={course.title} keyword={searchQuery} />
                       </h4>
-                      <p className='text-xs font-bold text-[oklch(0.577_0.245_27.325)]'>
+                      <p className='text-xs font-bold text-primary'>
                         {course.price === 0 || !course.price ? 'Miễn phí' : `${course.price.toLocaleString()} IDRT`}
                       </p>
                     </div>
@@ -201,7 +201,7 @@ export default function SearchInput({
               </div>
             ) : (
               <div className='p-8 text-center flex flex-col items-center gap-3'>
-                <div className='p-4 bg-orange-50 dark:bg-orange-900/10 rounded-full text-[oklch(0.577_0.245_27.325)]'>
+                <div className='p-4 bg-orange-50 dark:bg-orange-900/10 rounded-full text-primary'>
                   <Search size={24} />
                 </div>
                 <div className='space-y-1'>
@@ -219,7 +219,7 @@ export default function SearchInput({
           {suggestions.length > 0 && (
             <Link
               href={`/search?search=${encodeURIComponent(searchQuery)}`}
-              className='flex items-center justify-center w-full py-4 bg-gray-50/80 dark:bg-white/5 hover:bg-[oklch(0.577_0.245_27.325)] hover:text-white text-xs font-bold text-[oklch(0.552_0.016_285.938)] transition-all gap-2 group/all'
+              className='flex items-center justify-center w-full py-4 bg-gray-50/80 dark:bg-white/5 hover:bg-primary hover:text-white text-xs font-bold text-[oklch(0.552_0.016_285.938)] transition-all gap-2 group/all'
               onClick={() => setIsSuggestionsOpen(false)}
             >
               Xem tất cả kết quả

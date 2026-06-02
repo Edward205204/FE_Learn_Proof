@@ -110,7 +110,7 @@ export default function PaymentHistoryPage() {
             Hiển thị 1-{filteredData.length} của {filteredData.length} giao dịch
           </p>
           <div className='flex gap-2'>
-            <button className='w-10 h-10 rounded-full flex items-center justify-center text-sm font-black bg-primary text-white shadow-lg shadow-rose-200'>
+            <button className='w-10 h-10 rounded-full flex items-center justify-center text-sm font-black bg-primary text-white shadow-lg shadow-primary/20'>
               1
             </button>
           </div>

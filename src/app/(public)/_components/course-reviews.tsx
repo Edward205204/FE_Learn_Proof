@@ -94,8 +94,8 @@ export function CourseReviews({
     <section className='space-y-10'>
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
-          <div className='w-8 h-8 rounded-full bg-rose-500/10 flex items-center justify-center'>
-            <Star size={16} className='text-rose-600' />
+          <div className='w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center'>
+            <Star size={16} className='text-primary' />
           </div>
           <h2 className='text-xl font-black text-slate-900 dark:text-white uppercase tracking-wider'>
             Đánh giá học viên
@@ -105,7 +105,7 @@ export function CourseReviews({
         {isEnrolled && !isWriting && !userReview && (
           <Button
             onClick={() => setIsWriting(true)}
-            className='bg-rose-600 hover:bg-rose-700 text-white rounded-2xl px-6 h-11 font-black shadow-lg shadow-rose-200 dark:shadow-none'
+            className='bg-primary hover:bg-primary/90 text-white rounded-2xl px-6 h-11 font-black shadow-lg shadow-primary/20 dark:shadow-none'
           >
             Viết đánh giá
           </Button>
@@ -116,7 +116,7 @@ export function CourseReviews({
       {isWriting && (
         <div
           id='review-form'
-          className='bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border-2 border-rose-100 dark:border-rose-900/30 shadow-xl animate-in fade-in zoom-in-95 duration-300'
+          className='bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border-2 border-primary/20 dark:border-primary/30 shadow-xl animate-in fade-in zoom-in-95 duration-300'
         >
           <div className='space-y-6'>
             <div className='flex items-center justify-between'>
@@ -150,7 +150,7 @@ export function CourseReviews({
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder='Hãy chia sẻ những điều bạn thích hoặc cần cải thiện của khóa học này...'
-              className='min-h-[140px] rounded-3xl p-5 border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 focus-visible:ring-rose-500 font-medium'
+              className='min-h-[140px] rounded-3xl p-5 border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 focus-visible:ring-primary font-medium'
             />
 
             <div className='flex justify-end gap-3'>
@@ -169,7 +169,7 @@ export function CourseReviews({
               <Button
                 disabled={!comment.trim() || submitMutation.isPending || updateMutation.isPending}
                 onClick={handleSubmit}
-                className='bg-rose-600 hover:bg-rose-700 text-white rounded-xl px-8 h-11 font-black'
+                className='bg-primary hover:bg-primary/90 text-white rounded-xl px-8 h-11 font-black'
               >
                 {submitMutation.isPending || updateMutation.isPending
                   ? 'Đang gửi...'
@@ -194,7 +194,7 @@ export function CourseReviews({
                 <div className='flex items-center gap-4'>
                   <Avatar className='h-12 w-12 border-2 border-slate-50 shadow-sm'>
                     <AvatarImage src={review.user.avatar || undefined} />
-                    <AvatarFallback className='font-black bg-rose-50 text-rose-600'>
+                    <AvatarFallback className='font-black bg-primary/10 text-primary'>
                       {review.user.fullName.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
@@ -235,7 +235,7 @@ export function CourseReviews({
                       variant='ghost'
                       size='icon'
                       onClick={handleDelete}
-                      className='h-8 w-8 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50'
+                      className='h-8 w-8 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/5'
                     >
                       <Trash2 size={14} />
                     </Button>
@@ -250,21 +250,21 @@ export function CourseReviews({
                 {review.instructorReply && (
                   <div className='mt-8 pt-6 border-t border-slate-50 dark:border-slate-800 flex gap-4'>
                     <div className='shrink-0 pt-1'>
-                      <CornerDownRight size={20} className='text-rose-500' />
+                      <CornerDownRight size={20} className='text-primary' />
                     </div>
                     <div className='flex-1 space-y-4'>
                       <div className='flex justify-between items-start'>
                         <div className='flex items-center gap-3'>
-                          <Avatar className='h-8 w-8 border border-rose-100'>
+                          <Avatar className='h-8 w-8 border border-primary/20'>
                             <AvatarImage src={instructorAvatar || undefined} />
-                            <AvatarFallback className='bg-rose-600 text-white text-[10px] font-black'>
+                            <AvatarFallback className='bg-primary text-primary-foreground text-[10px] font-black'>
                               INST
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <p className='text-[11px] font-black text-slate-900 dark:text-white'>
                               {instructorName}
-                              <span className='ml-2 text-[9px] text-white bg-rose-500 px-1.5 py-0.5 rounded-md uppercase tracking-tighter'>
+                              <span className='ml-2 text-[9px] text-primary-foreground bg-primary px-1.5 py-0.5 rounded-md uppercase tracking-tighter'>
                                 Giảng viên
                               </span>
                             </p>
@@ -279,7 +279,7 @@ export function CourseReviews({
                         {isMyReview(review) && !review.learnerReply && (
                           <button
                             onClick={() => setReplyingId(review.id)}
-                            className='text-[10px] font-black text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1.5'
+                            className='text-[10px] font-black text-slate-400 hover:text-primary transition-colors flex items-center gap-1.5'
                           >
                             <Reply size={12} />
                             PHẢN HỒI LẠI
@@ -287,7 +287,7 @@ export function CourseReviews({
                         )}
                       </div>
 
-                      <p className='text-sm text-slate-600 dark:text-slate-300 font-bold bg-rose-50/30 dark:bg-rose-900/10 p-5 rounded-2xl rounded-tl-none border-l-2 border-rose-500 leading-relaxed italic'>
+                      <p className='text-sm text-slate-600 dark:text-slate-300 font-bold bg-primary/5 dark:bg-primary/10 p-5 rounded-2xl rounded-tl-none border-l-2 border-primary leading-relaxed italic'>
                         &quot;{review.instructorReply}&quot;
                       </p>
 
@@ -316,7 +316,7 @@ export function CourseReviews({
                               size='sm'
                               onClick={() => handleLearnerReply(review.id)}
                               disabled={!learnerReplyText.trim() || learnerReplyMutation.isPending}
-                              className='h-8 text-[10px] font-black bg-rose-600 hover:bg-rose-700'
+                              className='h-8 text-[10px] font-black bg-primary hover:bg-primary/90'
                             >
                               {learnerReplyMutation.isPending ? 'Đang gửi...' : 'Gửi phản hồi'}
                             </Button>

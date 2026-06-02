@@ -20,8 +20,11 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 import { PATH } from '@/constants/path'
+import homeApi from './(public)/_api/home.api'
+import { HomeSectionsResponse } from '@/schemas/course.schema'
+import { getCourseThumbnailUrl } from '@/utils/course'
 
-const courses = [
+const MOCK_COURSES = [
   {
     title: 'Fullstack Next.js 14 & NestJS Mastery',
     time: '16 weeks',
@@ -29,7 +32,8 @@ const courses = [
     rating: 4.9,
     category: 'Development',
     price: '$99',
-    img: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80'
+    img: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80',
+    slug: ''
   },
   {
     title: 'UI/UX Design for Developers',
@@ -38,7 +42,8 @@ const courses = [
     rating: 4.8,
     category: 'Design',
     price: '$49',
-    img: 'https://images.unsplash.com/photo-1545235617-9465d2a55698?auto=format&fit=crop&q=80'
+    img: 'https://images.unsplash.com/photo-1545235617-9465d2a55698?auto=format&fit=crop&q=80',
+    slug: ''
   },
   {
     title: 'Data Structure & Algorithms in JS',
@@ -47,7 +52,8 @@ const courses = [
     rating: 4.9,
     category: 'Fundamentals',
     price: 'Free',
-    img: 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?auto=format&fit=crop&q=80'
+    img: 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?auto=format&fit=crop&q=80',
+    slug: ''
   },
   {
     title: 'DevOps & AWS Cloud Essentials',
@@ -56,23 +62,24 @@ const courses = [
     rating: 4.7,
     category: 'Infrastructure',
     price: '$79',
-    img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80'
+    img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80',
+    slug: ''
   }
 ]
 
 const features = [
   {
-    icon: <Terminal className='w-6 h-6 text-rose-500' />,
+    icon: <Terminal className='w-6 h-6 text-primary' />,
     title: 'Project-Based Learning',
     desc: 'Không chỉ học lý thuyết, bạn xây dựng các dự án thực tế như E-commerce, SaaS, và Social Media ngay trong khóa học.'
   },
   {
-    icon: <Github className='w-6 h-6 text-rose-500' />,
+    icon: <Github className='w-6 h-6 text-primary' />,
     title: 'Code Review 1:1',
     desc: 'Mọi dòng code bạn viết đều được các Senior Developer review chi tiết qua Pull Request trên GitHub.'
   },
   {
-    icon: <Briefcase className='w-6 h-6 text-rose-500' />,
+    icon: <Briefcase className='w-6 h-6 text-primary' />,
     title: 'Job Guarantee',
     desc: 'Hỗ trợ tối ưu CV, Portfolio và kết nối trực tiếp với mạng lưới đối tác tuyển dụng của LearnProof.'
   }
@@ -118,7 +125,31 @@ const testimonials = [
   }
 ]
 
-export default function Home() {
+export default async function Home() {
+  let displayCourses = MOCK_COURSES
+
+  try {
+    const res = await homeApi.getHomeSections()
+    if (res.ok) {
+      const data: HomeSectionsResponse = await res.json()
+      const realCourses = data.trending?.length > 0 ? data.trending : data.newest
+      if (realCourses && realCourses.length > 0) {
+        displayCourses = realCourses.slice(0, 4).map((c) => ({
+          title: c.title,
+          time: c.level === 'BEGINNER' ? 'Cơ bản' : c.level === 'INTERMEDIATE' ? 'Trung cấp' : 'Nâng cao',
+          students: c.overallAnalytics?.totalStudents ? c.overallAnalytics.totalStudents.toLocaleString('vi-VN') : '0',
+          rating: c.avgRating || 0,
+          category: c.category.name,
+          price: c.isFree ? 'Miễn phí' : c.price.toLocaleString('vi-VN') + ' ₫',
+          img: getCourseThumbnailUrl(c.thumbnail),
+          slug: c.slug
+        }))
+      }
+    }
+  } catch (error) {
+    console.error('Error loading real courses on landing page:', error)
+  }
+
   return (
     <div className='min-h-screen bg-background overflow-x-hidden' suppressHydrationWarning>
       <Header />
@@ -493,10 +524,11 @@ export default function Home() {
             </div>
 
             <div className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4'>
-              {courses.map((course, idx) => (
-                <div
+              {displayCourses.map((course, idx) => (
+                <Link
                   key={idx}
-                  className='group flex flex-col gap-6 rounded-[3rem] bg-card p-5 shadow-2xl shadow-foreground/5 border border-border hover:border-primary/30 transition-all duration-500 hover:-translate-y-3'
+                  href={course.slug ? `/courses/${course.slug}` : '/courses'}
+                  className='group flex flex-col gap-6 rounded-[3rem] bg-card p-5 shadow-2xl shadow-foreground/5 border border-border hover:border-primary/30 transition-all duration-500 hover:-translate-y-3 cursor-pointer'
                 >
                   <div className='relative aspect-square w-full overflow-hidden rounded-[2.2rem] shadow-inner'>
                     <Image
@@ -531,7 +563,7 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -583,9 +615,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 8. CTA SECTION */}
         <section className='px-6 py-32'>
-          <div className='mx-auto max-w-[1200px] bg-primary rounded-[4rem] p-12 md:p-24 relative overflow-hidden shadow-[0_40px_80px_-15px_rgba(244,63,94,0.3)]'>
+          <div className='mx-auto max-w-[1200px] bg-primary rounded-[4rem] p-12 md:p-24 relative overflow-hidden shadow-[0_40px_80px_-15px_color-mix(in_oklch,var(--primary)_30%,transparent)]'>
             {/* Abstract Decorative Shapes */}
             <div className='absolute top-0 right-0 w-[400px] h-[400px] bg-white opacity-10 rounded-full -mr-40 -mt-40 blur-3xl' />
             <div className='absolute bottom-0 left-0 w-[300px] h-[300px] bg-orange-300 opacity-20 rounded-full -ml-20 -mb-20 blur-2xl' />
@@ -601,12 +632,12 @@ export default function Home() {
                 </p>
               </div>
               <div className='flex flex-wrap justify-center gap-6'>
-                <Button className='h-20 px-14 text-lg font-black bg-white text-primary hover:bg-rose-50 rounded-[2rem] transition-all hover:scale-[1.05] active:scale-[0.98] shadow-2xl'>
+                <Button className='h-20 px-14 text-lg font-black bg-white text-primary hover:bg-white/90 rounded-[2rem] transition-all hover:scale-[1.05] active:scale-[0.98] shadow-2xl'>
                   Đăng ký tư vấn miễn phí
                 </Button>
                 <Button
-                  variant='outline'
-                  className='h-20 px-14 text-lg font-black border-2 border-white/40 text-white hover:bg-white/10 rounded-[2rem] transition-all'
+                  variant='ghost'
+                  className='h-20 px-14 text-lg font-black border-2 border-white/40 bg-transparent text-white hover:bg-white hover:text-primary rounded-[2rem] transition-all hover:scale-[1.05] active:scale-[0.98]'
                 >
                   Gia nhập Discord cộng đồng
                 </Button>

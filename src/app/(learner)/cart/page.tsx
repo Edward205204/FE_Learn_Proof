@@ -60,11 +60,11 @@ export default function CartPage() {
   return (
     <div className='container mx-auto py-10 px-6 max-w-[1200px]' suppressHydrationWarning>
       <nav className='flex items-center gap-2 text-[12px] font-black tracking-widest uppercase text-slate-400 mb-8 mt-2'>
-        <Link href='/' className='hover:text-[oklch(0.577_0.245_27.325)] transition-colors'>
+        <Link href='/' className='hover:text-primary transition-colors'>
           Trang chủ
         </Link>
         <ChevronRight size={14} />
-        <span className='text-[oklch(0.577_0.245_27.325)]'>Giỏ hàng</span>
+        <span className='text-primary'>Giỏ hàng</span>
       </nav>
       <h1 className='text-3xl font-bold mb-8 text-[oklch(0.141_0.005_285.823)] dark:text-white'>
         Giỏ hàng của bạn ({cartItems.length})
@@ -82,7 +82,7 @@ export default function CartPage() {
             <p className='text-slate-500 mb-6 text-sm'>
               Hãy khám phá hàng ngàn khóa học hấp dẫn để bắt đầu hành trình học tập.
             </p>
-            <Button asChild className='bg-[oklch(0.577_0.245_27.325)] hover:opacity-90'>
+            <Button asChild className='bg-primary hover:opacity-90'>
               <Link href='/'>Khám phá khóa học ngay</Link>
             </Button>
           </div>
@@ -106,7 +106,7 @@ export default function CartPage() {
 
                   <div className='flex-1 flex flex-col justify-between py-1'>
                     <div>
-                      <h3 className='font-semibold text-lg line-clamp-2 text-gray-900 dark:text-white hover:text-[oklch(0.577_0.245_27.325)] transition-colors'>
+                      <h3 className='font-semibold text-lg line-clamp-2 text-gray-900 dark:text-white hover:text-primary transition-colors'>
                         <Link href={`/courses/${item.courseId}`}>{item.course.title}</Link>
                       </h3>
                       <p className='text-sm text-[oklch(0.552_0.016_285.938)] mt-1'>
@@ -114,8 +114,8 @@ export default function CartPage() {
                       </p>
 
                       <div className='flex items-center gap-2 mt-2'>
-                        <span className='font-bold text-[oklch(0.577_0.245_27.325)] text-sm'>5.0</span>
-                        <div className='flex text-[oklch(0.577_0.245_27.325)]'>
+                        <span className='font-bold text-primary text-sm'>5.0</span>
+                        <div className='flex text-primary'>
                           <Star size={14} fill='currentColor' />
                         </div>
                         <span className='text-xs text-[oklch(0.552_0.016_285.938)]'>(0 đánh giá)</span>
@@ -123,7 +123,7 @@ export default function CartPage() {
                     </div>
 
                     <div className='mt-4 flex sm:hidden items-center gap-3'>
-                      <span className='text-xl font-bold text-[oklch(0.577_0.245_27.325)]'>
+                      <span className='text-xl font-bold text-primary'>
                         {item.course.price.toLocaleString('vi-VN')} đ
                       </span>
                       {(item.course.originalPrice || item.course.price) > item.course.price && (
@@ -137,7 +137,7 @@ export default function CartPage() {
                   {/* Price Right side */}
                   <div className='hidden sm:flex flex-col items-end gap-2 shrink-0 w-32 justify-between'>
                     <div className='text-right'>
-                      <div className='text-xl font-bold text-[oklch(0.577_0.245_27.325)] block'>
+                      <div className='text-xl font-bold text-primary block'>
                         {item.course.price.toLocaleString('vi-VN')} đ
                       </div>
                       {(item.course.originalPrice || item.course.price) > item.course.price && (
@@ -180,7 +180,7 @@ export default function CartPage() {
                     <span className='font-bold'>-{discount.toLocaleString('vi-VN')} đ</span>
                   </div>
                   <div className='flex items-center gap-2 pt-6 border-t border-[oklch(0.92_0.004_286.32)] dark:border-[oklch(0.274_0.006_286.033)]'>
-                    <div className='flex-1 flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 px-4 py-3 rounded-xl border border-transparent focus-within:border-[oklch(0.577_0.245_27.325)]/30 transition-all'>
+                    <div className='flex-1 flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 px-4 py-3 rounded-xl border border-transparent focus-within:border-primary/30 transition-all'>
                       <Tag size={16} className='text-[oklch(0.552_0.016_285.938)]' />
                       <input
                         type='text'
@@ -188,7 +188,7 @@ export default function CartPage() {
                         className='bg-transparent border-none outline-none text-xs w-full focus:ring-0 dark:text-white placeholder:text-[oklch(0.552_0.016_285.938)] font-bold'
                       />
                     </div>
-                    <button className='text-[oklch(0.577_0.245_27.325)] dark:text-rose-400 font-black text-xs hover:scale-105 transition-transform uppercase tracking-tighter'>
+                    <button className='text-primary dark:text-primary font-black text-xs hover:scale-105 transition-transform uppercase tracking-tighter'>
                       Áp dụng
                     </button>
                   </div>
@@ -199,7 +199,7 @@ export default function CartPage() {
                     <span className='font-black text-gray-900 dark:text-white uppercase text-xs tracking-widest'>
                       Thành tiền:
                     </span>
-                    <span className='text-4xl font-black text-[oklch(0.577_0.245_27.325)]'>
+                    <span className='text-4xl font-black text-primary'>
                       {totalPrice.toLocaleString('vi-VN')} đ
                     </span>
                   </div>
@@ -210,7 +210,7 @@ export default function CartPage() {
 
                 <Button
                   asChild
-                  className='w-full h-16 bg-[oklch(0.577_0.245_27.325)] hover:opacity-90 text-white rounded-2xl font-black text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] mb-4 shadow-xl shadow-[oklch(0.577_0.245_27.325)]/20'
+                  className='w-full h-16 bg-primary hover:opacity-90 text-white rounded-2xl font-black text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] mb-4 shadow-xl shadow-primary/20'
                 >
                   <Link href={PATH.CHECKOUT}>
                     Tiến hành thanh toán <ArrowRight size={22} />

@@ -29,7 +29,7 @@ export default function LessonsRedirectPage() {
         <p className='text-rose-500 font-bold'>Lỗi: Khóa học này chưa có nội dung bài học.</p>
         <button
           onClick={() => router.back()}
-          className='text-sm font-bold text-slate-500 hover:text-rose-600 transition-colors'
+          className='text-sm font-bold text-slate-500 hover:text-primary transition-colors'
         >
           Quay lại trang trước
         </button>
@@ -39,7 +39,7 @@ export default function LessonsRedirectPage() {
 
   return (
     <div className='flex flex-col items-center justify-center min-h-[60vh] gap-4'>
-      <Loader2 className='w-12 h-12 animate-spin text-rose-500' />
+      <Loader2 className='w-12 h-12 animate-spin text-primary' />
       <p className='text-muted-foreground font-medium animate-pulse'>Đang chuẩn bị bài học...</p>
     </div>
   )

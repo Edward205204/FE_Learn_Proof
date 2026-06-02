@@ -69,7 +69,7 @@ export default function Header() {
     >
       <div className='mx-auto flex max-w-[1200px] items-center justify-between gap-8'>
         <div className='flex items-center gap-8'>
-          <div className='flex items-center gap-2 text-[oklch(0.577_0.245_27.325)]'>
+          <div className='flex items-center gap-2 text-primary'>
             <Image
               src='/images/leaner/logo (2).png'
               alt='Learner Logo'
@@ -93,48 +93,67 @@ export default function Header() {
 
         <div className='flex items-center gap-6'>
           <nav
-            className='hidden lg:flex items-center gap-6 text-sm font-medium text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)]'
+            className='hidden lg:flex items-center gap-3 text-sm font-medium text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)]'
             aria-label='Main navigation'
           >
-            <Link className='hover:text-[oklch(0.577_0.245_27.325)] transition-colors' href='/courses'>
-              Khám phá
+            <Link
+              href='/courses'
+              className='liquid-glass-item relative px-4 py-2 transition-all duration-300 hover:text-primary'
+            >
+              <span className='liquid-glass-bg' />
+              <span className='liquid-glass-shine' />
+              <span className='relative z-10 font-bold'>Khám phá</span>
             </Link>
             <Link
-              className='hover:text-[oklch(0.577_0.245_27.325)] transition-colors'
               href={PATH.MY_COURSES || '/courses/list'}
+              className='liquid-glass-item relative px-4 py-2 transition-all duration-300 hover:text-primary'
             >
-              Học tập
-            </Link>
-            <Link className='hover:text-[oklch(0.577_0.245_27.325)] transition-colors' href='/wishlist'>
-              Yêu thích
+              <span className='liquid-glass-bg' />
+              <span className='liquid-glass-shine' />
+              <span className='relative z-10 font-bold'>Học tập</span>
             </Link>
             <Link
-              className='hover:text-[oklch(0.577_0.245_27.325)] transition-colors inline-flex items-center gap-2'
-              href='/cart'
+              href='/wishlist'
+              className='liquid-glass-item relative px-4 py-2 transition-all duration-300 hover:text-primary'
             >
-              <span className='relative inline-flex items-center'>
-                <ShoppingCart size={16} />
-                {isLoggedIn && cartCount > 0 && (
-                  <span className='absolute -right-2 -top-2 min-w-4 h-4 px-1 rounded-full bg-[oklch(0.577_0.245_27.325)] text-white text-[10px] leading-4 font-black text-center'>
-                    {cartCount > 99 ? '99+' : cartCount}
-                  </span>
-                )}
+              <span className='liquid-glass-bg' />
+              <span className='liquid-glass-shine' />
+              <span className='relative z-10 font-bold'>Yêu thích</span>
+            </Link>
+            <Link
+              href='/cart'
+              className='liquid-glass-item relative px-4 py-2 transition-all duration-300 hover:text-primary gap-2'
+            >
+              <span className='liquid-glass-bg' />
+              <span className='liquid-glass-shine' />
+              <span className='relative z-10 flex items-center gap-2 font-bold'>
+                <span className='relative inline-flex items-center'>
+                  <ShoppingCart size={16} />
+                  {isLoggedIn && cartCount > 0 && (
+                    <span className='absolute -right-2 -top-2 min-w-4 h-4 px-1 rounded-full bg-primary text-white text-[10px] leading-4 font-black text-center'>
+                      {cartCount > 99 ? '99+' : cartCount}
+                    </span>
+                  )}
+                </span>
+                Giỏ hàng
               </span>
-              Giỏ hàng
             </Link>
 
             {/* CMS Button — chỉ hiện với ADMIN hoặc CONTENT_MANAGER */}
             {isLoggedIn && user && (user.role === Role.ADMIN || user.role === Role.CONTENT_MANAGER) && (
               <Link
                 href={PATH.STUDIO_COURSES}
-                className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold
-                  bg-[oklch(0.577_0.245_27.325)] text-white
-                  hover:bg-[oklch(0.52_0.245_27.325)] hover:scale-105
-                  transition-all duration-200 shadow-sm'
+                className='flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold
+                  bg-primary text-primary-foreground
+                  hover:bg-primary/90 hover:scale-105
+                  transition-all duration-200 shadow-sm relative overflow-hidden group'
                 aria-label='Vào trang quản trị CMS'
               >
-                <LayoutDashboard size={15} />
-                Quản trị CMS
+                <span className='absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out z-0' />
+                <span className='relative z-10 flex items-center gap-1.5 font-bold'>
+                  <LayoutDashboard size={15} />
+                  Quản trị CMS
+                </span>
               </Link>
             )}
 
@@ -163,9 +182,9 @@ export default function Header() {
                   aria-expanded={isMenuOpen}
                   aria-haspopup='true'
                 >
-                  <Avatar className='h-9 w-9 border-2 border-transparent hover:border-[oklch(0.577_0.245_27.325)] transition-all'>
+                  <Avatar className='h-9 w-9 border-2 border-transparent hover:border-primary transition-all'>
                     <AvatarImage src={avatarUrl} alt={user.fullName} />
-                    <AvatarFallback className='bg-[oklch(0.577_0.245_27.325)] text-white text-xs font-bold'>
+                    <AvatarFallback className='bg-primary text-white text-xs font-bold'>
                       {initials}
                     </AvatarFallback>
                   </Avatar>
@@ -182,10 +201,10 @@ export default function Header() {
                         <p className='text-xs text-[oklch(0.552_0.016_285.938)] truncate'>{user.email}</p>
                       </div>
 
-                      <div className='p-1'>
+                      <div className='p-1 flex flex-col gap-0.5'>
                         <Link
                           href={PATH.PROFILE || '/profile'}
-                          className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors'
+                          className='liquid-glass-dropdown-item flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:text-primary dark:hover:text-primary border border-transparent transition-all duration-200'
                           onClick={closeMenu}
                         >
                           <UserIcon size={16} />
@@ -193,7 +212,7 @@ export default function Header() {
                         </Link>
                         <Link
                           href={PATH.MY_COURSES || '/courses/list'}
-                          className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors'
+                          className='liquid-glass-dropdown-item flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:text-primary dark:hover:text-primary border border-transparent transition-all duration-200'
                           onClick={closeMenu}
                         >
                           <BookOpen size={16} />
@@ -201,7 +220,7 @@ export default function Header() {
                         </Link>
                         <Link
                           href='/my-certificates'
-                          className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors'
+                          className='liquid-glass-dropdown-item flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:text-primary dark:hover:text-primary border border-transparent transition-all duration-200'
                           onClick={closeMenu}
                         >
                           <Award size={16} />
@@ -209,7 +228,7 @@ export default function Header() {
                         </Link>
                         <Link
                           href={PATH.PAYMENT_HISTORY || '/payment-history'}
-                          className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors'
+                          className='liquid-glass-dropdown-item flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:text-primary dark:hover:text-primary border border-transparent transition-all duration-200'
                           onClick={closeMenu}
                         >
                           <HistoryIcon size={16} />
@@ -217,7 +236,7 @@ export default function Header() {
                         </Link>
                         <Link
                           href={PATH.SETTINGS || '/settings'}
-                          className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:bg-[oklch(0.92_0.004_286.32)] dark:hover:bg-[oklch(0.21_0.006_285.885)] transition-colors'
+                          className='liquid-glass-dropdown-item flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[oklch(0.141_0.005_285.823)] dark:text-[oklch(0.985_0_0)] hover:text-primary dark:hover:text-primary border border-transparent transition-all duration-200'
                           onClick={closeMenu}
                         >
                           <Settings size={16} />
@@ -228,7 +247,7 @@ export default function Header() {
                       <div className='border-t p-1 dark:border-[oklch(0.274_0.006_286.033)]'>
                         <button
                           onClick={handleLogout}
-                          className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors'
+                          className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-500/5 dark:hover:bg-red-500/10 border border-transparent hover:border-red-500/10 transition-all duration-200'
                         >
                           <LogOut size={16} />
                           Đăng xuất
@@ -242,7 +261,7 @@ export default function Header() {
               <Link
                 href='/login'
                 className='flex h-10 min-w-[90px] items-center justify-center px-5 text-sm font-bold text-white transition-opacity hover:opacity-90
-              bg-[oklch(0.577_0.245_27.325)] 
+              bg-primary 
               rounded-[calc(0.5rem-2px)] 
               shadow-sm'
               >

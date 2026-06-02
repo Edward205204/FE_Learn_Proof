@@ -19,14 +19,14 @@ export default function CheckoutSuccessPage() {
         {/* Main Success Card */}
         <div className='w-full bg-white dark:bg-[oklch(0.141_0.005_285.823)] rounded-[60px] p-12 md:p-20 shadow-2xl shadow-[oklch(0.141_0.005_285.823)]/5 flex flex-col items-center text-center relative overflow-hidden'>
           {/* Decorative gradients */}
-          <div className='absolute -top-24 -left-24 w-64 h-64 bg-[oklch(0.577_0.245_27.325)]/5 rounded-full blur-3xl' />
+          <div className='absolute -top-24 -left-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl' />
           <div className='absolute -bottom-24 -right-24 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl' />
 
           {/* Icon */}
           <div
             className={`w-24 h-24 rounded-full flex items-center justify-center text-white mb-10 shadow-xl animate-in zoom-in-50 duration-500 ${
               success
-                ? 'bg-[oklch(0.577_0.245_27.325)] shadow-[oklch(0.577_0.245_27.325)]/30'
+                ? 'bg-primary shadow-primary/30'
                 : 'bg-red-500 shadow-red-500/30'
             }`}
           >
@@ -41,7 +41,7 @@ export default function CheckoutSuccessPage() {
           </p>
 
           {/* Receipt Summary Card (Simplified for mock) */}
-          <div className='w-full max-w-xl bg-[oklch(0.577_0.245_27.325)]/5 dark:bg-[oklch(0.577_0.245_27.325)]/10 rounded-3xl p-8 mb-12 text-left border border-[oklch(0.577_0.245_27.325)]/10 relative'>
+          <div className='w-full max-w-xl bg-primary/5 dark:bg-primary/10 rounded-3xl p-8 mb-12 text-left border border-primary/10 relative'>
             <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8'>
               <div>
                 <p className='text-[10px] uppercase tracking-widest font-black text-[oklch(0.552_0.016_285.938)] mb-2'>
@@ -52,11 +52,11 @@ export default function CheckoutSuccessPage() {
                 </h2>
               </div>
               <div className='text-right'>
-                <p className='text-3xl font-black text-[oklch(0.577_0.245_27.325)]'>{courseIds.length} khóa học</p>
+                <p className='text-3xl font-black text-primary'>{courseIds.length} khóa học</p>
               </div>
             </div>
 
-            <div className='grid grid-cols-2 gap-8 pt-6 border-t border-[oklch(0.577_0.245_27.325)]/20'>
+            <div className='grid grid-cols-2 gap-8 pt-6 border-t border-primary/20'>
               <div>
                 <p className='text-[10px] uppercase tracking-widest font-black text-[oklch(0.552_0.016_285.938)] mb-1.5'>
                   Mã giao dịch
@@ -76,7 +76,7 @@ export default function CheckoutSuccessPage() {
           <div className='flex flex-col sm:flex-row gap-5 w-full max-w-md'>
             <Button
               asChild
-              className='flex-1 h-16 bg-[oklch(0.577_0.245_27.325)] hover:bg-[oklch(0.477_0.245_27.325)] text-white gap-2 rounded-2xl font-black text-lg shadow-lg shadow-[oklch(0.577_0.245_27.325)]/20 transition-all active:scale-[0.98]'
+              className='flex-1 h-16 bg-primary hover:opacity-90 text-white gap-2 rounded-2xl font-black text-lg shadow-lg shadow-primary/20 transition-all active:scale-[0.98]'
             >
               <Link href={success ? PATH.MY_COURSES : PATH.CHECKOUT}>
                 {success ? 'Bắt đầu học ngay' : 'Thử thanh toán lại'} <ArrowRight size={20} />
@@ -99,8 +99,8 @@ export default function CheckoutSuccessPage() {
           </p>
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
-            <div className='bg-[oklch(0.577_0.245_27.325)]/5 dark:bg-[oklch(0.141_0.005_285.823)] p-8 rounded-[40px] border border-transparent hover:border-[oklch(0.577_0.245_27.325)]/20 transition-all group'>
-              <div className='w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center text-[oklch(0.577_0.245_27.325)] mb-6 mx-auto shadow-sm group-hover:scale-110 transition-transform'>
+            <div className='bg-primary/5 dark:bg-[oklch(0.141_0.005_285.823)] p-8 rounded-[40px] border border-transparent hover:border-primary/20 transition-all group'>
+              <div className='w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center text-primary mb-6 mx-auto shadow-sm group-hover:scale-110 transition-transform'>
                 <Users size={24} />
               </div>
               <p className='font-extrabold text-gray-900 dark:text-white mb-2'>Join Community</p>
@@ -109,7 +109,7 @@ export default function CheckoutSuccessPage() {
               </p>
             </div>
 
-            <div className='bg-[oklch(0.577_0.245_27.325)]/5 dark:bg-[oklch(0.141_0.005_285.823)] p-8 rounded-[40px] border border-transparent hover:border-[oklch(0.577_0.245_27.325)]/20 transition-all group'>
+            <div className='bg-primary/5 dark:bg-[oklch(0.141_0.005_285.823)] p-8 rounded-[40px] border border-transparent hover:border-primary/20 transition-all group'>
               <div className='w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center text-green-500 mb-6 mx-auto shadow-sm group-hover:scale-110 transition-transform'>
                 <Mail size={24} />
               </div>
@@ -119,7 +119,7 @@ export default function CheckoutSuccessPage() {
               </p>
             </div>
 
-            <div className='bg-[oklch(0.577_0.245_27.325)]/5 dark:bg-[oklch(0.141_0.005_285.823)] p-8 rounded-[40px] border border-transparent hover:border-[oklch(0.577_0.245_27.325)]/20 transition-all group'>
+            <div className='bg-primary/5 dark:bg-[oklch(0.141_0.005_285.823)] p-8 rounded-[40px] border border-transparent hover:border-primary/20 transition-all group'>
               <div className='w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center text-blue-500 mb-6 mx-auto shadow-sm group-hover:scale-110 transition-transform'>
                 <Award size={24} />
               </div>

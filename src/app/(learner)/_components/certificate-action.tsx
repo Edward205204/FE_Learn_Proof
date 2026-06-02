@@ -185,7 +185,7 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
           {/* Thanh Progress Bar bám sát thiết kế */}
           <div className='w-full bg-slate-100 h-4 rounded-full overflow-hidden'>
             <div
-              className='bg-primary h-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(225,29,72,0.3)]'
+              className='bg-primary h-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(110,214,242,0.4)]'
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -218,8 +218,8 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
                 className={cn(
                   'w-full py-5 rounded-2xl font-black flex items-center justify-center gap-3 transition-all shadow-xl',
                   isSuccess
-                    ? 'bg-emerald-500 text-white cursor-default'
-                    : 'bg-primary hover:bg-rose-600 text-white shadow-rose-100 active:scale-[0.98]'
+                    ? 'bg-emerald-50 text-white cursor-default'
+                    : 'bg-primary hover:bg-primary/90 text-white shadow-primary/20 active:scale-[0.98]'
                 )}
               >
                 {mintMutation.isPending ? (
@@ -360,7 +360,7 @@ export function CertificateAction({ courseId }: CertificateActionProps) {
                 <button
                   onClick={handleDownloadPDF}
                   disabled={isDownloading}
-                  className='bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-rose-600 transition-colors shadow-lg'
+                  className='bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-primary/90 transition-colors shadow-lg'
                 >
                   {isDownloading ? (
                     <div className='w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin' />

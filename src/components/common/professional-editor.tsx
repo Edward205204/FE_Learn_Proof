@@ -152,7 +152,7 @@ export function ProfessionalEditor({
       <div className='flex-1 overflow-y-auto'>
         <EditorContent
           editor={editor}
-          className={`p-10 prose prose-rose max-w-none focus:outline-none [&_.ProseMirror]:outline-none text-foreground leading-relaxed selection:bg-primary/30 prose-pre:bg-[#282c34] prose-pre:text-[#abb2bf] prose-pre:border prose-pre:border-border prose-pre:shadow-sm prose-code:text-rose-500 prose-code:bg-rose-500/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none`}
+          className={`p-10 prose prose-cyan max-w-none focus:outline-none [&_.ProseMirror]:outline-none text-foreground leading-relaxed selection:bg-primary/30 prose-pre:bg-[#282c34] prose-pre:text-[#abb2bf] prose-pre:border prose-pre:border-border prose-pre:shadow-sm prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none`}
           style={{ minHeight }}
         />
       </div>

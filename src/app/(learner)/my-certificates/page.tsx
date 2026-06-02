@@ -268,7 +268,7 @@ export default function MyCertificatesPage() {
                   <button
                     onClick={() => handleDownloadPDF(cert.course.id, cert.course.title)}
                     disabled={downloadingId === cert.course.id}
-                    className='inline-flex items-center gap-2 text-sm font-bold text-white transition-colors bg-primary hover:bg-rose-600 px-4 py-2.5 rounded-xl shadow-sm disabled:opacity-70 disabled:cursor-not-allowed'
+                    className='inline-flex items-center gap-2 text-sm font-bold text-white transition-colors bg-primary hover:bg-primary/90 px-4 py-2.5 rounded-xl shadow-sm disabled:opacity-70 disabled:cursor-not-allowed'
                   >
                     {downloadingId === cert.course.id ? (
                       <>
@@ -298,7 +298,7 @@ export default function MyCertificatesPage() {
           </p>
           <Link
             href='/courses'
-            className='bg-primary hover:bg-rose-600 text-white px-8 py-4 rounded-2xl font-black transition-transform active:scale-95 shadow-lg shadow-rose-200'
+            className='bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-2xl font-black transition-transform active:scale-95 shadow-lg shadow-primary/20'
           >
             Khám phá khóa học ngay
           </Link>

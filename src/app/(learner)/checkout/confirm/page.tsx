@@ -17,7 +17,7 @@ export default function OrderConfirmationPage() {
           {/* Section 1: Chi tiết khóa học */}
           <section className='bg-white rounded-3xl p-8 shadow-sm border border-slate-50'>
             <h2 className='flex items-center gap-2 font-bold text-slate-800 mb-6'>
-              <span className='p-2 bg-rose-50 text-primary rounded-lg'>🛍️</span>
+              <span className='p-2 bg-primary/10 text-primary rounded-lg'>🛍️</span>
               Chi tiết khóa học
             </h2>
 
@@ -47,7 +47,7 @@ export default function OrderConfirmationPage() {
           {/* Section 2: Phương thức thanh toán */}
           <section className='bg-white rounded-3xl p-8 shadow-sm border border-slate-50'>
             <h2 className='font-bold text-slate-800 mb-6 text-lg'>Phương thức thanh toán</h2>
-            <div className='p-5 rounded-2xl border-2 border-rose-100 bg-rose-50/30 flex items-center justify-between'>
+            <div className='p-5 rounded-2xl border-2 border-primary/20 bg-primary/5 flex items-center justify-between'>
               <div className='flex items-center gap-4'>
                 <div className='p-3 bg-white rounded-xl shadow-sm'>
                   <CreditCard className='w-6 h-6 text-primary' />
@@ -78,7 +78,7 @@ export default function OrderConfirmationPage() {
                 <span className='text-slate-500'>Giảm giá</span>
                 <span className='font-bold text-emerald-500'>0đ</span>
               </div>
-              <div className='flex justify-between items-center bg-rose-50/50 p-3 rounded-xl'>
+              <div className='flex justify-between items-center bg-primary/5 p-3 rounded-xl'>
                 <span className='text-xs text-slate-500'>Mã giảm giá (Coupon)</span>
                 <button className='text-xs font-bold text-primary hover:underline'>Áp dụng ngay</button>
               </div>
@@ -89,7 +89,7 @@ export default function OrderConfirmationPage() {
               <span className='text-2xl font-black text-slate-900'>1.200.000đ</span>
             </div>
 
-            <button className='w-full bg-red-600 hover:bg-red-700 text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-xl shadow-red-100 active:scale-[0.98]'>
+            <button className='w-full bg-primary hover:bg-primary/90 text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-xl shadow-primary/20 active:scale-[0.98]'>
               Xác nhận Thanh toán
               <ChevronRight className='w-5 h-5' />
             </button>

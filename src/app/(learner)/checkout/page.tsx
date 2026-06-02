@@ -102,7 +102,7 @@ export default function CheckoutPage() {
             {/* Step 1: Payment Method */}
             <section>
               <div className='flex items-center gap-3 mb-6'>
-                <div className='flex items-center justify-center w-8 h-8 rounded-full bg-[oklch(0.577_0.245_27.325)] text-white text-sm font-black'>
+                <div className='flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white text-sm font-black'>
                   1
                 </div>
                 <h2 className='text-xl font-bold text-[oklch(0.141_0.005_285.823)] dark:text-white'>
@@ -116,7 +116,7 @@ export default function CheckoutPage() {
                     key={method.id}
                     className={`relative flex items-center p-6 rounded-3xl border-2 cursor-pointer transition-all duration-300 bg-white dark:bg-[oklch(0.141_0.005_285.823)] hover:shadow-md ${
                       paymentMethod === method.id
-                        ? 'border-[oklch(0.577_0.245_27.325)] ring-1 ring-[oklch(0.577_0.245_27.325)]/20'
+                        ? 'border-primary ring-1 ring-primary/20'
                         : 'border-transparent dark:border-[oklch(0.274_0.006_286.033)]'
                     }`}
                   >
@@ -132,7 +132,7 @@ export default function CheckoutPage() {
                       <div
                         className={`p-3 rounded-2xl transition-colors ${
                           paymentMethod === method.id
-                            ? 'bg-[oklch(0.577_0.245_27.325)]/10 text-[oklch(0.577_0.245_27.325)]'
+                            ? 'bg-primary/10 text-primary'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
                         }`}
                       >
@@ -147,7 +147,7 @@ export default function CheckoutPage() {
                     <div
                       className={`absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                         paymentMethod === method.id
-                          ? 'border-[oklch(0.577_0.245_27.325)] bg-[oklch(0.577_0.245_27.325)]'
+                          ? 'border-primary bg-primary'
                           : 'border-slate-300 dark:border-slate-600'
                       }`}
                     >
@@ -161,19 +161,19 @@ export default function CheckoutPage() {
             {/* Step 2: Discount Code */}
             <section>
               <div className='flex items-center gap-3 mb-6'>
-                <div className='flex items-center justify-center w-8 h-8 rounded-full bg-[oklch(0.577_0.245_27.325)] text-white text-sm font-black'>
+                <div className='flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white text-sm font-black'>
                   2
                 </div>
                 <h2 className='text-xl font-bold text-[oklch(0.141_0.005_285.823)] dark:text-white'>Mã giảm giá</h2>
               </div>
-
+ 
               <div className='flex gap-4 p-4 rounded-3xl bg-white dark:bg-[oklch(0.141_0.005_285.823)] border border-transparent dark:border-[oklch(0.274_0.006_286.033)] shadow-sm max-w-md'>
                 <input
                   type='text'
                   placeholder='Nhập mã ưu đãi...'
                   className='bg-transparent border-none outline-none flex-1 px-4 text-gray-900 dark:text-white placeholder:text-[oklch(0.552_0.016_285.938)]'
                 />
-                <Button className='bg-[oklch(0.577_0.245_27.325)] text-white hover:bg-[oklch(0.477_0.245_27.325)] rounded-2xl px-6 font-bold'>
+                <Button className='bg-primary text-white hover:opacity-90 rounded-2xl px-6 font-bold'>
                   Áp dụng
                 </Button>
               </div>
@@ -228,7 +228,7 @@ export default function CheckoutPage() {
               <div className='border-t border-slate-100 dark:border-slate-800 pt-6 mb-10'>
                 <div className='flex items-center justify-between'>
                   <span className='text-lg font-bold text-gray-900 dark:text-white'>Tổng thanh toán</span>
-                  <span className='text-3xl font-black text-[oklch(0.577_0.245_27.325)]'>
+                  <span className='text-3xl font-black text-primary'>
                     {totalPrice.toLocaleString('vi-VN')}đ
                   </span>
                 </div>
@@ -238,7 +238,7 @@ export default function CheckoutPage() {
               <Button
                 onClick={handleCheckout}
                 disabled={createPaymentMutation.isPending || cartItems.length === 0}
-                className='w-full h-16 bg-[oklch(0.577_0.245_27.325)] hover:bg-[oklch(0.477_0.245_27.325)] text-white gap-2 rounded-3xl font-black text-lg shadow-lg shadow-[oklch(0.577_0.245_27.325)]/20 transition-all active:scale-[0.98]'
+                className='w-full h-16 bg-primary hover:opacity-90 text-white gap-2 rounded-3xl font-black text-lg shadow-lg shadow-primary/20 transition-all active:scale-[0.98]'
               >
                 {createPaymentMutation.isPending ? (
                   <Loader2 className='animate-spin' />
@@ -267,9 +267,9 @@ export default function CheckoutPage() {
             </div>
 
             {/* Need Help Section */}
-            <div className='bg-white dark:bg-[oklch(0.141_0.005_285.823)] p-6 rounded-3xl border border-transparent dark:border-[oklch(0.274_0.006_286.033)] shadow-md flex items-center justify-between group cursor-pointer hover:border-[oklch(0.577_0.245_27.325)]/30 transition-all'>
+            <div className='bg-white dark:bg-[oklch(0.141_0.005_285.823)] p-6 rounded-3xl border border-transparent dark:border-[oklch(0.274_0.006_286.033)] shadow-md flex items-center justify-between group cursor-pointer hover:border-primary/30 transition-all'>
               <div className='flex items-center gap-4'>
-                <div className='w-12 h-12 rounded-2xl bg-[oklch(0.577_0.245_27.325)]/5 flex items-center justify-center text-[oklch(0.577_0.245_27.325)] shadow-inner'>
+                <div className='w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center text-primary shadow-inner'>
                   <HelpCircle size={22} />
                 </div>
                 <div>
@@ -281,7 +281,7 @@ export default function CheckoutPage() {
               </div>
               <ChevronRight
                 size={18}
-                className='text-slate-300 group-hover:text-[oklch(0.577_0.245_27.325)] group-hover:translate-x-1 transition-all'
+                className='text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all'
               />
             </div>
           </div>

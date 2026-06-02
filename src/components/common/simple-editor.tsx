@@ -38,7 +38,7 @@ export function SimpleEditor({
       <EditorToolbar editor={editor} professional={false} />
       <EditorContent
         editor={editor}
-        className={`p-4 prose prose-sm prose-rose max-w-none focus:outline-none text-foreground ${minHeight ?? 'min-h-[120px]'}`}
+        className={`p-4 prose prose-sm prose-cyan max-w-none focus:outline-none text-foreground ${minHeight ?? 'min-h-[120px]'}`}
       />
     </div>
   )
