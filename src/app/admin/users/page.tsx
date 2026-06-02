@@ -1,14 +1,24 @@
 'use client'
 
 import * as React from 'react'
-import { Users, Search, MoreHorizontal, ShieldCheck, Ban, UserCog, RefreshCw } from 'lucide-react'
+import {
+  Search,
+  MoreHorizontal,
+  ShieldCheck,
+  UserCog,
+  RefreshCw,
+  GraduationCap,
+  BookOpen,
+  Crown
+} from 'lucide-react'
 
 import { useAdminUsersQuery, useAdminUpdateUserRoleMutation } from '@/app/admin/_hooks/use-admin-query'
 import { AdminRole } from '@/app/admin/_utils/zod'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,69 +28,86 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-export default function AdminUsersPage() {
+// ── Config từng tab ──────────────────────────────────────────────────────────
+const TABS: {
+  key: AdminRole | 'ALL'
+  label: string
+  icon: React.ElementType
+  color: string
+  badgeClass: string
+  badgeLabel: string
+}[] = [
+  {
+    key: 'LEARNER',
+    label: 'Người học',
+    icon: GraduationCap,
+    color: 'text-slate-600',
+    badgeClass: 'bg-slate-100 text-slate-600 hover:bg-slate-100 border-none',
+    badgeLabel: 'LEARNER'
+  },
+  {
+    key: 'CONTENT_MANAGER',
+    label: 'Quản lý nội dung',
+    icon: BookOpen,
+    color: 'text-blue-600',
+    badgeClass: 'bg-blue-100 text-blue-700 hover:bg-blue-100 border-none',
+    badgeLabel: 'MANAGER'
+  },
+  {
+    key: 'ADMIN',
+    label: 'Quản trị viên',
+    icon: Crown,
+    color: 'text-purple-600',
+    badgeClass: 'bg-purple-100 text-purple-700 hover:bg-purple-100 border-none',
+    badgeLabel: 'ADMIN'
+  }
+]
+
+// ── Sub-component: User Table ─────────────────────────────────────────────────
+function UserTable({ role }: { role: AdminRole }) {
   const [search, setSearch] = React.useState('')
-  const [role, setRole] = React.useState<AdminRole | undefined>(undefined)
   const [page, setPage] = React.useState(1)
+  const updateUserRole = useAdminUpdateUserRoleMutation()
 
   const { data, isLoading, refetch } = useAdminUsersQuery({
     page,
     limit: 20,
     search: search || undefined,
-    role: role as AdminRole | undefined
+    role
   })
 
-  const updateUserRole = useAdminUpdateUserRoleMutation()
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value)
-    setPage(1)
-  }
-
-  const handleRoleChange = (val: string) => {
-    setRole(val === 'ALL' ? undefined : (val as AdminRole))
-    setPage(1)
-  }
+  const tab = TABS.find((t) => t.key === role)!
 
   return (
-    <div className='space-y-6'>
-      <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-        <div>
-          <h1 className='text-3xl font-bold tracking-tight'>Quản lý người dùng</h1>
-          <p className='text-muted-foreground'>
-            Quản lý tất cả người dùng, phân quyền và trạng thái hoạt động trên hệ thống.
-          </p>
+    <div className='space-y-4'>
+      {/* Thanh tìm kiếm */}
+      <div className='flex gap-3 items-center'>
+        <div className='relative flex-1'>
+          <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+          <Input
+            placeholder={`Tìm kiếm ${tab.label.toLowerCase()}...`}
+            className='pl-10'
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
+          />
         </div>
         <Button onClick={() => refetch()} variant='outline' size='icon' className='shrink-0 rounded-full'>
           <RefreshCw className='h-4 w-4' />
         </Button>
       </div>
 
-      <div className='flex flex-col gap-4 sm:flex-row sm:items-center'>
-        <div className='relative flex-1'>
-          <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-          <Input
-            placeholder='Tìm kiếm người dùng theo tên hoặc email...'
-            className='pl-10'
-            value={search}
-            onChange={handleSearchChange}
-          />
-        </div>
-        <Select onValueChange={handleRoleChange} value={role || 'ALL'}>
-          <SelectTrigger className='w-full sm:w-[200px]'>
-            <SelectValue placeholder='Lọc theo vai trò' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='ALL'>Tất cả vai trò</SelectItem>
-            <SelectItem value='LEARNER'>Người học (Learner)</SelectItem>
-            <SelectItem value='CONTENT_MANAGER'>Quản lý nội dung</SelectItem>
-            <SelectItem value='ADMIN'>Quản trị viên (Admin)</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Tổng số */}
+      {!isLoading && data && (
+        <p className='text-sm text-muted-foreground'>
+          Tổng cộng <span className='font-semibold text-foreground'>{data.meta.total}</span> {tab.label.toLowerCase()}
+        </p>
+      )}
 
+      {/* Bảng */}
       <Card className='border-none shadow-sm overflow-hidden'>
         <div className='overflow-x-auto'>
           <table className='w-full text-sm text-left'>
@@ -97,20 +124,21 @@ export default function AdminUsersPage() {
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className='animate-pulse'>
-                    <td colSpan={6} className='px-6 py-8 text-center text-muted-foreground'>
+                    <td colSpan={5} className='px-6 py-8 text-center text-muted-foreground'>
                       Đang tải dữ liệu...
                     </td>
                   </tr>
                 ))
               ) : data?.items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className='px-6 py-12 text-center text-muted-foreground'>
-                    Không tìm thấy người dùng nào.
+                  <td colSpan={5} className='px-6 py-12 text-center text-muted-foreground'>
+                    Không có {tab.label.toLowerCase()} nào.
                   </td>
                 </tr>
               ) : (
                 data?.items.map((user) => (
                   <tr key={user.id} className='hover:bg-muted/30 transition-colors'>
+                    {/* Avatar + tên */}
                     <td className='px-6 py-4 font-medium'>
                       <div className='flex items-center gap-3'>
                         <Avatar className='h-9 w-9 border'>
@@ -125,7 +153,7 @@ export default function AdminUsersPage() {
                         </Avatar>
                         <div className='flex flex-col'>
                           <div className='flex items-center gap-1.5'>
-                            <span className='font-semibold text-foreground truncate max-w-[150px]'>
+                            <span className='font-semibold text-foreground truncate max-w-[160px]'>
                               {user.fullName}
                             </span>
                             {user.provider === 'GOOGLE' && (
@@ -154,40 +182,32 @@ export default function AdminUsersPage() {
                               </div>
                             )}
                           </div>
-                          <span className='text-xs text-muted-foreground truncate max-w-[150px]'>{user.email}</span>
+                          <span className='text-xs text-muted-foreground truncate max-w-[160px]'>{user.email}</span>
                         </div>
                       </div>
                     </td>
+
+                    {/* Badge vai trò */}
                     <td className='px-6 py-4'>
-                      {user.role === 'ADMIN' ? (
-                        <Badge
-                          variant='secondary'
-                          className='bg-purple-100 text-purple-700 hover:bg-purple-100 border-none'
-                        >
-                          ADMIN
-                        </Badge>
-                      ) : user.role === 'CONTENT_MANAGER' ? (
-                        <Badge variant='secondary' className='bg-blue-100 text-blue-700 hover:bg-blue-100 border-none'>
-                          MANAGER
-                        </Badge>
-                      ) : (
-                        <Badge
-                          variant='secondary'
-                          className='bg-slate-100 text-slate-600 hover:bg-slate-100 border-none'
-                        >
-                          LEARNER
-                        </Badge>
-                      )}
+                      <Badge variant='secondary' className={tab.badgeClass}>
+                        {tab.badgeLabel}
+                      </Badge>
                     </td>
+
+                    {/* Thống kê */}
                     <td className='px-6 py-4'>
                       <div className='flex flex-col text-[11px] text-muted-foreground'>
                         <span>Khóa học: {user._count.coursesCreated}</span>
                         <span>Đã mua: {user._count.enrollments}</span>
                       </div>
                     </td>
+
+                    {/* Ngày tham gia */}
                     <td className='px-6 py-4 text-muted-foreground'>
                       {new Date(user.createdAt).toLocaleDateString('vi-VN')}
                     </td>
+
+                    {/* Thao tác */}
                     <td className='px-6 py-4 text-right'>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -195,7 +215,7 @@ export default function AdminUsersPage() {
                             <MoreHorizontal className='h-4 w-4' />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end' className='w-48'>
+                        <DropdownMenuContent align='end' className='w-52'>
                           <DropdownMenuLabel>Hành động</DropdownMenuLabel>
                           <DropdownMenuItem onClick={() => {}}>
                             <UserCog className='mr-2 h-4 w-4' />
@@ -205,17 +225,19 @@ export default function AdminUsersPage() {
                           <DropdownMenuLabel className='text-[10px] uppercase text-muted-foreground'>
                             Thay đổi quyền
                           </DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => updateUserRole.mutate({ id: user.id, role: 'LEARNER' })}>
-                            Chuyển thành Learner
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => updateUserRole.mutate({ id: user.id, role: 'CONTENT_MANAGER' })}
-                          >
-                            Chuyển thành Manager
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => updateUserRole.mutate({ id: user.id, role: 'ADMIN' })}>
-                            Chuyển thành Admin
-                          </DropdownMenuItem>
+                          {TABS.map((t) => (
+                            <DropdownMenuItem
+                              key={t.key}
+                              disabled={t.key === role}
+                              onClick={() =>
+                                t.key !== role &&
+                                updateUserRole.mutate({ id: user.id, role: t.key as AdminRole })
+                              }
+                            >
+                              <t.icon className='mr-2 h-4 w-4' />
+                              Chuyển thành {t.label}
+                            </DropdownMenuItem>
+                          ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
@@ -226,10 +248,11 @@ export default function AdminUsersPage() {
           </table>
         </div>
 
+        {/* Phân trang */}
         {data && data.meta.totalPages > 1 && (
           <div className='flex items-center justify-between px-6 py-4 bg-muted/20 border-t'>
             <div className='text-xs text-muted-foreground'>
-              Hiển thị trang {data.meta.page} / {data.meta.totalPages} ({data.meta.total} người dùng)
+              Trang {data.meta.page} / {data.meta.totalPages}
             </div>
             <div className='flex gap-2'>
               <Button variant='outline' size='sm' disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
@@ -247,6 +270,51 @@ export default function AdminUsersPage() {
           </div>
         )}
       </Card>
+    </div>
+  )
+}
+
+// ── Tổng count để hiển thị trên tab header ────────────────────────────────────
+function TabCountBadge({ role }: { role: AdminRole }) {
+  const { data } = useAdminUsersQuery({ page: 1, limit: 1, role })
+  if (!data) return null
+  return (
+    <span className='ml-1.5 inline-flex items-center justify-center rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold tabular-nums'>
+      {data.meta.total}
+    </span>
+  )
+}
+
+// ── Page chính ────────────────────────────────────────────────────────────────
+export default function AdminUsersPage() {
+  return (
+    <div className='space-y-6'>
+      <div>
+        <h1 className='text-3xl font-bold tracking-tight'>Quản lý người dùng</h1>
+        <p className='text-muted-foreground'>Quản lý tất cả người dùng, phân quyền và trạng thái hoạt động trên hệ thống.</p>
+      </div>
+
+      <Tabs defaultValue='LEARNER'>
+        <TabsList className='h-auto gap-1 bg-muted/60 p-1 rounded-xl'>
+          {TABS.map(({ key, label, icon: Icon, color }) => (
+            <TabsTrigger
+              key={key}
+              value={key}
+              className='flex items-center gap-2 rounded-lg px-4 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm'
+            >
+              <Icon className={`h-4 w-4 ${color}`} />
+              <span>{label}</span>
+              <TabCountBadge role={key as AdminRole} />
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        {TABS.map(({ key }) => (
+          <TabsContent key={key} value={key} className='mt-6'>
+            <UserTable role={key as AdminRole} />
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   )
 }

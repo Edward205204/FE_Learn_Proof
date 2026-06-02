@@ -161,7 +161,8 @@ export const HomeSectionsResponseSchema = z.object({
   trending: z.array(HomeCourseCardSchema),
   topSelling: z.array(HomeCourseCardSchema),
   newest: z.array(HomeCourseCardSchema),
-  topRated: z.array(HomeCourseCardSchema)
+  topRated: z.array(HomeCourseCardSchema),
+  heroImage: z.string().nullable().optional()
 })
 
 export const CategoryWithCountSchema = z.object({

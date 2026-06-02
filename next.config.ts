@@ -2,6 +2,10 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   images: {
+    // Backend (localhost:3000) đã tự convert ảnh sang WebP bằng Sharp.
+    // Tắt Next.js image optimization để tránh lỗi SSRF "resolved to private ip"
+    // khi đang phát triển với backend chạy trên localhost.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'http',

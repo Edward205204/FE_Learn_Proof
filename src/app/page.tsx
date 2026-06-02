@@ -23,6 +23,8 @@ import { PATH } from '@/constants/path'
 import homeApi from './(public)/_api/home.api'
 import { HomeSectionsResponse } from '@/schemas/course.schema'
 import { getCourseThumbnailUrl } from '@/utils/course'
+import { cookies } from 'next/headers'
+import HeroPreview from '@/app/_components/hero-preview'
 
 const MOCK_COURSES = [
   {
@@ -127,11 +129,19 @@ const testimonials = [
 
 export default async function Home() {
   let displayCourses = MOCK_COURSES
+  let heroImage: string | null = null
+
+  const cookieStore = await cookies()
+  const role = cookieStore.get('role')?.value
+  const isAdmin = role === 'ADMIN'
 
   try {
     const res = await homeApi.getHomeSections()
     if (res.ok) {
       const data: HomeSectionsResponse = await res.json()
+      if (data.heroImage) {
+        heroImage = data.heroImage
+      }
       const realCourses = data.trending?.length > 0 ? data.trending : data.newest
       if (realCourses && realCourses.length > 0) {
         displayCourses = realCourses.slice(0, 4).map((c) => ({
@@ -228,53 +238,7 @@ export default async function Home() {
                 </div>
               </div>
 
-              {/* Terminal Preview */}
-              <div className='relative lg:block hidden group'>
-                <div className='absolute -inset-1 bg-gradient-to-r from-primary to-orange-500 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000'></div>
-                <div className='relative h-[550px] w-full bg-card rounded-[2.5rem] border border-border shadow-2xl overflow-hidden font-mono text-sm'>
-                  <div className='bg-muted/50 px-6 py-4 border-b border-border flex items-center justify-between'>
-                    <div className='flex gap-2'>
-                      <div className='w-3 h-3 rounded-full bg-[#FF5F56]'></div>
-                      <div className='w-3 h-3 rounded-full bg-[#FFBD2E]'></div>
-                      <div className='w-3 h-3 rounded-full bg-[#27C93F]'></div>
-                    </div>
-                    <span className='text-[10px] text-muted-foreground font-bold uppercase tracking-widest'>
-                      learnproof-main.tsx
-                    </span>
-                  </div>
-                  <div className='p-8 space-y-2'>
-                    <p className='text-blue-400'>
-                      import <span className='text-foreground'>LearnProof</span> from{' '}
-                      <span className='text-emerald-400'>&apos;@/career-path&apos;</span>;
-                    </p>
-                    <p className='text-muted-foreground italic mt-4'>{'// Setup your dream career'}</p>
-                    <p className='text-primary'>
-                      const <span className='text-foreground'>myFuture</span> = () ={'>'} &#123;
-                    </p>
-                    <p className='pl-6 text-foreground'>
-                      <span className='text-blue-400'>return</span> LearnProof.start(&#123;
-                    </p>
-                    <p className='pl-12 text-foreground'>
-                      skills: [<span className='text-emerald-400'>&apos;Fullstack&apos;</span>,{' '}
-                      <span className='text-emerald-400'>&apos;DevOps&apos;</span>],
-                    </p>
-                    <p className='pl-12 text-foreground'>
-                      mentorship: <span className='text-amber-400'>true</span>,
-                    </p>
-                    <p className='pl-12 text-foreground'>
-                      jobReady: <span className='text-amber-400'>true</span>
-                    </p>
-                    <p className='pl-6 text-foreground'>&#125;);</p>
-                    <p className='text-primary'>&#125;;</p>
-                    <div className='mt-8 pt-8 border-t border-border flex items-center gap-4 animate-pulse'>
-                      <div className='w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_#10b981]'></div>
-                      <span className='text-emerald-500 text-xs font-bold'>
-                        Compiling Success: Future.exe is ready!
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <HeroPreview isAdmin={isAdmin} initialHeroImage={heroImage} />
             </div>
           </div>
         </section>
