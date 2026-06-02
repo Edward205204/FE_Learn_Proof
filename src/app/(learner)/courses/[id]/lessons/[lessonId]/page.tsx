@@ -9,6 +9,7 @@ import { ReadingContent } from '../../../../_components/reading-content'
 import { QuizContainer } from '../../../../_components/quiz-container'
 import { LessonDiscussion } from '../../../../_components/lesson-discussion'
 import { NextLessonButton } from '../../../../_components/next-lesson-button'
+import { LessonQuizReview } from '../../../../_components/lesson-quiz-review'
 import { useGetCourseProgressQuery } from '../../../../_hooks/use-course'
 import learnerLessonApi from '../../../../_api/lesson.api'
 import learnerQuizApi from '../../../../_api/quiz.api'
@@ -119,7 +120,14 @@ export default function LessonPage() {
         videoUrl: lessonData.videoUrl,
         lastPosition: 0,
         description: lessonData.shortDesc || 'Không có mô tả cho bài học này.',
-        materials: []
+        materials: [],
+        reviewQuiz: lessonData.reviewQuiz
+          ? lessonData.reviewQuiz.questions.map((q) => ({
+              id: q.id,
+              text: q.content,
+              options: q.answers.map((a) => ({ id: a.id, text: a.content }))
+            }))
+          : null
       }
     }
     if (lessonData.type === 'TEXT') {
@@ -130,7 +138,14 @@ export default function LessonPage() {
         title: lessonData.title,
         content: lessonData.textContent,
         estimatedMinutes: Math.max(1, Math.ceil(wordCount / 220)),
-        materials: []
+        materials: [],
+        reviewQuiz: lessonData.reviewQuiz
+          ? lessonData.reviewQuiz.questions.map((q) => ({
+              id: q.id,
+              text: q.content,
+              options: q.answers.map((a) => ({ id: a.id, text: a.content }))
+            }))
+          : null
       }
     }
     return {
@@ -218,6 +233,17 @@ export default function LessonPage() {
               materials={activeLesson.materials}
               authToken={accessToken}
             />
+            {/* Quiz tổng kết gen bởi AI — hiện sau khi countdown xong */}
+            {activeLesson.reviewQuiz && activeLesson.reviewQuiz.length > 0 && (
+              <LessonQuizReview
+                questions={activeLesson.reviewQuiz.map((q) => ({
+                  id: q.id,
+                  content: q.text,
+                  answers: q.options.map((o) => ({ id: o.id, content: o.text }))
+                }))}
+                lessonTitle={activeLesson.title}
+              />
+            )}
             <NextLessonButton
               key={activeLesson.id}
               courseId={courseId}
@@ -237,6 +263,17 @@ export default function LessonPage() {
               lesson={activeLesson}
               onComplete={() => markCompleteMutation.mutate(activeLesson.id)}
             />
+            {/* Quiz tổng kết gen bởi AI — hiện sau khi đọc xong bài */}
+            {activeLesson.reviewQuiz && activeLesson.reviewQuiz.length > 0 && (
+              <LessonQuizReview
+                questions={activeLesson.reviewQuiz.map((q) => ({
+                  id: q.id,
+                  content: q.text,
+                  answers: q.options.map((o) => ({ id: o.id, content: o.text }))
+                }))}
+                lessonTitle={activeLesson.title}
+              />
+            )}
             <LessonDiscussion courseId={courseId} lessonId={activeLesson.id} />
             <NextLessonButton
               key={activeLesson.id}

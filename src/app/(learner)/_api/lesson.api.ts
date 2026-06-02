@@ -20,6 +20,8 @@ export type LearnerLessonDetail =
       chapterId: string
       duration: number | null
       videoUrl: string
+      /** Quiz tổng kết do AI gen — hiện sau khi xem xong video */
+      reviewQuiz: LearnerQuiz
     }
   | {
       id: string
@@ -29,6 +31,8 @@ export type LearnerLessonDetail =
       order: number
       chapterId: string
       textContent: string
+      /** Quiz tổng kết do AI gen — hiện sau khi đọc xong bài */
+      reviewQuiz: LearnerQuiz
     }
   | {
       id: string

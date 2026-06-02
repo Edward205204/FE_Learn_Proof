@@ -23,6 +23,8 @@ export interface VideoLesson {
   lastPosition: number
   description: string
   materials: Material[]
+  /** Câu hỏi tổng kết do AI gen — hiện sau khi xem xong video */
+  reviewQuiz: QuizQuestion[] | null
 }
 
 export interface ReadingLesson {
@@ -32,6 +34,8 @@ export interface ReadingLesson {
   content: string
   estimatedMinutes: number
   materials?: Material[]
+  /** Câu hỏi tổng kết do AI gen — hiện sau khi đọc xong bài */
+  reviewQuiz: QuizQuestion[] | null
 }
 
 export interface QuizLesson {
