@@ -163,7 +163,11 @@ export default function LessonPage() {
       quizId: activeLesson.quizId,
       submission
     })
-    await markCompleteMutation.mutateAsync(activeLesson.id)
+    try {
+      await markCompleteMutation.mutateAsync(activeLesson.id)
+    } catch (e) {
+      console.log('Chưa đủ điểm để hoàn thành bài học:', e)
+    }
     return {
       correctCount: result.correctCount,
       totalQuestions: result.totalQuestions,
